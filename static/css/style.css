@@ -1,0 +1,55 @@
+:root{
+
+    --primary:#0D6EFD;
+    --secondary:#6C63FF;
+    --success:#20C997;
+    --danger:#DC3545;
+    --warning:#FFC107;
+    --dark:#1F2937;
+    --light:#F8F9FA;
+    --white:#FFFFFF;
+
+}
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+
+}
+
+body{
+
+    background:#F5F7FB;
+
+}
+
+a{
+
+    text-decoration:none;
+
+}
+
+.card{
+
+    border:none;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+}
+
+.btn-primary{
+
+    border-radius:10px;
+    padding:10px 20px;
+
+}
+
+.section-title{
+
+    font-weight:700;
+    color:#222;
+
+}
