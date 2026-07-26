@@ -6,27 +6,27 @@ Dashboard
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="d-flex">
 
-    <h1 class="text-success">
+    {% include "dashboard/sidebar.html" %}
 
-        Welcome to FitFusion AI Dashboard 🎉
+    <div class="flex-grow-1">
 
-    </h1>
+        {% include "dashboard/navbar.html" %}
 
-    <hr>
+        <div class="container-fluid mt-4">
 
-    <h4>
+            <h2>
+                Dashboard
+            </h2>
 
-        Hello {{ request.session.user_name }}
+            <p>
+                Welcome to FitFusion AI 🚀
+            </p>
 
-    </h4>
+        </div>
 
-    <p>
-
-        Authentication is working successfully.
-
-    </p>
+    </div>
 
 </div>
 
