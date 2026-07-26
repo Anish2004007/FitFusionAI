@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block title %}
+
+Register
+
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+
+<div class="auth-card">
+
+<h2 class="text-center mb-4">
+
+Create Account
+
+</h2>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<div class="mb-3">
+
+<label>Full Name</label>
+
+<input
+type="text"
+name="full_name"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Email</label>
+
+<input
+type="email"
+name="email"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Password</label>
+
+<input
+type="password"
+name="password"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Phone</label>
+
+<input
+type="text"
+name="phone"
+class="form-control">
+
+</div>
+
+<button class="btn btn-primary w-100">
+
+Register
+
+</button>
+
+<div class="text-center mt-3">
+
+Already have an account?
+
+<a href="{% url 'login' %}">
+
+Login
+
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

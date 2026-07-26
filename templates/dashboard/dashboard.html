@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h1 class="text-success">
+
+        Welcome to FitFusion AI Dashboard 🎉
+
+    </h1>
+
+    <hr>
+
+    <h4>
+
+        Hello {{ request.session.user_name }}
+
+    </h4>
+
+    <p>
+
+        Authentication is working successfully.
+
+    </p>
+
+</div>
+
+{% endblock %}

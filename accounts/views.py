@@ -2,6 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from .models import User
+from django.http import HttpResponse
+from .forms import RegisterForm
+from .services.otp_service import OTPService
+from .services.email_service import EmailService
+
+
 
 
 def home(request):
@@ -17,7 +23,6 @@ def register(request):
         password = request.POST.get("password")
         phone = request.POST.get("phone")
 
-        # Check existing email
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email already registered.")
             return redirect("register")
@@ -36,7 +41,6 @@ def register(request):
         return redirect("login")
 
     return render(request, "accounts/register.html")
-
 
 def login_view(request):
 
@@ -62,7 +66,6 @@ def login_view(request):
             messages.error(request, "Email not found.")
 
     return render(request, "accounts/login.html")
-
 
 def logout_view(request):
 

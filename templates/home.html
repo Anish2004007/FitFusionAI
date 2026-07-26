@@ -1,30 +1,62 @@
 {% extends 'base.html' %}
 
-{% block title %}
-FitFusion AI
-{% endblock %}
+{% block title %}FitFusion AI{% endblock %}
 
 {% block content %}
 
-<div class="container text-center mt-5">
+<div class="container">
 
-    <h1 class="display-3 fw-bold">
+    <div class="row align-items-center" style="min-height:90vh;">
 
-        FitFusion AI
+        <div class="col-lg-6">
 
-    </h1>
+            <h1 class="display-3 fw-bold">
 
-    <p class="lead">
+                FitFusion AI
 
-        Smart Fitness & Nutrition Platform Powered by AI
+            </h1>
 
-    </p>
+            <h3 class="text-primary">
 
-    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                Smart Fitness & Nutrition Platform
 
-        Get Started
+            </h3>
 
-    </a>
+            <p class="lead mt-4">
+
+                Your AI-powered fitness companion that creates personalized
+                workout plans, diet recommendations, and tracks your fitness
+                journey.
+
+            </p>
+
+            <div class="mt-4">
+
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-3">
+
+                    Get Started
+
+                </a>
+
+                <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+
+                    Login
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-6 text-center">
+
+            <img src="https://cdn-icons-png.flaticon.com/512/4727/4727424.png"
+                 class="img-fluid"
+                 style="max-width:450px;">
+
+        </div>
+
+    </div>
 
 </div>
 
