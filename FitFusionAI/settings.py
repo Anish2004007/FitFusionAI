@@ -40,12 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'dashboard',
-    'workout',
     'diet',
     'tracker',
     'goals',
     'chatbot',
     'reports',
+    'workout',
 ]
 
 MIDDLEWARE = [

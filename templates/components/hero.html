@@ -1,0 +1,77 @@
+{% load static %}
+
+<section class="hero-section">
+
+    <div class="container">
+
+    <div class="row align-items-center g-0">
+
+    <!-- Left -->
+
+    <div class="col-lg-6 hero-left">
+
+        <span class="hero-tag">
+            🚀 AI Powered Fitness Platform
+        </span>
+
+        <h1 class="hero-title">
+
+        Train <span>Smarter.</span>
+
+        <br>
+
+        Eat <span>Better.</span>
+
+        <br>
+
+        Live <span>Healthier.</span>
+
+        </h1>
+        
+        <p class="hero-text">
+
+            Meet your intelligent fitness companion.
+
+            Get personalized workout plans,
+            smart diet recommendations,
+            AI coaching,
+            progress tracking
+            and health analytics—
+            all in one platform.
+
+        </p>
+
+        <div class="mt-5">
+
+            <a href="#features"
+               class="btn btn-success btn-lg me-3">
+
+                Get Started
+
+            </a>
+
+            <a href="{% url 'login' %}"
+               class="btn btn-outline-light btn-lg">
+
+                Login
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- Right -->
+
+    <div class="col-lg-6 hero-right">
+
+        <img src="{% static 'images/hero.png' %}"
+             class="hero-image img-fluid">
+
+    </div>
+
+</div>
+
+    </div>
+
+</section>
