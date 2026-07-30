@@ -4,6 +4,8 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+
 {% endblock %}
 
 {% block title %}
@@ -14,9 +16,9 @@ Register
 
 {% block content %}
 
-<div class="auth-container">
+<section class="auth-page">
 
-<div class="auth-card">
+    <div class="auth-card">
 
 <h2 class="text-center mb-4">
 
@@ -108,6 +110,6 @@ Login
 
 </div>
 
-</div>
+</section>
 
 {% endblock %}

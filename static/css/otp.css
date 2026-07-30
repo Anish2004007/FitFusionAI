@@ -1,0 +1,81 @@
+.otp-container{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:12px;
+
+    margin:25px 0;
+
+}
+
+.otp-box{
+
+    width:58px;
+
+    height:60px;
+
+    border-radius:14px;
+
+    background:#111827;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:white;
+
+    font-size:26px;
+
+    font-weight:700;
+
+    text-align:center;
+
+    transition:.3s;
+
+}
+
+.otp-box:focus{
+
+    outline:none;
+
+    border-color:#22C55E;
+
+    box-shadow:0 0 15px rgba(34,197,94,.25);
+
+}
+
+.otp-footer{
+
+    margin-top:25px;
+
+    text-align:center;
+
+}
+
+#timerText{
+
+    color:#94A3B8;
+
+    margin-bottom:10px;
+
+}
+
+#countdown{
+
+    color:#22C55E;
+
+    font-weight:700;
+
+}
+
+#resendLink{
+
+    display:none;
+
+    color:#22C55E;
+
+    font-weight:600;
+
+    text-decoration:none;
+
+}

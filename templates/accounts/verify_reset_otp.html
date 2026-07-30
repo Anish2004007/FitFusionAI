@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Verify OTP{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        <h2 class="text-center mb-4">
+            Verify OTP
+        </h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="mb-3">
+
+                <label>Enter OTP</label>
+
+                <input
+                    type="text"
+                    name="otp"
+                    class="form-control"
+                    maxlength="6"
+                    required>
+
+            </div>
+
+            <button class="btn btn-success w-100">
+
+                Verify OTP
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

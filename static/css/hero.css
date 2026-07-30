@@ -1,15 +1,14 @@
 .hero-section{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
 
-    min-height:85vh;
+    padding-top: 70px;
+    padding-bottom: 50px;
 
-    display:flex;
+    background: #000;
 
-    align-items:center;
-
-     padding:60px 0 40px;
-
-      background:#000000;
-
+    margin-bottom: 0;
 }
 
 .hero-tag{

@@ -1,88 +1,118 @@
 {% extends 'base.html' %}
-
 {% load static %}
+
+{% block title %}Login{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
-{% endblock %}
-
-{% block title %}
-Login
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<div class="auth-container">
+<section class="auth-page">
 
-<div class="auth-card">
+    <div class="auth-card">
 
-<h2 class="text-center mb-4">
+        <div class="text-center">
 
-Welcome Back
+            <h2 class="brand">
+                FitFusion <span>AI</span>
+            </h2>
 
-</h2>
+            <h1 class="auth-title">
+                Welcome Back
+            </h1>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"></button>
+            <p class="auth-subtitle">
+                Your AI Fitness Coach is ready.<br>
+                Sign in to continue your journey.
+            </p>
+
         </div>
-    {% endfor %}
-{% endif %}
 
-<form method="POST">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-{% csrf_token %}
+        <form method="POST">
 
-<div class="mb-3">
+            {% csrf_token %}
 
-<label>Email</label>
+            <div class="mb-3">
 
-<input
-type="email"
-name="email"
-class="form-control"
-required>
+                <label>Email Address</label>
 
-</div>
+                <input
+                    type="email"
+                    name="email"
+                    class="form-control"
+                    placeholder="Enter your email"
+                    required>
 
-<div class="mb-3">
+            </div>
 
-<label>Password</label>
+            <div class="mb-3">
 
-<input
-type="password"
-name="password"
-class="form-control"
-required>
+                <label>Password</label>
 
-</div>
+                <input
+                    type="password"
+                    name="password"
+                    class="form-control"
+                    placeholder="Enter your password"
+                    required>
 
-<button class="btn btn-primary w-100">
+            </div>
 
-Login
+            <div class="options">
 
-</button>
+                <div>
 
-<div class="text-center mt-3">
+                    <input type="checkbox">
 
-Don't have an account?
+                    <span>Remember me</span>
 
-<a href="{% url 'register' %}">
+                </div>
 
-Register
+                <a href="{% url 'forgot_password' %}">
+                    Forgot Password?
+                </a>
 
-</a>
+            </div>
 
-</div>
+            <button type="submit" class="login-btn">
 
-</form>
+                Login
 
-</div>
+            </button>
 
-</div>
+        </form>
+
+        <div class="divider">
+
+            <span>OR</span>
+
+        </div>
+
+        <div class="bottom-text">
+
+            Don't have an account?
+
+            <a href="{% url 'register' %}">
+
+                Create Account
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
 
 {% endblock %}

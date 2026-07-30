@@ -6,6 +6,7 @@
 
 html{
     scroll-behavior:smooth;
+    scroll-padding-top: 100px;
 }
 
 body{
@@ -38,6 +39,22 @@ section{
 
     padding:90px 0;
 
+}
+
+.features-section{
+    padding:140px 0 100px;
+}
+
+.about-section{
+    padding:140px 0 100px;
+}   
+
+.stats-section{
+    padding:140px 0 100px;
+}
+
+.footer-section{
+    padding:140px 0 100px;
 }
 
 a{

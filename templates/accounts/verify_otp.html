@@ -1,49 +1,96 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}
-Verify OTP
+{% block title %}Verify Email{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+<link rel="stylesheet" href="{% static 'css/otp.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<div class="container mt-5">
+<section class="auth-page">
 
-    <div class="row justify-content-center">
+    <div class="auth-card">
 
-        <div class="col-md-5">
+        <div class="text-center">
 
-            <div class="card p-4">
+            <h2 class="brand">
+                FitFusion <span>AI</span>
+            </h2>
 
-                <h3 class="text-center mb-4">
+            <h1 class="auth-title">
+                Verify Email
+            </h1>
 
-                    Email Verification
+            <p class="auth-subtitle">
+                We have sent a verification code to
+                <br>
+                <strong>{{ request.session.email }}</strong>
+            </p>
 
-                </h3>
+        </div>
 
-                <form method="POST">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-                    {% csrf_token %}
+        <form method="POST" id="otpForm">
 
-                    <input
-                        type="text"
-                        name="otp"
-                        class="form-control mb-3"
-                        placeholder="Enter OTP">
+            {% csrf_token %}
 
-                    <button class="btn btn-primary w-100">
+            <div class="otp-container">
 
-                        Verify OTP
-
-                    </button>
-
-                </form>
+                <input type="text" maxlength="1" class="otp-box">
+                <input type="text" maxlength="1" class="otp-box">
+                <input type="text" maxlength="1" class="otp-box">
+                <input type="text" maxlength="1" class="otp-box">
+                <input type="text" maxlength="1" class="otp-box">
+                <input type="text" maxlength="1" class="otp-box">
 
             </div>
+
+            <input
+                type="hidden"
+                name="otp"
+                id="otpValue">
+
+            <button
+                type="submit"
+                class="login-btn mt-4">
+
+                Verify Account
+
+            </button>
+
+        </form>
+
+        <div class="otp-footer">
+
+            <p id="timerText">
+
+                Resend OTP in
+                <span id="countdown">60</span>s
+
+            </p>
+
+           <a href="javascript:void(0)"
+                 id="resendLink">
+                Resend OTP
+
+            </a>
 
         </div>
 
     </div>
 
-</div>
+</section>
+
+<script src="{% static 'js/otp.js' %}"></script>
 
 {% endblock %}
