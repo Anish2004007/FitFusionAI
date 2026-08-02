@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Complete Profile
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="profile-page">
+
+    <div class="profile-card">
+
+        <h1 class="profile-title">
+            Complete Your Profile
+        </h1>
+
+        <p class="profile-subtitle">
+           Your profile helps FitFusion AI generate
+            personalized workouts, diet plans,
+            and accurate health insights.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <!-- PERSONAL INFO -->
+
+            <div class="profile-section">
+
+               
+
+                <div class="row">
+                <div class="profile-section">
+
+    <h3>
+        <i class="bi bi-person-circle"></i>
+        Personal Information
+    </h3>
+
+    <div class="row">
+
+        <div class="col-md-6 mb-3">
+
+            <label>Full Name</label>
+
+            <input
+                type="text"
+                class="form-control"
+                value="{{ user.full_name }}"
+                readonly>
+
+        </div>
+
+        <div class="col-md-6 mb-3">
+
+            <label>Email</label>
+
+            <input
+                type="email"
+                class="form-control"
+                value="{{ user.email }}"
+                readonly>
+
+        </div>
+
+        <div class="col-md-6 mb-3">
+
+            <label>Phone</label>
+
+            <input
+                type="text"
+                class="form-control"
+                value="{{ user.phone }}"
+                readonly>
+
+        </div>
+
+        <div class="col-md-6 mb-3">
+
+            <label>Date of Birth</label>
+
+            {{ form.date_of_birth }}
+
+        </div>
+
+        <div class="col-md-6 mb-3">
+
+            <label>Gender</label>
+
+            {{ form.gender }}
+
+        </div>
+
+    </div>
+
+</div>
+                    
+
+                    
+
+                    
+
+                    
+
+                </div>
+
+            </div>
+
+            <!-- BODY -->
+
+            <div class="profile-section">
+
+                <h3>
+
+                    <i class="bi bi-rulers"></i>
+
+                    Body Measurements
+
+                </h3>
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+
+                        <label>Height (cm)</label>
+
+                        {{ form.height }}
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label>Weight (kg)</label>
+
+                        {{ form.weight }}
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label>Target Weight</label>
+
+                        {{ form.target_weight }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FITNESS -->
+
+            <div class="profile-section">
+
+                <h3>
+
+                    <i class="bi bi-bullseye"></i>
+
+                    Fitness
+
+                </h3>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Fitness Goal</label>
+
+                        {{ form.fitness_goal }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Activity Level</label>
+
+                        {{ form.activity_level }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- DIET -->
+
+            <div class="profile-section">
+
+                <h3>
+
+                    <i class="bi bi-egg-fried"></i>
+
+                    Nutrition
+
+                </h3>
+
+                {{ form.diet_preference }}
+
+            </div>
+
+            <!-- HEALTH -->
+
+            <div class="profile-section">
+
+                <h3>
+
+                    <i class="bi bi-heart-pulse"></i>
+
+                    Health
+
+                </h3>
+
+                <div class="mb-3">
+
+                    <label>Medical Conditions</label>
+
+                    {{ form.medical_conditions }}
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label>Allergies</label>
+
+                    {{ form.allergies }}
+
+                </div>
+
+            </div>
+
+            <!-- PHOTO -->
+
+            <div class="profile-section">
+
+                <h3>
+
+                    <i class="bi bi-camera"></i>
+
+                    Profile Picture
+
+                </h3>
+
+                {{ form.profile_picture }}
+
+            </div>
+
+            <button type="submit" class="profile-btn">
+
+                Save & Continue
+
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

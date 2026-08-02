@@ -30,9 +30,6 @@ Create Account
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
             {{ message }}
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"></button>
         </div>
     {% endfor %}
 {% endif %}
@@ -88,21 +85,21 @@ class="form-control">
 
 </div>
 
-<button class="btn btn-primary w-100">
-
-Register
-
+<button type="submit" class="auth-btn">
+    Register
 </button>
 
-<div class="text-center mt-3">
+<p class="text-center mt-3 text-light">
 
-Already have an account?
+    Already have an account?
 
-<a href="{% url 'login' %}">
+    <a href="{% url 'login' %}" class="auth-link">
 
-Login
+        Login
 
-</a>
+    </a>
+
+</p>
 
 </div>
 

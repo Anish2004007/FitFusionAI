@@ -112,7 +112,7 @@ def login_view(request):
 
     if request.method == "POST":
 
-        email = request.POST.get("email")
+        email = request.POST.get("email", "").strip().lower()
         password = request.POST.get("password")
 
         try:
@@ -120,10 +120,17 @@ def login_view(request):
 
             if check_password(password, user.password):
 
+                # Save user session
                 request.session["user_id"] = user.user_id
                 request.session["user_name"] = user.full_name
 
-                return redirect("dashboard")
+                from profile_app.models import UserProfile
+
+                # Check if profile already exists
+                if UserProfile.objects.filter(user=user).exists():
+                    return redirect("dashboard")
+                else:
+                    return redirect("profile_setup")
 
             else:
                 messages.error(request, "Invalid password.")

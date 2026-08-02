@@ -45,7 +45,7 @@ body{
 
     max-width:520px;
 
-    background:rgba(18,24,38,.88);
+       background:#141C2B;
 
     border:1px solid rgba(255,255,255,.08);
 
@@ -55,10 +55,36 @@ body{
 
     padding:35px;
 
-    box-shadow:0 20px 60px rgba(0,0,0,.45);
+     box-shadow:0 20px 60px rgba(0,0,0,.35);
 
 }
 
+.auth-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:600px;
+
+    height:600px;
+
+    background:radial-gradient(circle,
+        rgba(34,197,94,.35) 0%,
+        rgba(34,197,94,.12) 45%,
+        transparent 80%);
+
+    filter:blur(120px);
+
+    top:50%;
+
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    z-index:-1;
+
+}
 .brand{
 
     color:#fff;
@@ -110,7 +136,7 @@ body{
     justify-content:center;
     align-items:center;
     padding:30px;
-}
+}       
 .form-label{
 
     color:#fff;
@@ -151,32 +177,157 @@ body{
 
 }
 
-.login-btn{
+.btn-login{
 
     width:100%;
 
-    height:52px;
+    padding:16px;
 
-    border:none;
+    border:1.5px solid rgba(255,255,255,.12);
 
-    border-radius:14px;
+    border-radius:23px;
 
-    background:#22C55E;
+    background:rgba(255,255,255,.04);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
 
     color:#fff;
 
-    font-size:18px;
+    font-size:20px;
 
-    font-weight:600;
+    font-weight:700;
 
-    transition:.3s;
+    transition:all .35s ease;
+
+    cursor:pointer;
 
 }
 
-.login-btn:hover{
+.btn-login:hover{
 
-    background:#16A34A;
+    background:rgba(34,197,94,.10);
+
+    border-color:#22C55E;
+
+    transform:translateY(-3px);
+
+    box-shadow:0 12px 30px rgba(34,197,94,.25);
+
+}
+
+.btn-register{
+
+    width:100%;
+
+    padding:16px;
+
+    border:1.5px solid rgba(255,255,255,.15);
+
+    border-radius:23px;
+
+    background:rgba(255,255,255,.04);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    color:#ffffff;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:all .35s ease;
+
+    appearance:none;
+    -webkit-appearance:none;
+
+    outline:none;
+
+}
+
+.btn-register:hover{
+
+    background:rgba(34,197,94,.15);
+
+    border-color:#22C55E;
 
     color:#fff;
+
+    transform:translateY(-3px);
+
+    box-shadow:0 12px 30px rgba(34,197,94,.35);
+
+}
+
+.auth-btn{
+
+    width:100%;
+
+    padding:16px;
+
+    border:1.5px solid rgba(255,255,255,.15);
+
+    border-radius:23px;
+
+    background:rgba(255,255,255,.04);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    color:#fff;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:all .35s ease;
+
+    appearance:none;
+    -webkit-appearance:none;
+
+    outline:none;
+
+}
+
+.auth-btn:hover{
+
+    background:rgba(34,197,94,.15);
+
+    border-color:#22C55E;
+
+    color:#fff;
+
+    transform:translateY(-3px);
+
+    box-shadow:0 12px 30px rgba(34,197,94,.35);
+
+}
+
+/* ==========================
+   AUTH LINKS
+========================== */
+
+.auth-link{
+
+    color:#22C55E;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    transition:all .3s ease;
+
+}
+
+.auth-link:hover{
+
+    color:#4ADE80;
+
+    text-decoration:none;
 
 }

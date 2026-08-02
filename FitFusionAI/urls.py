@@ -23,4 +23,6 @@ urlpatterns = [
     path("", include("accounts.urls")),
 
     path("dashboard/", include("dashboard.urls")),
+
+    path("profile/", include("profile_app.urls")),
 ]
