@@ -124,6 +124,8 @@ def login_view(request):
                 request.session["user_id"] = user.user_id
                 request.session["user_name"] = user.full_name
 
+                print("LOGIN:", user.user_id, user.full_name, user.email)
+            
                 from profile_app.models import UserProfile
 
                 # Check if profile already exists

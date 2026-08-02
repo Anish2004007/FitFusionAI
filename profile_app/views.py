@@ -14,7 +14,7 @@ def profile_setup(request):
 
     # Get logged-in user
     user = User.objects.get(user_id=user_id)
-
+    print("PROFILE:", user.user_id, user.full_name, user.email)
     # Check if profile already exists
     try:
         profile = UserProfile.objects.get(user=user)
