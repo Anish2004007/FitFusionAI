@@ -1,0 +1,26 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="welcome-card">
+
+    <h1>
+
+        Welcome Back,
+        {{ user.full_name }}
+
+    </h1>
+
+    <p>
+
+        Your personalized fitness dashboard will appear here.
+
+    </p>
+
+</div>
+
+{% endblock %}
