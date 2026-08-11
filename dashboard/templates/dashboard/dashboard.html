@@ -6,21 +6,283 @@ Dashboard
 
 {% block content %}
 
+<!-- HERO -->
+
 <div class="welcome-card">
 
-    <h1>
+    <div class="welcome-content">
 
-        Welcome Back,
-        {{ user.full_name }}
+        <span class="welcome-label">
+            <i class="bi bi-stars"></i>
+            Your Fitness Overview
+        </span>
+        <p>
+            Here's a quick look at your current fitness journey.
+        </p>
 
-    </h1>
+    </div>
 
-    <p>
+</div>
 
-        Your personalized fitness dashboard will appear here.
 
-    </p>
+<!-- HEALTH SUMMARY -->
 
+<div class="dashboard-section">
+
+    <div class="section-heading">
+
+        <div>
+
+            <span class="section-label">
+                HEALTH SUMMARY
+            </span>
+
+            <h2>
+                Your Fitness Metrics
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+
+        <!-- BMI -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon bmi-icon">
+
+                <i class="bi bi-heart-pulse-fill"></i>
+
+            </div>
+
+            <div class="stat-info">
+
+                <span class="stat-label">
+                    BMI
+                </span>
+
+                <h3>
+                    {{ bmi }}
+                </h3>
+
+                <span class="stat-status">
+                    {{ bmi_category }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- WATER -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon water-icon">
+
+                <i class="bi bi-droplet-fill"></i>
+
+            </div>
+
+            <div class="stat-info">
+
+                <span class="stat-label">
+                    Daily Water Goal
+                </span>
+
+                <h3>
+                    {{ water_goal }}
+                    <small>L</small>
+                </h3>
+
+                <span class="stat-status">
+                    Recommended daily intake
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- FITNESS GOAL -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon goal-icon">
+
+                <i class="bi bi-bullseye"></i>
+
+            </div>
+
+            <div class="stat-info">
+
+                <span class="stat-label">
+                    Fitness Goal
+                </span>
+
+                <h3 class="goal-value">
+                    {{ fitness_goal }}
+                </h3>
+
+                <span class="stat-status">
+                    Your current objective
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- WEIGHT -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon weight-icon">
+
+                <i class="bi bi-speedometer2"></i>
+
+            </div>
+
+            <div class="stat-info">
+
+                <span class="stat-label">
+                    Current Weight
+                </span>
+
+                <h3>
+                    {{ profile.weight }}
+                    <small>kg</small>
+                </h3>
+
+                <span class="stat-status">
+                    Target: {{ profile.target_weight }} kg
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+<!-- ENERGY SECTION -->
+
+<div class="energy-section">
+
+    <div class="section-heading">
+
+        <div>
+
+            <span class="section-label">
+                DAILY ENERGY
+            </span>
+
+            <h2>
+                Your Calorie Overview
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="energy-grid">
+
+
+        <!-- BMR -->
+
+        <div class="energy-card">
+
+            <div class="energy-icon">
+
+                <i class="bi bi-person-heart"></i>
+
+            </div>
+
+            <div>
+
+                <span>
+                    BMR
+                </span>
+
+                <h3>
+                    {{ bmr }}
+                    <small>kcal</small>
+                </h3>
+
+                <p>
+                    Calories your body needs at rest
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- TDEE -->
+
+        <div class="energy-card">
+
+            <div class="energy-icon">
+
+                <i class="bi bi-activity"></i>
+
+            </div>
+
+            <div>
+
+                <span>
+                    TDEE
+                </span>
+
+                <h3>
+                    {{ tdee }}
+                    <small>kcal</small>
+                </h3>
+
+                <p>
+                    Estimated daily energy expenditure
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- CALORIE TARGET -->
+
+        <div class="energy-card calorie-target-card">
+
+            <div class="energy-icon">
+
+                <i class="bi bi-fire"></i>
+
+            </div>
+
+            <div>
+
+                <span>
+                    Recommended Calories
+                </span>
+
+                <h3>
+                    {{ calorie_target }}
+                    <small>kcal/day</small>
+                </h3>
+
+                <p>
+                    Personalized for {{ fitness_goal|lower }}
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 </div>
 
 {% endblock %}

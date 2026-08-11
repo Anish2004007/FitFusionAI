@@ -390,9 +390,9 @@ body{
 
 .menu li:hover{
 
-    background:#1f2937;
+    background:rgba(255,255,255,.035);
 
-    transform:translateX(5px);
+    transform:translateX(4px);
 
 }
 
@@ -469,29 +469,492 @@ body{
 }
 
 .welcome-card{
+    position:relative;
 
     background:#111827;
 
-    border-radius:20px;
+    border-radius:22px;
 
-    padding:40px;
+    padding: 28px 40px;
 
-    border:1px solid rgba(255,255,255,.08);
+    min-height: 0px;
+
+    border:1px solid rgba(255,255,255,.07);
+
+    overflow:hidden;
 
 }
 
+.welcome-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:220px;
+
+    height:220px;
+
+    right:-80px;
+
+    top:-100px;
+
+    border-radius:50%;
+
+    background:rgba(34,197,94,.08);
+
+    filter:blur(20px);
+
+}
+
+.welcome-content{
+
+    position:relative;
+
+    z-index: 1;
+
+}
+
+.welcome-label{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    color:#22c55e;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    margin-bottom:6px;
+
+}
+
+.welcome-label i{
+
+    font-size:15px;
+
+}
 .welcome-card h1{
+    margin: 0;
 
     font-size:38px;
+
+    line-height: 1.2;
 
     font-weight:700;
 
     margin-bottom:10px;
 
+    color: #ffffff;
+
 }
 
-.welcome-card p{
+.welcome-card p {
 
-    color:#9CA3AF;
+    margin: 4px 0 0;
+
+    color: #9ca3af;
+
+    font-size: 16px;
+
+}
+/* =================================
+   DASHBOARD HEALTH SUMMARY
+================================= */
+
+.dashboard-section{
+
+    margin-top:25px;
+
+}
+
+.section-heading{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-end;
+
+    margin-bottom:20px;
+
+}
+
+.section-label{
+
+    display:block;
+
+    color:#22c55e;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    letter-spacing:1.5px;
+
+    margin-bottom:5px;
+
+}
+
+.section-heading h2{
+
+    margin:0;
+
+    color:#ffffff;
+
+    font-size:24px;
+
+    font-weight:600;
+
+}
+
+
+/* ================================
+   STAT GRID
+================================ */
+
+.stats-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+        repeat(4, 1fr);
+
+    gap:20px;
+
+}
+
+
+/* ================================
+   STAT CARD
+================================ */
+
+.stat-card{
+
+    min-height:165px;
+
+    padding:22px;
+
+    border-radius:20px;
+
+    background:#111827;
+
+    border:1px solid rgba(255,255,255,.07);
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    transition:
+
+        transform .3s ease,
+
+        border-color .3s ease,
+
+        box-shadow .3s ease;
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-5px);
+
+    border-color:rgba(34,197,94,.35);
+
+    box-shadow:
+
+        0 15px 35px rgba(0,0,0,.25),
+
+        0 0 25px rgba(34,197,94,.08);
+
+}
+
+
+/* ================================
+   STAT ICON
+================================ */
+
+.stat-icon{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:14px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:21px;
+
+}
+
+.bmi-icon{
+
+    background:rgba(239,68,68,.12);
+
+    color:#ef4444;
+
+}
+
+.water-icon{
+
+    background:rgba(59,130,246,.12);
+
+    color:#3b82f6;
+
+}
+
+.goal-icon{
+
+    background:rgba(34,197,94,.12);
+
+    color:#22c55e;
+
+}
+
+.weight-icon{
+
+    background:rgba(168,85,247,.12);
+
+    color:#a855f7;
+
+}
+
+
+/* ================================
+   STAT TEXT
+================================ */
+
+.stat-info{
+
+    margin-top:20px;
+
+}
+
+.stat-label{
+
+    display:block;
+
+    color:#9ca3af;
+
+    font-size:13px;
+
+    font-weight:500;
+
+}
+
+.stat-info h3{
+
+    margin:5px 0;
+
+    color:#ffffff;
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+.stat-info h3 small{
+
+    font-size:15px;
+
+    font-weight:500;
+
+    color:#9ca3af;
+
+}
+
+.stat-status{
+
+    color:#9ca3af;
+
+    font-size:12px;
+
+}
+
+.goal-value{
+
+    font-size:22px !important;
+
+    margin-top:10px !important;
+
+    line-height:1.2;
+
+}
+
+/* =================================
+   ENERGY SECTION
+================================= */
+
+.energy-section{
+
+    margin-top:35px;
+
+    padding-bottom:40px;
+
+}
+
+
+.energy-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+        repeat(3, 1fr);
+
+    gap:20px;
+
+}
+
+
+.energy-card{
+
+    min-height:145px;
+
+    padding:22px;
+
+    border-radius:20px;
+
+    background:#111827;
+
+    border:1px solid rgba(255,255,255,.07);
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:18px;
+
+    transition:
+
+        transform .3s ease,
+
+        border-color .3s ease,
+
+        box-shadow .3s ease;
+
+}
+
+
+.energy-card:hover{
+
+    transform:translateY(-4px);
+
+    border-color:
+
+        rgba(34,197,94,.35);
+
+    box-shadow:
+
+        0 15px 30px rgba(0,0,0,.22);
+
+}
+
+
+.energy-icon{
+
+    width:48px;
+
+    height:48px;
+
+    min-width:48px;
+
+    border-radius:14px;
+
+    background:
+
+        rgba(34,197,94,.12);
+
+    color:#22c55e;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:20px;
+
+}
+
+
+.energy-card > div:last-child > span{
+
+    display:block;
+
+    color:#9ca3af;
+
+    font-size:13px;
+
+    font-weight:500;
+
+}
+
+
+.energy-card h3{
+
+    margin:6px 0;
+
+    color:#ffffff;
+
+    font-size:27px;
+
+    font-weight:700;
+
+}
+
+
+.energy-card h3 small{
+
+    color:#9ca3af;
+
+    font-size:13px;
+
+    font-weight:500;
+
+}
+
+
+.energy-card p{
+
+    margin:0;
+
+    color:#9ca3af;
+
+    font-size:12px;
+
+}
+
+
+.calorie-target-card{
+
+    border-color:
+
+        rgba(34,197,94,.18);
+
+    background:
+
+        linear-gradient(
+
+            135deg,
+
+            #111827,
+
+            rgba(34,197,94,.06)
+
+        );
 
 }
