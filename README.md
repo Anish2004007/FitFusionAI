@@ -1,247 +1,196 @@
-# 🏋️ FitFusion AI
+# FitFusion AI 🏋️‍♂️🤖
 
-> **Smart Fitness. Better You.**
+FitFusion AI is an AI-powered fitness and wellness platform designed to provide users with personalized fitness guidance based on their individual health and lifestyle information.
 
-FitFusion AI is an AI-powered fitness web application developed using **Django**. It helps users achieve their fitness goals by providing personalized workout plans, diet recommendations, progress tracking, and AI-powered fitness assistance.
-
----
-
-## 📌 Project Overview
-
-FitFusion AI is designed to simplify fitness management by combining intelligent recommendations with an easy-to-use interface. The application provides secure authentication, personalized user profiles, workout planning, nutrition guidance, and progress monitoring.
+The project combines fitness tracking, nutrition planning, health insights, and AI-powered recommendations into a single platform.
 
 ---
 
-## ✨ Current Features
+## 🚀 Project Status
 
-### 🔐 Authentication Module
-- User Registration
-- Secure Login & Logout
-- Email OTP Verification
-- Beautiful HTML OTP Email
-- Forgot Password
-- Password Reset using OTP
-- Password Hashing
-- Session Management
+**Current Stage:** Module 3 — Dashboard Development
 
-### 🎨 Landing Page
-- Modern Responsive UI
-- Hero Section
-- Features Section
-- Professional Footer
-- Smooth Navigation
-- Mobile Responsive Design
+### Completed
 
-### 📧 Email System
-- Gmail SMTP Integration
-- Professional HTML Email Templates
-- OTP Verification Email
-- Password Reset Email
+- User registration and login
+- Session-based authentication
+- Profile setup
+- Personal information management
+- Body measurements
+- Fitness goals
+- Activity level selection
+- Diet preferences
+- Medical conditions and allergies
+- Profile picture upload and preview
+- Responsive dark-themed UI
+- Dashboard layout
+- Dynamic time-based greeting
+- Health summary cards
+- BMI calculation
+- BMI category calculation
+- Daily water goal calculation
+- Fitness goal display
+- Current and target weight display
+- BMR calculation
+- TDEE calculation
+- Personalized calorie target calculation
+- Dashboard sidebar and navigation
 
----
+### In Progress / Upcoming
 
-## 🚀 Upcoming Features
-
-- 👤 User Profile Setup
-- 🤖 AI Workout Generator
-- 🥗 AI Diet Planner
-- 📊 Progress Tracker
-- 📈 BMI & BMR Calculator
-- 💧 Water Intake Tracker
-- 🎯 Goal Management
-- 💬 AI Fitness Chatbot
-- 📄 Reports & Analytics
-- 📱 Fully Responsive Dashboard
-
----
-
-## 🛠 Tech Stack
-
-### Frontend
-- HTML5
-- CSS3
-- Bootstrap 5
-- JavaScript
-
-### Backend
-- Python
-- Django
-
-### Database
-- MySQL
-
-### Authentication
-- Email OTP Verification
-- Secure Password Hashing
-
-### Email Service
-- Gmail SMTP
-
-### Version Control
-- Git
-- GitHub
+- Dashboard progress visualization
+- Workout module
+- Diet and nutrition module
+- Water tracking module
+- Progress tracking
+- AI Coach
+- AI-powered personalized recommendations
+- Advanced health insights
 
 ---
 
-## 📂 Project Structure
+## 🎯 Main Objectives
+
+FitFusion AI aims to help users:
+
+- Understand their current fitness status
+- Track important health metrics
+- Set personalized fitness goals
+- Monitor body measurements
+- Receive personalized workout recommendations
+- Receive nutrition and calorie guidance
+- Track daily water intake
+- Monitor fitness progress
+- Interact with an AI fitness coach
+
+---
+
+## 🧩 Core Modules
+
+### 1. Authentication
+
+Handles:
+
+- User registration
+- User login
+- Session management
+- Logout
+- Authentication-based dashboard access
+
+---
+
+### 2. Profile Setup
+
+Users can create and maintain their fitness profile.
+
+Collected information includes:
+
+- Full name
+- Email
+- Phone number
+- Date of birth
+- Gender
+- Height
+- Weight
+- Target weight
+- Fitness goal
+- Activity level
+- Diet preference
+- Medical conditions
+- Allergies
+- Profile picture
+
+The profile information forms the foundation for personalized fitness calculations and future AI recommendations.
+
+---
+
+### 3. Dashboard
+
+The dashboard provides a personalized overview of the user's fitness information.
+
+Current dashboard features include:
+
+- Personalized greeting
+- Fitness overview section
+- BMI
+- BMI category
+- Daily water goal
+- Fitness goal
+- Current weight
+- Target weight
+- BMR
+- TDEE
+- Recommended daily calorie target
+
+The dashboard uses data stored in the user's profile rather than hardcoded values.
+
+---
+
+### 4. Workout Module
+
+Planned features:
+
+- Personalized workout plans
+- Exercise recommendations
+- Workout tracking
+- Workout history
+- Goal-based exercise selection
+
+---
+
+### 5. Diet & Nutrition Module
+
+Planned features:
+
+- Personalized calorie targets
+- Meal recommendations
+- Diet preference-based plans
+- Nutrition tracking
+- Daily nutrition insights
+
+---
+
+### 6. Water Tracker
+
+Planned features:
+
+- Daily water goal
+- Water intake tracking
+- Progress visualization
+- Hydration reminders
+
+---
+
+### 7. Progress Tracking
+
+Planned features:
+
+- Weight progress
+- Goal progress
+- Workout history
+- Fitness statistics
+- Progress charts
+
+---
+
+### 8. AI Coach
+
+Planned AI functionality includes:
+
+- Personalized fitness guidance
+- Workout recommendations
+- Nutrition suggestions
+- Fitness-related questions and answers
+- Progress-based recommendations
+- Personalized health insights
+
+---
+
+## 🧮 Current Health Calculations
+
+### BMI
+
+BMI is calculated using:
 
 ```text
-FitFusionAI/
-│
-├── accounts/
-├── chatbot/
-├── dashboard/
-├── diet/
-├── goals/
-├── reports/
-├── tracker/
-├── workout/
-│
-├── static/
-│   ├── css/
-│   ├── images/
-│   ├── js/
-│
-├── templates/
-│   ├── accounts/
-│   ├── components/
-│   ├── emails/
-│
-├── media/
-├── manage.py
-├── requirements.txt
-└── README.md
-```
-
----
-
-## ⚙️ Installation
-
-### 1. Clone Repository
-
-```bash
-git clone https://github.com/Anish2004007/FitFusionAI.git
-```
-
-### 2. Navigate to Project
-
-```bash
-cd FitFusionAI
-```
-
-### 3. Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
-### 4. Activate Virtual Environment
-
-#### Windows
-
-```bash
-venv\Scripts\activate
-```
-
-#### Linux / macOS
-
-```bash
-source venv/bin/activate
-```
-
-### 5. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 6. Configure Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-app-password
-EMAIL_USE_TLS=True
-```
-
-### 7. Configure Database
-
-Update your MySQL credentials in `settings.py`.
-
-### 8. Run Migrations
-
-```bash
-python manage.py migrate
-```
-
-### 9. Start Server
-
-```bash
-python manage.py runserver
-```
-
-Open:
-
-```
-http://127.0.0.1:8000
-```
-
----
-
-## 📸 Screenshots
-
-> Screenshots of the application will be added as development progresses.
-
----
-
-## 📅 Development Status
-
-| Module | Status |
-|---------|--------|
-| Landing Page | ✅ Completed |
-| Authentication | ✅ Completed |
-| OTP Verification | ✅ Completed |
-| Forgot Password | ✅ Completed |
-| Dashboard | 🚧 In Progress |
-| User Profile | 🚧 Upcoming |
-| AI Workout Planner | 🚧 Upcoming |
-| Diet Planner | 🚧 Upcoming |
-| Chatbot | 🚧 Upcoming |
-
----
-
-## 🔒 Security Features
-
-- Password Hashing
-- OTP Expiration
-- Session Authentication
-- Secure Email Verification
-- CSRF Protection
-- Django Security Middleware
-
----
-
-## 🎯 Project Objective
-
-The objective of **FitFusion AI** is to provide users with a smart fitness platform that combines AI technology with personalized health recommendations to improve overall fitness and lifestyle.
-
----
-
-## 👨‍💻 Developer
-
-**Anish Gholap**
-
-MCA Student
-
----
-
-## 📜 License
-
-This project is developed for educational purposes as part of an MCA Mini Project.
-
----
-
-# ⭐ If you like this project, don't forget to star the repository!
+BMI = Weight (kg) / Height² (m)
