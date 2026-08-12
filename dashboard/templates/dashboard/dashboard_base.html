@@ -53,73 +53,65 @@
 
     <ul class="menu">
 
-        <li class="active">
-
+    <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <a href="{% url 'dashboard' %}">
             <i class="bi bi-grid-fill"></i>
-
             Dashboard
+        </a>
+    </li>
 
-        </li>
-
-        <li>
-
+    <li>
+        <a href="#">
             <i class="bi bi-person-circle"></i>
-
             Profile
+        </a>
+    </li>
 
-        </li>
-
-        <li>
-
+    <li class="{% if request.resolver_match.url_name == 'workout' %}active{% endif %}">
+        <a href="{% url 'workout' %}">
             <i class="bi bi-heart-pulse"></i>
-
             Workout
+        </a>
+    </li>
 
-        </li>
-
-        <li>
-
+    <li>
+        <a href="#">
             <i class="bi bi-egg-fried"></i>
-
             Diet
+        </a>
+    </li>
 
-        </li>
-
-        <li>
-
+    <li>
+        <a href="#">
             <i class="bi bi-droplet-half"></i>
-
             Water Tracker
+        </a>
+    </li>
 
-        </li>
-
-        <li>
-
+    <li>
+        <a href="#">
             <i class="bi bi-graph-up-arrow"></i>
-
             Progress
+        </a>
+    </li>
 
-        </li>
-
-        <li>
-
+    <li>
+        <a href="#">
             <i class="bi bi-robot"></i>
-
             AI Coach
+        </a>
+    </li>
 
-        </li>
-
-    </ul>
-
+</ul>
     <!-- Logout -->
 
-    <div class="logout">
+    <a href="{% url 'logout' %}" class="logout">
 
         <i class="bi bi-box-arrow-left"></i>
 
         Logout
 
-    </div>
+    </a>
 
 </aside>
 

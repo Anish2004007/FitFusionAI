@@ -11,6 +11,7 @@ from django.conf import settings
 from django.utils import timezone
 
 
+
 def home(request):
     return render(request, "home.html")
 

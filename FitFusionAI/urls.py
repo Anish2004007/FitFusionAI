@@ -25,4 +25,6 @@ urlpatterns = [
     path("dashboard/", include("dashboard.urls")),
 
     path("profile/", include("profile_app.urls")),
+
+    path("workout/",include("workout.urls")),
 ]

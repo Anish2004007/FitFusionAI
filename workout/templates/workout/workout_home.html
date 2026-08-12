@@ -1,0 +1,267 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}
+Workout
+{% endblock %}
+
+{% block content %}
+
+<div class="workout-page">
+
+    <!-- Page Header -->
+
+    <div class="workout-header">
+
+        <div>
+
+            <span class="workout-label">
+                <i class="bi bi-fire"></i>
+                YOUR WORKOUT
+            </span>
+
+            <h1>
+                Today's Workout
+            </h1>
+
+            <p>
+                A personalized workout based on your fitness goal.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if workout_plan %}
+
+    <!-- Workout Plan -->
+
+    <div class="workout-plan-card">
+
+        <div class="workout-plan-top">
+
+            <div>
+
+                <span class="plan-label">
+                    PERSONALIZED PLAN
+                </span>
+
+                <h2>
+                    {{ workout_plan.name }}
+                </h2>
+
+                <p>
+                    {{ workout_plan.description }}
+                </p>
+
+            </div>
+
+            <div class="workout-duration">
+
+                <i class="bi bi-clock"></i>
+
+                <span>
+                    {{ workout_plan.duration_minutes }} min
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Workout Information -->
+
+        <div class="workout-info-grid">
+
+            <div class="workout-info">
+
+                <i class="bi bi-bullseye"></i>
+
+                <div>
+
+                    <span>
+                        Goal
+                    </span>
+
+                    <strong>
+                        {{ workout_plan.goal }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="workout-info">
+
+                <i class="bi bi-bar-chart"></i>
+
+                <div>
+
+                    <span>
+                        Difficulty
+                    </span>
+
+                    <strong>
+                        {{ workout_plan.difficulty }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="workout-info">
+
+                <i class="bi bi-list-check"></i>
+
+                <div>
+
+                    <span>
+                        Exercises
+                    </span>
+
+                    <strong>
+                        {{ workout_plan.exercises.count }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Exercises -->
+
+    <div class="exercise-section">
+
+        <div class="section-title">
+
+            <div>
+
+                <span>
+                    WORKOUT ROUTINE
+                </span>
+
+                <h2>
+                    Today's Exercises
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="exercise-grid">
+
+            {% for exercise in workout_plan.exercises.all %}
+
+            <div class="exercise-card">
+
+                <div class="exercise-number">
+                    {{ forloop.counter }}
+                </div>
+
+                <div class="exercise-icon">
+
+                    {% if exercise.category == "Cardio" %}
+
+                        <i class="bi bi-lightning-charge-fill"></i>
+
+                    {% elif exercise.category == "Strength" %}
+
+                        <i class="bi bi-person-arms-up"></i>
+
+                    {% elif exercise.category == "Flexibility" %}
+
+                        <i class="bi bi-person-standing"></i>
+
+                    {% else %}
+
+                        <i class="bi bi-person-walking"></i>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="exercise-content">
+
+                    <h3>
+                        {{ exercise.name }}
+                    </h3>
+
+                    <p>
+                        {{ exercise.description }}
+                    </p>
+
+                    <div class="exercise-meta">
+
+                        <span>
+                            <i class="bi bi-bullseye"></i>
+                            {{ exercise.muscle_group }}
+                        </span>
+
+                        {% if exercise.duration_minutes %}
+
+                        <span>
+                            <i class="bi bi-clock"></i>
+                            {{ exercise.duration_minutes }} min
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <!-- Start Button -->
+
+    <div class="workout-action">
+
+        <button class="start-workout-btn">
+
+            <i class="bi bi-play-fill"></i>
+
+            Start Workout
+
+        </button>
+
+    </div>
+
+
+    {% else %}
+
+    <!-- No Workout -->
+
+    <div class="no-workout-card">
+
+        <i class="bi bi-calendar-x"></i>
+
+        <h2>
+            No Workout Plan Available
+        </h2>
+
+        <p>
+            We couldn't find a workout plan for your current fitness goal.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
