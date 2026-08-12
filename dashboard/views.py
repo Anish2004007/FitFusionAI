@@ -12,10 +12,7 @@ def calculate_age(date_of_birth):
 
     age = today.year - date_of_birth.year
 
-    if (
-        today.month,
-        today.day
-    ) < (
+    if (today.month, today.day) < (
         date_of_birth.month,
         date_of_birth.day
     ):
@@ -120,7 +117,6 @@ def dashboard(request):
 
     # -----------------------------
     # BMR
-    # Mifflin-St Jeor Equation
     # -----------------------------
 
     if profile.gender == "Male":
@@ -143,14 +139,12 @@ def dashboard(request):
 
     else:
 
-        # Neutral estimate for "Other"
         bmr = (
             10 * weight_kg
             + 6.25 * height_cm
             - 5 * age
             - 78
         )
-
 
     bmr = round(bmr)
 
@@ -173,13 +167,9 @@ def dashboard(request):
 
     }
 
-
     activity_multiplier = activity_multipliers.get(
-
         profile.activity_level,
-
         1.2
-
     )
 
 
@@ -187,36 +177,38 @@ def dashboard(request):
     # TDEE
     # -----------------------------
 
-    tdee = bmr * activity_multiplier
-
-    tdee = round(tdee)
+    tdee = round(
+        bmr * activity_multiplier
+    )
 
 
     # -----------------------------
     # CALORIE TARGET
     # -----------------------------
 
-    calorie_target = tdee
-
+    calorie_adjustment = 0
 
     if profile.fitness_goal == "Lose Weight":
 
-        calorie_target = tdee - 500
+        calorie_adjustment = -500
 
     elif profile.fitness_goal == "Gain Muscle":
 
-        calorie_target = tdee + 300
+        calorie_adjustment = 300
 
     elif profile.fitness_goal == "Maintain Weight":
 
-        calorie_target = tdee
+        calorie_adjustment = 0
 
     elif profile.fitness_goal == "Improve Fitness":
 
-        calorie_target = tdee
+        calorie_adjustment = 0
 
 
-    # Prevent unrealistic negative target
+    calorie_target = tdee + calorie_adjustment
+
+
+    # Prevent unrealistically low target
 
     calorie_target = max(
         calorie_target,
@@ -255,6 +247,8 @@ def dashboard(request):
         "tdee": tdee,
 
         "calorie_target": calorie_target,
+
+        "calorie_adjustment": calorie_adjustment,
 
         "water_goal": water_goal,
 

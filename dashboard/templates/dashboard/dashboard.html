@@ -273,7 +273,21 @@ Dashboard
                 </h3>
 
                 <p>
-                    Personalized for {{ fitness_goal|lower }}
+
+                    {% if calorie_adjustment < 0 %}
+
+                        {{ calorie_adjustment }} kcal from TDEE for weight loss
+
+                    {% elif calorie_adjustment > 0 %}
+
+                        +{{ calorie_adjustment }} kcal from TDEE for muscle gain
+
+                    {% else %}
+
+                        Based on your maintenance needs
+
+                    {% endif %}
+
                 </p>
 
             </div>
