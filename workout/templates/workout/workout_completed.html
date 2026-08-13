@@ -1,0 +1,74 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}
+Workout Completed
+{% endblock %}
+
+{% block content %}
+
+<div class="workout-completed-page">
+
+    <div class="completed-card">
+
+        <div class="completed-icon">
+
+            <i class="bi bi-check-lg"></i>
+
+        </div>
+
+        <span class="completed-label">
+            WORKOUT COMPLETE
+        </span>
+
+        <h1>
+            Great Job, {{ user.full_name }}!
+        </h1>
+
+        <p>
+            You successfully completed your
+            <strong>{{ workout_plan.name }}</strong>.
+        </p>
+
+        <div class="completed-info">
+
+            <div>
+
+                <i class="bi bi-check-circle"></i>
+
+                <span>
+                    Workout completed
+                </span>
+
+            </div>
+
+            <div>
+
+                <i class="bi bi-clock"></i>
+
+                <span>
+                    {{ workout_plan.duration_minutes }} minutes
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="completed-actions">
+
+            <a
+                href="{% url 'workout' %}"
+                class="back-workout-btn">
+
+                <i class="bi bi-arrow-left"></i>
+
+                Back to Workout
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

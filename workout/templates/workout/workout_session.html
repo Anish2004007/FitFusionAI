@@ -1,0 +1,228 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}
+Workout Session
+{% endblock %}
+
+{% block content %}
+
+<div class="workout-session-page">
+
+    <!-- Header -->
+
+    <div class="session-header">
+
+        <div>
+
+            <span class="workout-label">
+                <i class="bi bi-lightning-charge-fill"></i>
+                WORKOUT SESSION
+            </span>
+
+            <h1>
+                {{ workout_plan.name }}
+            </h1>
+
+            <p>
+                Complete each exercise to finish today's workout.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Session Information -->
+
+    <div class="session-summary">
+
+        <div class="session-summary-item">
+
+            <i class="bi bi-list-check"></i>
+
+            <div>
+
+                <span>
+                    Exercises
+                </span>
+
+                <strong>
+                    {{ exercise_progress.count }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="session-summary-item">
+
+            <i class="bi bi-clock"></i>
+
+            <div>
+
+                <span>
+                    Duration
+                </span>
+
+                <strong>
+                    {{ workout_plan.duration_minutes }} min
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="session-summary-item">
+
+            <i class="bi bi-bullseye"></i>
+
+            <div>
+
+                <span>
+                    Goal
+                </span>
+
+                <strong>
+                    {{ workout_plan.goal }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Exercises -->
+
+    <div class="session-exercises">
+
+        <div class="section-title">
+
+            <span>
+                EXERCISES
+            </span>
+
+            <h2>
+                Today's Routine
+            </h2>
+
+        </div>
+
+{% for progress in exercise_progress %}
+
+<div class="session-exercise-card">
+
+    <div class="session-exercise-number">
+
+        {{ forloop.counter }}
+
+    </div>
+
+
+    <div class="session-exercise-icon">
+
+        {% if progress.exercise.category == "Cardio" %}
+
+            <i class="bi bi-lightning-charge-fill"></i>
+
+        {% elif progress.exercise.category == "Strength" %}
+
+            <i class="bi bi-person-arms-up"></i>
+
+        {% elif progress.exercise.category == "Flexibility" %}
+
+            <i class="bi bi-person-standing"></i>
+
+        {% else %}
+
+            <i class="bi bi-person-walking"></i>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="session-exercise-content">
+
+        <h3>
+            {{ progress.exercise.name }}
+        </h3>
+
+        <p>
+            {{ progress.exercise.description }}
+        </p>
+
+        <div class="exercise-meta">
+
+            <span>
+                <i class="bi bi-bullseye"></i>
+                {{ progress.exercise.muscle_group }}
+            </span>
+
+            {% if progress.exercise.duration_minutes %}
+
+            <span>
+                <i class="bi bi-clock"></i>
+                {{ progress.exercise.duration_minutes }} min
+            </span>
+
+            {% endif %}
+
+            <span>
+                <i class="bi bi-bar-chart"></i>
+                {{ progress.exercise.difficulty }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="exercise-status">
+
+        {% if progress.completed %}
+
+            <span class="exercise-completed">
+                <i class="bi bi-check-circle-fill"></i>
+                Completed
+            </span>
+
+        {% else %}
+
+            <span>
+                Not Started
+            </span>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+    </div>
+
+
+    <!-- Complete Workout -->
+
+    <div class="session-action">
+
+        <a
+            href="{% url 'complete_workout' workout_session.id %}"
+            class="complete-workout-btn">
+
+            <i class="bi bi-check-circle-fill"></i>
+
+            Complete Workout
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

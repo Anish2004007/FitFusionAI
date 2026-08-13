@@ -1,5 +1,5 @@
 from django.db import models
-
+from accounts.models import User
 
 class Exercise(models.Model):
 
@@ -116,3 +116,61 @@ class WorkoutPlan(models.Model):
     def __str__(self):
 
         return self.name
+
+class WorkoutSession(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="workout_sessions"
+    )
+
+    workout_plan = models.ForeignKey(
+        WorkoutPlan,
+        on_delete=models.CASCADE,
+        related_name="sessions"
+    )
+
+    started_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    completed = models.BooleanField(
+        default=False
+    )
+
+    def __str__(self):
+
+        return f"{self.user.full_name} - {self.workout_plan.name}"
+
+class WorkoutExercise(models.Model):
+
+    workout_session = models.ForeignKey(
+        WorkoutSession,
+        on_delete=models.CASCADE,
+        related_name="exercise_progress"
+    )
+
+    exercise = models.ForeignKey(
+        Exercise,
+        on_delete=models.CASCADE,
+        related_name="session_records"
+    )
+
+    completed = models.BooleanField(
+        default=False
+    )
+
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+
+        return f"{self.workout_session} - {self.exercise.name}"
