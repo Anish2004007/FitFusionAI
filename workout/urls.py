@@ -35,4 +35,10 @@ urlpatterns = [
         name="workout_completed"
     ),
 
+    path(
+    "session/<int:session_id>/exercise/<int:exercise_id>/complete/",
+    views.complete_exercise,
+    name="complete_exercise"
+),
+
 ]

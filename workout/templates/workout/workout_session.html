@@ -34,65 +34,41 @@ Workout Session
 
     <!-- Session Information -->
 
-    <div class="session-summary">
+    <div class="session-progress">
 
-        <div class="session-summary-item">
+    <div class="progress-header">
 
-            <i class="bi bi-list-check"></i>
+        <div>
 
-            <div>
+            <span>
+                WORKOUT PROGRESS
+            </span>
 
-                <span>
-                    Exercises
-                </span>
-
-                <strong>
-                    {{ exercise_progress.count }}
-                </strong>
-
-            </div>
+            <h2>
+                {{ completed_exercises }} / {{ total_exercises }}
+                Exercises Completed
+            </h2>
 
         </div>
 
+        <strong>
+            {{ progress_percentage }}%
+        </strong>
 
-        <div class="session-summary-item">
-
-            <i class="bi bi-clock"></i>
-
-            <div>
-
-                <span>
-                    Duration
-                </span>
-
-                <strong>
-                    {{ workout_plan.duration_minutes }} min
-                </strong>
-
-            </div>
-
-        </div>
+    </div>
 
 
-        <div class="session-summary-item">
+    <div class="progress-track">
 
-            <i class="bi bi-bullseye"></i>
-
-            <div>
-
-                <span>
-                    Goal
-                </span>
-
-                <strong>
-                    {{ workout_plan.goal }}
-                </strong>
-
-            </div>
-
+        <div
+            class="progress-fill"
+            id="workoutProgressFill"
+            data-progress="{{ progress_percentage }}">
         </div>
 
     </div>
+
+</div>
 
 
     <!-- Exercises -->
@@ -181,24 +157,30 @@ Workout Session
     </div>
 
 
-    <div class="exercise-status">
+   <div class="exercise-status">
 
-        {% if progress.completed %}
+    {% if progress.completed %}
 
-            <span class="exercise-completed">
-                <i class="bi bi-check-circle-fill"></i>
-                Completed
-            </span>
+        <span class="exercise-completed">
+            <i class="bi bi-check-circle-fill"></i>
+            Completed
+        </span>
 
-        {% else %}
+    {% else %}
 
-            <span>
-                Not Started
-            </span>
+        <button
+            type="button"
+            class="complete-exercise-btn"
+            data-url="{% url 'complete_exercise' workout_session.id progress.exercise.id %}"
+            onclick="completeExercise(this)">
 
-        {% endif %}
+            <i class="bi bi-check2"></i>
+            Mark Complete
+        </button>
 
-    </div>
+    {% endif %}
+
+</div>
 
 </div>
 
@@ -211,18 +193,156 @@ Workout Session
 
     <div class="session-action">
 
-        <a
-            href="{% url 'complete_workout' workout_session.id %}"
-            class="complete-workout-btn">
+        {% if progress_percentage == 100 %}
 
-            <i class="bi bi-check-circle-fill"></i>
+<a
+    href="{% url 'complete_workout' workout_session.id %}"
+    class="complete-workout-btn">
 
-            Complete Workout
+    <i class="bi bi-check-circle-fill"></i>
 
-        </a>
+    Complete Workout
+
+</a>
+
+{% else %}
+
+<div class="complete-workout-disabled">
+
+    <i class="bi bi-lock-fill"></i>
+
+    Complete all exercises to finish
+
+</div>
+
+{% endif %}
 
     </div>
 
 </div>
+
+<script>
+
+    const progressBar =
+        document.getElementById("workoutProgressFill");
+
+    if (progressBar) {
+
+        const progress =
+            progressBar.dataset.progress;
+
+        progressBar.style.width = progress + "%";
+
+    }
+
+</script>
+
+<script>
+
+    function completeExercise(button) {
+
+        const url = button.dataset.url;
+
+        button.disabled = true;
+
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            if (!data.success) {
+
+                button.disabled = false;
+
+                alert(data.error || "Something went wrong.");
+
+                return;
+            }
+
+
+            /* Change button */
+
+            button.innerHTML =
+                '<i class="bi bi-check-circle-fill"></i> Completed';
+
+            button.classList.add("exercise-completed");
+
+            button.classList.remove("complete-exercise-btn");
+
+
+            /* Update progress text */
+
+            const progressTitle =
+                document.querySelector(".progress-header h2");
+
+            if (progressTitle) {
+
+                progressTitle.textContent =
+                    data.completed_exercises +
+                    " / " +
+                    data.total_exercises +
+                    " Exercises Completed";
+
+            }
+
+
+            /* Update percentage */
+
+            const progressPercentage =
+                document.querySelector(".progress-header strong");
+
+            if (progressPercentage) {
+
+                progressPercentage.textContent =
+                    data.progress_percentage + "%";
+
+            }
+
+
+            /* Update progress bar */
+
+            const progressBar =
+                document.getElementById("workoutProgressFill");
+
+            if (progressBar) {
+
+                progressBar.dataset.progress =
+                    data.progress_percentage;
+
+                progressBar.style.width =
+                    data.progress_percentage + "%";
+
+            }
+
+
+            /* Enable Complete Workout */
+
+            if (data.progress_percentage === 100) {
+
+                location.reload();
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            button.disabled = false;
+
+            alert("Unable to complete the exercise.");
+
+        });
+
+    }
+
+</script>
 
 {% endblock %}
