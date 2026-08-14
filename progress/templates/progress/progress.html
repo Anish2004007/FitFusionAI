@@ -1,0 +1,150 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}
+Progress
+{% endblock %}
+
+{% block content %}
+
+<div class="progress-page">
+
+    <div class="workout-header">
+
+        <span class="workout-label">
+            <i class="bi bi-graph-up-arrow"></i>
+            YOUR PROGRESS
+        </span>
+
+        <h1>
+            Fitness Progress
+        </h1>
+
+        <p>
+            Track your workout consistency and achievements.
+        </p>
+
+    </div>
+
+
+    <div class="progress-stats">
+
+        <div class="progress-stat-card">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                Completed Workouts
+            </span>
+
+            <strong>
+                {{ total_workouts }}
+            </strong>
+
+        </div>
+
+
+        <div class="progress-stat-card">
+
+            <i class="bi bi-calendar-week"></i>
+
+            <span>
+                This Week
+            </span>
+
+            <strong>
+                {{ weekly_workouts }}
+            </strong>
+
+        </div>
+
+
+        <div class="progress-stat-card">
+
+            <i class="bi bi-bar-chart"></i>
+
+            <span>
+                Completion Rate
+            </span>
+
+            <strong>
+                {{ completion_rate }}%
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="progress-history">
+
+        <div class="section-title">
+
+            <span>
+                WORKOUT HISTORY
+            </span>
+
+            <h2>
+                Recent Workouts
+            </h2>
+
+        </div>
+
+
+        {% if workout_history %}
+
+            {% for session in workout_history %}
+
+            <div class="history-card">
+
+                <div class="history-icon">
+
+                    <i class="bi bi-check-lg"></i>
+
+                </div>
+
+
+                <div class="history-content">
+
+                    <h3>
+                        {{ session.workout_plan.name }}
+                    </h3>
+
+                    <p>
+                        Completed on
+                        {{ session.completed_at|date:"d M Y, h:i A" }}
+                    </p>
+
+                </div>
+
+
+                <div class="history-status">
+                    Completed
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="no-history">
+
+                <i class="bi bi-bar-chart"></i>
+
+                <h2>
+                    No Workout History Yet
+                </h2>
+
+                <p>
+                    Complete your first workout to start tracking your progress.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

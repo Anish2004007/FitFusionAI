@@ -27,4 +27,6 @@ urlpatterns = [
     path("profile/", include("profile_app.urls")),
 
     path("workout/",include("workout.urls")),
+
+    path("progress/", include("progress.urls")),
 ]

@@ -88,8 +88,8 @@
         </a>
     </li>
 
-    <li>
-        <a href="#">
+    <li class="{% if request.resolver_match.url_name == 'progress' %}active{% endif %}">
+        <a href="{% url 'progress' %}">
             <i class="bi bi-graph-up-arrow"></i>
             Progress
         </a>

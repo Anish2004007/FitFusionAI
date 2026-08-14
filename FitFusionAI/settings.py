@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'chatbot',
     'reports',
     'workout',
+    'progress',
     'profile_app',
 ]
 
