@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
+
 import { getProgress } from "./services/api";
+
+import ProgressDashboard from "./components/ProgressDashboard";
+import FitFusionLayout from "./components/FitFusionLayout";
+
+import "./App.css";
+
 
 function App() {
 
     const [progress, setProgress] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
 
     useEffect(() => {
 
@@ -16,16 +24,21 @@ function App() {
                 const data = await getProgress();
 
                 if (data.success) {
+
                     setProgress(data);
+
                 } else {
+
                     setError(
-                        data.error || "Unable to load progress."
+                        data.error ||
+                        "Unable to load progress."
                     );
+
                 }
 
-            } catch (err) {
+            } catch (error) {
 
-                console.error(err);
+                console.error(error);
 
                 setError(
                     "Unable to connect to Django."
@@ -45,85 +58,37 @@ function App() {
 
 
     if (loading) {
-        return <h2>Loading Progress...</h2>;
+
+        return (
+            <div className="app-message">
+                Loading Progress...
+            </div>
+        );
+
     }
 
 
     if (error) {
-        return <h2>{error}</h2>;
+
+        return (
+            <div className="app-message error">
+                {error}
+            </div>
+        );
+
     }
 
 
     return (
-        <div>
+        <FitFusionLayout user={progress.user}>
 
-            <h1>FitFusion AI Progress</h1>
+            <ProgressDashboard
+                progress={progress}
+            />
 
-            <div>
-
-                <h2>
-                    Completed Workouts
-                </h2>
-
-                <p>
-                    {progress.stats.total_workouts}
-                </p>
-
-            </div>
-
-
-            <div>
-
-                <h2>
-                    This Week
-                </h2>
-
-                <p>
-                    {progress.stats.weekly_workouts}
-                </p>
-
-            </div>
-
-
-            <div>
-
-                <h2>
-                    Completion Rate
-                </h2>
-
-                <p>
-                    {progress.stats.completion_rate}%
-                </p>
-
-            </div>
-
-
-            <h2>
-                Recent Workouts
-            </h2>
-
-            {progress.workout_history.map(
-                (workout) => (
-
-                    <div key={workout.id}>
-
-                        <h3>
-                            {workout.name}
-                        </h3>
-
-                        <p>
-                            {new Date(
-                                workout.completed_at
-                            ).toLocaleString()}
-                        </p>
-
-                    </div>
-
-                )
-            )}
-
-        </div>
+        </FitFusionLayout>
     );
 }
+
 
 export default App;

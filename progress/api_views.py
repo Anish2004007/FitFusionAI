@@ -16,9 +16,9 @@ def progress_api(request):
         return JsonResponse(
             {
                 "success": False,
-                "error": "Not logged in"
+                "error": "Not logged in",
             },
-            status=401
+            status=401,
         )
 
     # Get logged-in user
@@ -26,48 +26,83 @@ def progress_api(request):
         user = User.objects.get(
             user_id=user_id
         )
+
     except User.DoesNotExist:
+
         return JsonResponse(
             {
                 "success": False,
-                "error": "User not found"
+                "error": "User not found",
             },
-            status=401
+            status=401,
         )
 
     # Completed workouts
     completed_workouts = WorkoutSession.objects.filter(
         user=user,
-        completed=True
+        completed=True,
     )
 
+    # Total completed workouts
     total_workouts = completed_workouts.count()
 
-    # Current week
+    # Today's date
     today = timezone.localdate()
 
+    # Start of current week
     week_start = today - timedelta(
         days=today.weekday()
     )
 
+    # Completed workouts this week
     weekly_workouts = completed_workouts.filter(
         completed_at__date__gte=week_start
     ).count()
 
-    # All sessions
+    # All workout sessions
     total_sessions = WorkoutSession.objects.filter(
         user=user
     ).count()
 
     # Completion rate
     if total_sessions > 0:
+
         completion_rate = int(
             (total_workouts / total_sessions) * 100
         )
+
     else:
+
         completion_rate = 0
 
-    # Recent history
+    # --------------------------------
+    # Weekly activity - last 7 days
+    # --------------------------------
+
+    weekly_activity = []
+
+    for days_ago in range(6, -1, -1):
+
+        activity_date = today - timedelta(
+            days=days_ago
+        )
+
+        workout_count = completed_workouts.filter(
+            completed_at__date=activity_date
+        ).count()
+
+        weekly_activity.append(
+            {
+                "day": activity_date.strftime("%a"),
+                "date": activity_date.strftime("%d %b"),
+                "count": workout_count,
+            }
+        )
+
+    # --------------------------------
+    # Recent workout history
+    # --------------------------------
+
     workout_history = []
 
     recent_workouts = completed_workouts.select_related(
@@ -78,16 +113,29 @@ def progress_api(request):
 
     for session in recent_workouts:
 
-        workout_history.append({
-            "id": session.id,
-            "name": session.workout_plan.name,
-            "completed_at": session.completed_at.isoformat()
-            if session.completed_at
-            else None,
-        })
+        workout_history.append(
+            {
+                "id": session.id,
+                "name": session.workout_plan.name,
+                "completed_at": (
+                    session.completed_at.isoformat()
+                    if session.completed_at
+                    else None
+                ),
+            }
+        )
 
-    return JsonResponse({
+    # --------------------------------
+    # API response
+    # --------------------------------
+
+    return JsonResponse(
+    {
         "success": True,
+
+        "user": {
+            "full_name": user.full_name,
+        },
 
         "stats": {
             "total_workouts": total_workouts,
@@ -95,5 +143,8 @@ def progress_api(request):
             "completion_rate": completion_rate,
         },
 
+        "weekly_activity": weekly_activity,
+
         "workout_history": workout_history,
-    })
+    }
+)
