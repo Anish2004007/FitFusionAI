@@ -1,18 +1,15 @@
 function FitFusionLayout({ children, user }) {
 
-    const getGreeting = () => {
-        const hour = new Date().getHours();
+    const currentPath = window.location.pathname;
 
-        if (hour >= 5 && hour < 12) {
-            return "🌅 Good Morning,";
-        } else if (hour >= 12 && hour < 17) {
-            return "☀️ Good Afternoon,";
-        } else if (hour >= 17 && hour < 21) {
-            return "🌆 Good Evening,";
-        }
+    const isDashboard =
+        currentPath === "/dashboard/" ||
+        currentPath === "/dashboard";
 
-        return "🌙 Good Night,";
-    };
+    const isProgress =
+        currentPath === "/" ||
+        currentPath === "";
+
 
     return (
         <div className="dashboard-layout">
@@ -40,20 +37,23 @@ function FitFusionLayout({ children, user }) {
 
                 <ul className="menu">
 
-                    <li>
 
-                        <a href="http://localhost:8000/dashboard/">
+                    {/* Dashboard */}
+
+                    <li className={isDashboard ? "active" : ""}>
+
+                        <a href="http://localhost:5173/dashboard/">
 
                             <i className="bi bi-grid-fill"></i>
 
-                            <span>
-                                Dashboard
-                            </span>
+                            Dashboard
 
                         </a>
 
                     </li>
 
+
+                    {/* Profile */}
 
                     <li>
 
@@ -61,14 +61,14 @@ function FitFusionLayout({ children, user }) {
 
                             <i className="bi bi-person-circle"></i>
 
-                            <span>
-                                Profile
-                            </span>
+                            Profile
 
                         </a>
 
                     </li>
 
+
+                    {/* Workout */}
 
                     <li>
 
@@ -76,14 +76,14 @@ function FitFusionLayout({ children, user }) {
 
                             <i className="bi bi-heart-pulse"></i>
 
-                            <span>
-                                Workout
-                            </span>
+                            Workout
 
                         </a>
 
                     </li>
 
+
+                    {/* Diet */}
 
                     <li>
 
@@ -91,14 +91,14 @@ function FitFusionLayout({ children, user }) {
 
                             <i className="bi bi-egg-fried"></i>
 
-                            <span>
-                                Diet
-                            </span>
+                            Diet
 
                         </a>
 
                     </li>
 
+
+                    {/* Water Tracker */}
 
                     <li>
 
@@ -106,31 +106,29 @@ function FitFusionLayout({ children, user }) {
 
                             <i className="bi bi-droplet-half"></i>
 
-                            <span>
-                                Water Tracker
-                            </span>
+                            Water Tracker
 
                         </a>
 
                     </li>
 
 
-                    {/* React Progress Page */}
+                    {/* Progress */}
 
-                    <li className="active">
+                    <li className={isProgress ? "active" : ""}>
 
                         <a href="http://localhost:5173/">
 
                             <i className="bi bi-graph-up-arrow"></i>
 
-                            <span>
-                                Progress
-                            </span>
+                            Progress
 
                         </a>
 
                     </li>
 
+
+                    {/* AI Coach */}
 
                     <li>
 
@@ -138,13 +136,12 @@ function FitFusionLayout({ children, user }) {
 
                             <i className="bi bi-robot"></i>
 
-                            <span>
-                                AI Coach
-                            </span>
+                            AI Coach
 
                         </a>
 
                     </li>
+
 
                 </ul>
 
@@ -158,49 +155,50 @@ function FitFusionLayout({ children, user }) {
 
                     <i className="bi bi-box-arrow-left"></i>
 
-                    <span>
-                        Logout
-                    </span>
+                    Logout
 
                 </a>
+
 
             </aside>
 
 
-            {/* ================= MAIN CONTENT ================= */}
+            {/* ================= MAIN ================= */}
 
             <main className="main-content">
+
 
                 {/* ================= TOPBAR ================= */}
 
                 <header className="topbar">
 
+
                     <div className="topbar-left">
 
-                        <span className="greeting">
-
-                            {getGreeting()}
-
+                        <span
+                            className="greeting"
+                            id="dynamicGreeting"
+                        >
+                            👋 Good Afternoon,
                         </span>
 
+
                         <h2>
-
                             {user?.full_name || "User"}
-
                         </h2>
 
+
                         <p>
-
                             Stay consistent. You're doing great!
-
                         </p>
 
                     </div>
 
 
-                    {/* Topbar Right */}
-
                     <div className="topbar-right">
+
+
+                        {/* Search */}
 
                         <div className="icon-btn">
 
@@ -208,6 +206,8 @@ function FitFusionLayout({ children, user }) {
 
                         </div>
 
+
+                        {/* Notification */}
 
                         <div className="icon-btn">
 
@@ -217,6 +217,8 @@ function FitFusionLayout({ children, user }) {
 
                         </div>
 
+
+                        {/* Profile */}
 
                         <div className="profile-mini">
 
@@ -232,12 +234,14 @@ function FitFusionLayout({ children, user }) {
 
                         </div>
 
+
                     </div>
+
 
                 </header>
 
 
-                {/* ================= CONTENT ================= */}
+                {/* ================= PAGE CONTENT ================= */}
 
                 <section className="content">
 
@@ -245,7 +249,9 @@ function FitFusionLayout({ children, user }) {
 
                 </section>
 
+
             </main>
+
 
         </div>
     );

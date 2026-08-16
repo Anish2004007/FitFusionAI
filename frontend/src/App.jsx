@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { getProgress } from "./services/api";
+import { getProgress, getDashboard } from "./services/api";
 
 import ProgressDashboard from "./components/ProgressDashboard";
+import Dashboard from "./components/Dashboard";
 import FitFusionLayout from "./components/FitFusionLayout";
 
 import "./App.css";
@@ -10,28 +11,45 @@ import "./App.css";
 
 function App() {
 
-    const [progress, setProgress] = useState(null);
+    const [page, setPage] = useState(
+        window.location.pathname
+    );
+
+    const [data, setData] = useState(null);
+
     const [loading, setLoading] = useState(true);
+
     const [error, setError] = useState("");
 
 
     useEffect(() => {
 
-        const loadProgress = async () => {
+        const loadData = async () => {
 
             try {
 
-                const data = await getProgress();
+                let result;
 
-                if (data.success) {
+                if (page === "/dashboard/" || page === "/dashboard") {
 
-                    setProgress(data);
+                    result = await getDashboard();
+
+                } else {
+
+                    result = await getProgress();
+
+                }
+
+
+                if (result.success) {
+
+                    setData(result);
 
                 } else {
 
                     setError(
-                        data.error ||
-                        "Unable to load progress."
+                        result.error ||
+                        "Unable to load data."
                     );
 
                 }
@@ -52,16 +70,17 @@ function App() {
 
         };
 
-        loadProgress();
 
-    }, []);
+        loadData();
+
+    }, [page]);
 
 
     if (loading) {
 
         return (
             <div className="app-message">
-                Loading Progress...
+                Loading...
             </div>
         );
 
@@ -79,15 +98,50 @@ function App() {
     }
 
 
+    /*
+     * =========================
+     * DASHBOARD
+     * =========================
+     */
+
+    if (
+        page === "/dashboard/" ||
+        page === "/dashboard"
+    ) {
+
+        return (
+
+            <FitFusionLayout user={data.user}>
+
+                <Dashboard
+                    dashboard={data}
+                />
+
+            </FitFusionLayout>
+
+        );
+
+    }
+
+
+    /*
+     * =========================
+     * PROGRESS
+     * =========================
+     */
+
     return (
-        <FitFusionLayout user={progress.user}>
+
+        <FitFusionLayout user={data.user}>
 
             <ProgressDashboard
-                progress={progress}
+                progress={data}
             />
 
         </FitFusionLayout>
+
     );
+
 }
 
 

@@ -11,3 +11,23 @@ export const getProgress = async () => {
 };
 
 export default api;
+
+export async function getDashboard() {
+
+    const response = await fetch(
+        "http://localhost:8000/dashboard/api/",
+        {
+            credentials: "include",
+        }
+    );
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Unable to load dashboard data."
+        );
+
+    }
+
+    return await response.json();
+}
