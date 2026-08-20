@@ -1,33 +1,40 @@
 import axios from "axios";
 
+
 const api = axios.create({
     baseURL: "http://localhost:8000",
+
+    // Send Django session cookie with every request
     withCredentials: true,
 });
 
+
+/* =========================================
+   PROGRESS API
+========================================= */
+
 export const getProgress = async () => {
-    const response = await api.get("/progress/api/");
+
+    const response = await api.get(
+        "/progress/api/"
+    );
+
     return response.data;
 };
 
-export default api;
 
-export async function getDashboard() {
+/* =========================================
+   DASHBOARD API
+========================================= */
 
-    const response = await fetch(
-        "http://localhost:8000/dashboard/api/",
-        {
-            credentials: "include",
-        }
+export const getDashboard = async () => {
+
+    const response = await api.get(
+        "/dashboard/api/"
     );
 
-    if (!response.ok) {
+    return response.data;
+};
 
-        throw new Error(
-            "Unable to load dashboard data."
-        );
 
-    }
-
-    return await response.json();
-}
+export default api;
