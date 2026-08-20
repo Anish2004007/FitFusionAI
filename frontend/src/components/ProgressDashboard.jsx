@@ -10,28 +10,48 @@ import {
 
 function ProgressDashboard({ progress }) {
 
-    const stats = progress.stats;
+    /*
+     * Safely handle the situation where the API data
+     * has not arrived yet.
+     */
+    const stats = progress?.stats || {
+        total_workouts: 0,
+        weekly_workouts: 0,
+        completion_rate: 0,
+    };
 
-    const activity = progress.weekly_activity || [];
 
-    const history = progress.workout_history || [];
+    const activity =
+        progress?.weekly_activity || [];
+
+
+    const history =
+        progress?.workout_history || [];
 
 
     return (
+
         <div className="progress-dashboard">
 
-            {/* Header */}
+            {/* ================= HEADER ================= */}
 
             <div className="progress-header">
 
                 <div className="progress-label">
-                    <span className="label-icon">✦</span>
+
+                    <span className="label-icon">
+                        ✦
+                    </span>
+
                     YOUR FITNESS JOURNEY
+
                 </div>
+
 
                 <h1>
                     Progress Overview
                 </h1>
+
 
                 <p>
                     Track your consistency, celebrate your
@@ -41,9 +61,12 @@ function ProgressDashboard({ progress }) {
             </div>
 
 
-            {/* Statistics */}
+            {/* ================= STATISTICS ================= */}
 
             <div className="progress-stats">
+
+
+                {/* COMPLETED WORKOUTS */}
 
                 <div className="stat-card">
 
@@ -51,15 +74,18 @@ function ProgressDashboard({ progress }) {
                         ✓
                     </div>
 
+
                     <div className="stat-content">
 
                         <span>
                             Completed Workouts
                         </span>
 
+
                         <strong>
                             {stats.total_workouts}
                         </strong>
+
 
                         <small>
                             Total completed
@@ -70,11 +96,14 @@ function ProgressDashboard({ progress }) {
                 </div>
 
 
+                {/* THIS WEEK */}
+
                 <div className="stat-card">
 
                     <div className="stat-icon">
                         7
                     </div>
+
 
                     <div className="stat-content">
 
@@ -82,9 +111,11 @@ function ProgressDashboard({ progress }) {
                             This Week
                         </span>
 
+
                         <strong>
                             {stats.weekly_workouts}
                         </strong>
+
 
                         <small>
                             Workouts this week
@@ -95,11 +126,14 @@ function ProgressDashboard({ progress }) {
                 </div>
 
 
+                {/* COMPLETION RATE */}
+
                 <div className="stat-card">
 
                     <div className="stat-icon">
                         %
                     </div>
+
 
                     <div className="stat-content">
 
@@ -107,9 +141,11 @@ function ProgressDashboard({ progress }) {
                             Completion Rate
                         </span>
 
+
                         <strong>
                             {stats.completion_rate}%
                         </strong>
+
 
                         <small>
                             Overall consistency
@@ -122,7 +158,7 @@ function ProgressDashboard({ progress }) {
             </div>
 
 
-            {/* Weekly Activity */}
+            {/* ================= WEEKLY ACTIVITY ================= */}
 
             <div className="activity-card">
 
@@ -134,14 +170,18 @@ function ProgressDashboard({ progress }) {
                             WEEKLY ACTIVITY
                         </span>
 
+
                         <h2>
                             Workout Activity
                         </h2>
 
                     </div>
 
+
                     <div className="activity-badge">
+
                         Last 7 days
+
                     </div>
 
                 </div>
@@ -170,14 +210,18 @@ function ProgressDashboard({ progress }) {
                                 tickLine={false}
                             />
 
+
                             <YAxis
                                 allowDecimals={false}
                                 axisLine={false}
                                 tickLine={false}
                             />
 
+
                             <Tooltip
-                                cursor={{ opacity: 0.08 }}
+                                cursor={{
+                                    opacity: 0.08,
+                                }}
                                 contentStyle={{
                                     background: "#111827",
                                     border: "1px solid #1e293b",
@@ -186,10 +230,16 @@ function ProgressDashboard({ progress }) {
                                 }}
                             />
 
+
                             <Bar
                                 dataKey="count"
                                 fill="#22c55e"
-                                radius={[8, 8, 0, 0]}
+                                radius={[
+                                    8,
+                                    8,
+                                    0,
+                                    0,
+                                ]}
                                 maxBarSize={45}
                             />
 
@@ -202,7 +252,7 @@ function ProgressDashboard({ progress }) {
             </div>
 
 
-            {/* Workout History */}
+            {/* ================= WORKOUT HISTORY ================= */}
 
             <div className="history-section">
 
@@ -214,14 +264,18 @@ function ProgressDashboard({ progress }) {
                             ACTIVITY
                         </span>
 
+
                         <h2>
                             Recent Workouts
                         </h2>
 
                     </div>
 
+
                     <div className="history-count">
+
                         {history.length} records
+
                     </div>
 
                 </div>
@@ -237,9 +291,11 @@ function ProgressDashboard({ progress }) {
                                 ◌
                             </div>
 
+
                             <h3>
                                 No workouts completed yet
                             </h3>
+
 
                             <p>
                                 Complete your first workout to
@@ -268,8 +324,11 @@ function ProgressDashboard({ progress }) {
                                         {workout.name}
                                     </h3>
 
+
                                     <p>
+
                                         Completed on{" "}
+
                                         {new Date(
                                             workout.completed_at
                                         ).toLocaleDateString(
@@ -280,14 +339,20 @@ function ProgressDashboard({ progress }) {
                                                 year: "numeric",
                                             }
                                         )}
+
                                     </p>
 
                                 </div>
 
 
                                 <div className="completed-badge">
-                                    <span>✓</span>
+
+                                    <span>
+                                        ✓
+                                    </span>
+
                                     Completed
+
                                 </div>
 
                             </div>
@@ -301,7 +366,9 @@ function ProgressDashboard({ progress }) {
             </div>
 
         </div>
+
     );
+
 }
 
 

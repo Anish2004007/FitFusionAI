@@ -42,7 +42,7 @@ export const getDashboard = async () => {
 
 
 /* =========================================
-   WORKOUT HOME API
+   WORKOUT API
 ========================================= */
 
 export const getWorkout = async () => {
@@ -55,25 +55,6 @@ export const getWorkout = async () => {
 
 };
 
-
-/* =========================================
-   START WORKOUT API
-========================================= */
-
-export const startWorkout = async () => {
-
-    const response = await api.post(
-        "/workout/api/start/"
-    );
-
-    return response.data;
-
-};
-
-
-/* =========================================
-   WORKOUT SESSION API
-========================================= */
 
 export const getWorkoutSession = async (
     sessionId
@@ -88,9 +69,20 @@ export const getWorkoutSession = async (
 };
 
 
-/* =========================================
-   COMPLETE EXERCISE API
-========================================= */
+export const startWorkout = async () => {
+
+    const response = await api.post(
+        "/workout/api/start/",
+        {},
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+
+};
+
 
 export const completeExercise = async (
     sessionId,
@@ -98,7 +90,41 @@ export const completeExercise = async (
 ) => {
 
     const response = await api.post(
-        `/workout/api/session/${sessionId}/exercise/${exerciseId}/complete/`
+        `/workout/api/session/${sessionId}/exercise/${exerciseId}/complete/`,
+        {},
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+
+};
+
+
+export const completeWorkout = async (
+    sessionId
+) => {
+
+    const response = await api.post(
+        `/workout/api/session/${sessionId}/complete/`,
+        {},
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+
+};
+
+
+export const getWorkoutCompleted = async (
+    sessionId
+) => {
+
+    const response = await api.get(
+        `/workout/api/session/${sessionId}/completed/`
     );
 
     return response.data;
@@ -107,15 +133,30 @@ export const completeExercise = async (
 
 
 /* =========================================
-   COMPLETE WORKOUT API
+   DIET API
 ========================================= */
 
-export const completeWorkout = async (
-    sessionId
+export const getDiet = async () => {
+
+    const response = await api.get(
+        "/diet/api/"
+    );
+
+    return response.data;
+
+};
+
+
+/* =========================================
+   COMPLETE / UNCOMPLETE MEAL
+========================================= */
+
+export const completeMeal = async (
+    mealId
 ) => {
 
     const response = await api.post(
-        `/workout/api/session/${sessionId}/complete/`
+        `/diet/api/meal/${mealId}/complete/`
     );
 
     return response.data;

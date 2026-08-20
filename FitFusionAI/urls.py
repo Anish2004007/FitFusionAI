@@ -29,4 +29,7 @@ urlpatterns = [
     path("workout/",include("workout.urls")),
 
     path("progress/", include("progress.urls")),
+
+    path("diet/", include("diet.urls")
+),
 ]

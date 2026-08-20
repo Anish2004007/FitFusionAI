@@ -1,48 +1,139 @@
-function FitFusionLayout({ children, user }) {
+import React from "react";
 
-    const currentPath = window.location.pathname;
+
+function FitFusionLayout({
+    children,
+    user,
+    onNavigate,
+}) {
+
+    /*
+     * =========================================
+     * CURRENT PATH
+     * =========================================
+     */
+
+    const currentPath =
+        window.location.pathname;
+
+
+    /*
+     * =========================================
+     * ACTIVE MENU
+     * =========================================
+     */
 
     const isDashboard =
         currentPath === "/dashboard/" ||
         currentPath === "/dashboard";
+
 
     const isProgress =
         currentPath === "/" ||
         currentPath === "";
 
 
+    const isWorkout =
+        currentPath.startsWith(
+            "/workout"
+        );
+
+
+    const isDiet =
+        currentPath === "/diet/" ||
+        currentPath === "/diet";
+
+
+    /*
+     * =========================================
+     * NAVIGATION
+     * =========================================
+     */
+
+    const navigate = (url) => {
+
+        if (onNavigate) {
+
+            onNavigate(url);
+
+            return;
+
+        }
+
+
+        window.history.pushState(
+            {},
+            "",
+            url
+        );
+
+
+        window.dispatchEvent(
+            new PopStateEvent(
+                "popstate"
+            )
+        );
+
+    };
+
+
     return (
+
         <div className="dashboard-layout">
+
 
             {/* ================= SIDEBAR ================= */}
 
             <aside className="sidebar">
 
-                {/* Logo */}
+
+                {/* LOGO */}
 
                 <div className="logo">
 
                     <span className="logo-icon">
+
                         <i className="bi bi-heart-pulse-fill"></i>
+
                     </span>
 
+
                     <span className="logo-text">
+
                         FitFusion AI
+
                     </span>
 
                 </div>
 
 
-                {/* Navigation */}
+                {/* ================= NAVIGATION ================= */}
 
                 <ul className="menu">
 
 
-                    {/* Dashboard */}
+                    {/* DASHBOARD */}
 
-                    <li className={isDashboard ? "active" : ""}>
+                    <li
+                        className={
+                            isDashboard
+                                ? "active"
+                                : ""
+                        }
+                    >
 
-                        <a href="/dashboard/">
+                        <a
+                            href="/dashboard/"
+                            onClick={(e) => {
+
+                                e.preventDefault();
+
+                                navigate(
+                                    "/dashboard/"
+                                );
+
+                            }}
+                        >
 
                             <i className="bi bi-grid-fill"></i>
 
@@ -53,11 +144,16 @@ function FitFusionLayout({ children, user }) {
                     </li>
 
 
-                    {/* Profile */}
+                    {/* PROFILE */}
 
                     <li>
 
-                        <a href="#">
+                        <a
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                            }}
+                        >
 
                             <i className="bi bi-person-circle"></i>
 
@@ -68,27 +164,62 @@ function FitFusionLayout({ children, user }) {
                     </li>
 
 
-                    {/* Workout */}
+                    {/* WORKOUT */}
 
                     <li
                         className={
-                            window.location.pathname.startsWith("/workout")
+                            isWorkout
                                 ? "active"
                                 : ""
                         }
                     >
-                        <a href="/workout/">
+
+                        <a
+                            href="/workout/"
+                            onClick={(e) => {
+
+                                e.preventDefault();
+
+                                navigate(
+                                    "/workout/"
+                                );
+
+                            }}
+                        >
+
                             <i className="bi bi-heart-pulse"></i>
-                            <span>Workout</span>
+
+                            <span>
+                                Workout
+                            </span>
+
                         </a>
+
                     </li>
 
 
-                    {/* Diet */}
+                    {/* DIET */}
 
-                    <li>
+                    <li
+                        className={
+                            isDiet
+                                ? "active"
+                                : ""
+                        }
+                    >
 
-                        <a href="#">
+                        <a
+                            href="/diet/"
+                            onClick={(e) => {
+
+                                e.preventDefault();
+
+                                navigate(
+                                    "/diet/"
+                                );
+
+                            }}
+                        >
 
                             <i className="bi bi-egg-fried"></i>
 
@@ -99,11 +230,16 @@ function FitFusionLayout({ children, user }) {
                     </li>
 
 
-                    {/* Water Tracker */}
+                    {/* WATER TRACKER */}
 
                     <li>
 
-                        <a href="#">
+                        <a
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                            }}
+                        >
 
                             <i className="bi bi-droplet-half"></i>
 
@@ -114,11 +250,26 @@ function FitFusionLayout({ children, user }) {
                     </li>
 
 
-                    {/* Progress */}
+                    {/* PROGRESS */}
 
-                    <li className={isProgress ? "active" : ""}>
+                    <li
+                        className={
+                            isProgress
+                                ? "active"
+                                : ""
+                        }
+                    >
 
-                        <a href="/">
+                        <a
+                            href="/"
+                            onClick={(e) => {
+
+                                e.preventDefault();
+
+                                navigate("/");
+
+                            }}
+                        >
 
                             <i className="bi bi-graph-up-arrow"></i>
 
@@ -129,11 +280,16 @@ function FitFusionLayout({ children, user }) {
                     </li>
 
 
-                    {/* AI Coach */}
+                    {/* AI COACH */}
 
                     <li>
 
-                        <a href="#">
+                        <a
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                            }}
+                        >
 
                             <i className="bi bi-robot"></i>
 
@@ -147,7 +303,7 @@ function FitFusionLayout({ children, user }) {
                 </ul>
 
 
-                {/* Logout */}
+                {/* ================= LOGOUT ================= */}
 
                 <a
                     href="http://localhost:8000/logout/"
@@ -176,21 +332,32 @@ function FitFusionLayout({ children, user }) {
 
                     <div className="topbar-left">
 
+
                         <span
                             className="greeting"
                             id="dynamicGreeting"
                         >
+
                             👋 Good Afternoon,
+
                         </span>
 
 
                         <h2>
-                            {user?.full_name || "User"}
+
+                            {
+                                user?.full_name ||
+                                "User"
+                            }
+
                         </h2>
 
 
                         <p>
-                            Stay consistent. You're doing great!
+
+                            Stay consistent.
+                            You're doing great!
+
                         </p>
 
                     </div>
@@ -199,7 +366,7 @@ function FitFusionLayout({ children, user }) {
                     <div className="topbar-right">
 
 
-                        {/* Search */}
+                        {/* SEARCH */}
 
                         <div className="icon-btn">
 
@@ -208,7 +375,7 @@ function FitFusionLayout({ children, user }) {
                         </div>
 
 
-                        {/* Notification */}
+                        {/* NOTIFICATION */}
 
                         <div className="icon-btn">
 
@@ -219,17 +386,19 @@ function FitFusionLayout({ children, user }) {
                         </div>
 
 
-                        {/* Profile */}
+                        {/* PROFILE */}
 
                         <div className="profile-mini">
 
                             <div className="mini-avatar">
 
-                                {user?.full_name
-                                    ? user.full_name
-                                        .slice(0, 1)
-                                        .toUpperCase()
-                                    : "U"}
+                                {
+                                    user?.full_name
+                                        ? user.full_name
+                                            .slice(0, 1)
+                                            .toUpperCase()
+                                        : "U"
+                                }
 
                             </div>
 
@@ -237,7 +406,6 @@ function FitFusionLayout({ children, user }) {
 
 
                     </div>
-
 
                 </header>
 
@@ -253,9 +421,10 @@ function FitFusionLayout({ children, user }) {
 
             </main>
 
-
         </div>
+
     );
+
 }
 
 

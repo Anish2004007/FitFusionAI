@@ -1,23 +1,55 @@
 function Dashboard({ dashboard }) {
 
-    const metrics = dashboard.metrics;
-    const profile = dashboard.profile;
-    const energy = dashboard.energy;
+    const metrics =
+        dashboard?.metrics || {
+            bmi: "--",
+            bmi_category: "Not available",
+            water_goal: "--",
+            fitness_goal: "Not available",
+        };
+
+
+    const profile =
+        dashboard?.profile || {
+            weight: "--",
+            target_weight: "--",
+        };
+
+
+    const energy =
+        dashboard?.energy || {
+            bmr: "--",
+            tdee: "--",
+            calorie_target: "--",
+            calorie_adjustment: 0,
+        };
+
 
     return (
+
         <div className="dashboard-react-page">
+
+
+            {/* ================= WELCOME ================= */}
 
             <div className="welcome-card">
 
                 <div className="welcome-content">
 
                     <span className="welcome-label">
+
                         <i className="bi bi-stars"></i>
+
                         Your Fitness Overview
+
                     </span>
 
+
                     <p>
-                        Here's a quick look at your current fitness journey.
+
+                        Here's a quick look at your
+                        current fitness journey.
+
                     </p>
 
                 </div>
@@ -25,18 +57,26 @@ function Dashboard({ dashboard }) {
             </div>
 
 
+            {/* ================= HEALTH SUMMARY ================= */}
+
             <div className="dashboard-section">
+
 
                 <div className="section-heading">
 
                     <div>
 
                         <span className="section-label">
+
                             HEALTH SUMMARY
+
                         </span>
 
+
                         <h2>
+
                             Your Fitness Metrics
+
                         </h2>
 
                     </div>
@@ -57,18 +97,27 @@ function Dashboard({ dashboard }) {
 
                         </div>
 
+
                         <div className="stat-info">
 
                             <span className="stat-label">
+
                                 BMI
+
                             </span>
 
+
                             <h3>
+
                                 {metrics.bmi}
+
                             </h3>
 
+
                             <span className="stat-status">
+
                                 {metrics.bmi_category}
+
                             </span>
 
                         </div>
@@ -86,19 +135,31 @@ function Dashboard({ dashboard }) {
 
                         </div>
 
+
                         <div className="stat-info">
 
                             <span className="stat-label">
+
                                 Daily Water Goal
+
                             </span>
 
+
                             <h3>
+
                                 {metrics.water_goal}
-                                <small>L</small>
+
+                                <small>
+                                    L
+                                </small>
+
                             </h3>
 
+
                             <span className="stat-status">
+
                                 Recommended daily intake
+
                             </span>
 
                         </div>
@@ -116,18 +177,27 @@ function Dashboard({ dashboard }) {
 
                         </div>
 
+
                         <div className="stat-info">
 
                             <span className="stat-label">
+
                                 Fitness Goal
+
                             </span>
 
+
                             <h3 className="goal-value">
+
                                 {metrics.fitness_goal}
+
                             </h3>
 
+
                             <span className="stat-status">
+
                                 Your current objective
+
                             </span>
 
                         </div>
@@ -145,42 +215,61 @@ function Dashboard({ dashboard }) {
 
                         </div>
 
+
                         <div className="stat-info">
 
                             <span className="stat-label">
+
                                 Current Weight
+
                             </span>
 
+
                             <h3>
+
                                 {profile.weight}
-                                <small>kg</small>
+
+                                <small>
+                                    kg
+                                </small>
+
                             </h3>
 
+
                             <span className="stat-status">
+
                                 Target: {profile.target_weight} kg
+
                             </span>
 
                         </div>
 
                     </div>
 
+
                 </div>
 
 
-                {/* ENERGY */}
+                {/* ================= ENERGY ================= */}
 
                 <div className="energy-section">
+
 
                     <div className="section-heading">
 
                         <div>
 
                             <span className="section-label">
+
                                 DAILY ENERGY
+
                             </span>
 
+
                             <h2>
+
                                 Your Calorie Overview
+
                             </h2>
 
                         </div>
@@ -201,19 +290,30 @@ function Dashboard({ dashboard }) {
 
                             </div>
 
+
                             <div>
 
                                 <span>
                                     BMR
                                 </span>
 
+
                                 <h3>
+
                                     {energy.bmr}
-                                    <small>kcal</small>
+
+                                    <small>
+                                        kcal
+                                    </small>
+
                                 </h3>
 
+
                                 <p>
-                                    Calories your body needs at rest
+
+                                    Calories your body
+                                    needs at rest
+
                                 </p>
 
                             </div>
@@ -231,19 +331,30 @@ function Dashboard({ dashboard }) {
 
                             </div>
 
+
                             <div>
 
                                 <span>
                                     TDEE
                                 </span>
 
+
                                 <h3>
+
                                     {energy.tdee}
-                                    <small>kcal</small>
+
+                                    <small>
+                                        kcal
+                                    </small>
+
                                 </h3>
 
+
                                 <p>
-                                    Estimated daily energy expenditure
+
+                                    Estimated daily
+                                    energy expenditure
+
                                 </p>
 
                             </div>
@@ -261,24 +372,39 @@ function Dashboard({ dashboard }) {
 
                             </div>
 
+
                             <div>
 
                                 <span>
+
                                     Recommended Calories
+
                                 </span>
 
+
                                 <h3>
+
                                     {energy.calorie_target}
-                                    <small>kcal/day</small>
+
+                                    <small>
+                                        kcal/day
+                                    </small>
+
                                 </h3>
+
 
                                 <p>
 
-                                    {energy.calorie_adjustment < 0
-                                        ? `${energy.calorie_adjustment} kcal from TDEE for weight loss`
-                                        : energy.calorie_adjustment > 0
-                                            ? `+${energy.calorie_adjustment} kcal from TDEE for muscle gain`
-                                            : "Based on your maintenance needs"
+                                    {
+                                        energy.calorie_adjustment < 0
+
+                                            ? `${energy.calorie_adjustment} kcal from TDEE for weight loss`
+
+                                            : energy.calorie_adjustment > 0
+
+                                                ? `+${energy.calorie_adjustment} kcal from TDEE for muscle gain`
+
+                                                : "Based on your maintenance needs"
                                     }
 
                                 </p>
@@ -287,14 +413,18 @@ function Dashboard({ dashboard }) {
 
                         </div>
 
+
                     </div>
 
                 </div>
 
+
             </div>
 
         </div>
+
     );
+
 }
 
 

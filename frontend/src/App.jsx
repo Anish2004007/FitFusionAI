@@ -12,6 +12,8 @@ import WorkoutHome from "./components/workout/WorkoutHome";
 import WorkoutSession from "./components/workout/WorkoutSession";
 import WorkoutCompleted from "./components/workout/WorkoutCompleted";
 
+import DietHome from "./components/diet/DietHome";
+
 import FitFusionLayout from "./components/FitFusionLayout";
 
 import "./App.css";
@@ -25,23 +27,77 @@ function App() {
 
     const [data, setData] = useState(null);
 
-    const [workoutUser, setWorkoutUser] = useState(null);
+    const [workoutUser, setWorkoutUser] =
+        useState(null);
 
-    const [loading, setLoading] = useState(true);
+    const [dietUser, setDietUser] =
+        useState(null);
 
-    const [error, setError] = useState("");
+    const [loading, setLoading] =
+        useState(false);
+
+    const [error, setError] =
+        useState("");
 
 
-    /* =========================================
-       ROUTE DETECTION
-    ========================================= */
+    /*
+     * =========================================
+     * NORMALIZE URL
+     * =========================================
+     */
+
+    const normalizePath = (path) => {
+
+        if (!path) {
+            return "/";
+        }
+
+        if (
+            path !== "/" &&
+            !path.endsWith("/")
+        ) {
+            return path + "/";
+        }
+
+        return path;
+    };
+
+
+    /*
+     * =========================================
+     * NAVIGATION
+     * =========================================
+     */
+
+    const navigate = (url) => {
+
+        const normalizedUrl =
+            normalizePath(url);
+
+        window.history.pushState(
+            {},
+            "",
+            normalizedUrl
+        );
+
+        setPage(normalizedUrl);
+    };
+
+
+    /*
+     * =========================================
+     * BROWSER BACK / FORWARD
+     * =========================================
+     */
 
     useEffect(() => {
 
-        const handleLocationChange = () => {
+        const handlePopState = () => {
 
             setPage(
-                window.location.pathname
+                normalizePath(
+                    window.location.pathname
+                )
             );
 
         };
@@ -49,7 +105,7 @@ function App() {
 
         window.addEventListener(
             "popstate",
-            handleLocationChange
+            handlePopState
         );
 
 
@@ -57,7 +113,7 @@ function App() {
 
             window.removeEventListener(
                 "popstate",
-                handleLocationChange
+                handlePopState
             );
 
         };
@@ -65,38 +121,73 @@ function App() {
     }, []);
 
 
-    /* =========================================
-       RESET DATA WHEN PAGE CHANGES
-    ========================================= */
+    /*
+     * =========================================
+     * CURRENT ROUTE
+     * =========================================
+     */
+
+    const currentPage =
+        normalizePath(page);
+
+
+    const isDashboard =
+        currentPage === "/dashboard/";
+
+
+    const isProgress =
+        currentPage === "/";
+
+
+    const isWorkout =
+        currentPage.startsWith(
+            "/workout/"
+        );
+
+
+    const isDiet =
+        currentPage === "/diet/";
+
+
+    /*
+     * =========================================
+     * LOAD DASHBOARD / PROGRESS
+     * =========================================
+     */
 
     useEffect(() => {
 
-        setData(null);
-
-        setError("");
-
-        setLoading(true);
-
-    }, [page]);
+        let cancelled = false;
 
 
-    /* =========================================
-       LOAD DASHBOARD / PROGRESS DATA
-    ========================================= */
-
-    useEffect(() => {
-
-        const loadData = async () => {
+        const loadPageData = async () => {
 
             /*
-             * Workout pages have their own
-             * API calls.
+             * Workout and Diet load
+             * their own data.
              */
 
             if (
-                page === "/workout/" ||
-                page === "/workout" ||
-                page.startsWith("/workout/session/")
+                isWorkout ||
+                isDiet
+            ) {
+
+                setLoading(false);
+                setError("");
+
+                return;
+
+            }
+
+
+            /*
+             * Only Dashboard and Progress
+             * use this data loader.
+             */
+
+            if (
+                !isDashboard &&
+                !isProgress
             ) {
 
                 setLoading(false);
@@ -106,41 +197,71 @@ function App() {
             }
 
 
+            setLoading(true);
+            setError("");
+            setData(null);
+
+
             try {
 
                 let result;
 
 
-                if (
-                    page === "/dashboard/" ||
-                    page === "/dashboard"
-                ) {
+                if (isDashboard) {
 
-                    result = await getDashboard();
+                    result =
+                        await getDashboard();
 
                 } else {
 
-                    result = await getProgress();
+                    result =
+                        await getProgress();
 
                 }
 
 
-                if (result.success) {
+                /*
+                 * Ignore an old request if
+                 * the user changed pages.
+                 */
+
+                if (cancelled) {
+                    return;
+                }
+
+
+                if (
+                    result &&
+                    result.success
+                ) {
 
                     setData(result);
 
                 } else {
 
+                    setData(null);
+
                     setError(
-                        result.error ||
+                        result?.error ||
                         "Unable to load data."
                     );
 
                 }
 
-            } catch (error) {
+            } catch (err) {
 
-                console.error(error);
+                if (cancelled) {
+                    return;
+                }
+
+
+                console.error(
+                    "API ERROR:",
+                    err
+                );
+
+
+                setData(null);
 
                 setError(
                     "Unable to connect to Django."
@@ -148,40 +269,45 @@ function App() {
 
             } finally {
 
-                setLoading(false);
+                if (!cancelled) {
+
+                    setLoading(false);
+
+                }
 
             }
 
         };
 
 
-        loadData();
-
-    }, [page]);
+        loadPageData();
 
 
-    /* =========================================
-       NAVIGATION HELPER
-    ========================================= */
+        return () => {
 
-    const navigate = (url) => {
+            cancelled = true;
 
-        window.history.pushState(
-            {},
-            "",
-            url
-        );
+        };
 
-        setPage(url);
-
-    };
+    }, [
+        currentPage,
+        isDashboard,
+        isProgress,
+        isWorkout,
+        isDiet,
+    ]);
 
 
-    /* =========================================
-       DASHBOARD / PROGRESS LOADING
-    ========================================= */
+    /*
+     * =========================================
+     * LOADING SCREEN
+     * =========================================
+     */
 
-    if (loading) {
+    if (
+        loading &&
+        (isDashboard || isProgress)
+    ) {
 
         return (
 
@@ -196,13 +322,15 @@ function App() {
     }
 
 
-    /* =========================================
-       DASHBOARD / PROGRESS ERROR
-    ========================================= */
+    /*
+     * =========================================
+     * DASHBOARD / PROGRESS ERROR
+     * =========================================
+     */
 
     if (
         error &&
-        !page.startsWith("/workout")
+        (isDashboard || isProgress)
     ) {
 
         return (
@@ -218,159 +346,39 @@ function App() {
     }
 
 
-    /* =========================================
-       WORKOUT HOME
-    ========================================= */
+    /*
+     * =========================================
+     * DASHBOARD
+     * =========================================
+     */
 
-    if (
-        page === "/workout/" ||
-        page === "/workout"
-    ) {
+    if (isDashboard) {
 
-        return (
+        /*
+         * Never render Dashboard with
+         * null data.
+         */
 
-            <FitFusionLayout user={workoutUser}>
+        if (!data) {
 
-    <WorkoutHome
+            return (
 
-        onUserLoaded={(user) => {
+                <div className="app-message">
 
-            setWorkoutUser(user);
+                    Loading...
 
-        }}
+                </div>
 
-        onWorkoutStarted={(sessionId) => {
-
-            navigate(
-                `/workout/session/${sessionId}/`
             );
 
-        }}
+        }
 
-    />
-
-</FitFusionLayout>
-
-        );
-
-    }
-
-
-   /* =========================================
-   WORKOUT COMPLETED
-========================================= */
-
-if (
-    page.startsWith("/workout/session/") &&
-    page.endsWith("/completed/")
-) {
-
-    return (
-
-        <FitFusionLayout user={workoutUser}>
-
-    <WorkoutCompleted
-        workout={data}
-
-        onUserLoaded={(user) => {
-            setWorkoutUser(user);
-        }}
-
-        onBackToWorkout={() => {
-
-            navigate(
-                "/workout/"
-            );
-
-        }}
-    />
-
-</FitFusionLayout>
-
-    );
-
-}
-
-
-/* =========================================
-   WORKOUT SESSION
-========================================= */
-
-if (
-    page.startsWith("/workout/session/")
-) {
-
-    const sessionPath =
-        page
-            .replace(
-                "/workout/session/",
-                ""
-            )
-            .replace(
-                "/",
-                ""
-            );
-
-
-    const sessionId =
-        Number(sessionPath);
-
-
-    if (Number.isNaN(sessionId)) {
-
-        return (
-
-            <div className="app-message error">
-
-                Invalid workout session.
-
-            </div>
-
-        );
-
-    }
-
-
-    return (
-
-       <FitFusionLayout user={workoutUser}>
-
-    <WorkoutSession
-        sessionId={sessionId}
-
-        onUserLoaded={(user) => {
-            setWorkoutUser(user);
-        }}
-
-        onWorkoutCompleted={() => {
-
-            navigate(
-                `/workout/session/${sessionId}/completed/`
-            );
-
-        }}
-    />
-
-</FitFusionLayout>
-
-    );
-
-}
-
-
-    /* =========================================
-       DASHBOARD
-    ========================================= */
-
-    if (
-        page === "/dashboard/" ||
-        page === "/dashboard"
-    ) {
 
         return (
 
             <FitFusionLayout
-                user={data?.user}
+                user={data.user}
+                onNavigate={navigate}
             >
 
                 <Dashboard
@@ -384,21 +392,268 @@ if (
     }
 
 
-    /* =========================================
-       PROGRESS
-    ========================================= */
+    /*
+     * =========================================
+     * PROGRESS
+     * =========================================
+     */
+
+    if (isProgress) {
+
+        /*
+         * Never render ProgressDashboard
+         * with null data.
+         */
+
+        if (!data) {
+
+            return (
+
+                <div className="app-message">
+
+                    Loading...
+
+                </div>
+
+            );
+
+        }
+
+
+        return (
+
+            <FitFusionLayout
+                user={data.user}
+                onNavigate={navigate}
+            >
+
+                <ProgressDashboard
+                    progress={data}
+                />
+
+            </FitFusionLayout>
+
+        );
+
+    }
+
+
+    /*
+     * =========================================
+     * WORKOUT HOME
+     * =========================================
+     */
+
+    if (
+        currentPage === "/workout/"
+    ) {
+
+        return (
+
+            <FitFusionLayout
+                user={workoutUser}
+                onNavigate={navigate}
+            >
+
+                <WorkoutHome
+
+                    onUserLoaded={(user) => {
+
+                        setWorkoutUser(user);
+
+                    }}
+
+
+                    onWorkoutStarted={(sessionId) => {
+
+                        navigate(
+                            `/workout/session/${sessionId}/`
+                        );
+
+                    }}
+
+                />
+
+            </FitFusionLayout>
+
+        );
+
+    }
+
+
+    /*
+     * =========================================
+     * WORKOUT COMPLETED
+     * =========================================
+     */
+
+    if (
+        currentPage.startsWith(
+            "/workout/session/"
+        ) &&
+        currentPage.endsWith(
+            "/completed/"
+        )
+    ) {
+
+        return (
+
+            <FitFusionLayout
+                user={workoutUser}
+                onNavigate={navigate}
+            >
+
+                <WorkoutCompleted
+
+                    onBackToWorkout={() => {
+
+                        navigate(
+                            "/workout/"
+                        );
+
+                    }}
+
+                />
+
+            </FitFusionLayout>
+
+        );
+
+    }
+
+
+    /*
+     * =========================================
+     * WORKOUT SESSION
+     * =========================================
+     */
+
+    if (
+        currentPage.startsWith(
+            "/workout/session/"
+        )
+    ) {
+
+        const sessionPath =
+            currentPage
+                .replace(
+                    "/workout/session/",
+                    ""
+                )
+                .replace(
+                    "/",
+                    ""
+                );
+
+
+        const sessionId =
+            Number(sessionPath);
+
+
+        if (
+            Number.isNaN(sessionId)
+        ) {
+
+            return (
+
+                <div className="app-message error">
+
+                    Invalid workout session.
+
+                </div>
+
+            );
+
+        }
+
+
+        return (
+
+            <FitFusionLayout
+                user={workoutUser}
+                onNavigate={navigate}
+            >
+
+                <WorkoutSession
+
+                    sessionId={sessionId}
+
+                    onWorkoutCompleted={() => {
+
+                        navigate(
+                            `/workout/session/${sessionId}/completed/`
+                        );
+
+                    }}
+
+                />
+
+            </FitFusionLayout>
+
+        );
+
+    }
+
+
+    /*
+     * =========================================
+     * DIET
+     * =========================================
+     */
+
+    if (isDiet) {
+
+        return (
+
+            <FitFusionLayout
+                user={dietUser}
+                onNavigate={navigate}
+            >
+
+                <DietHome
+
+                    onUserLoaded={(user) => {
+
+                        setDietUser(user);
+
+                    }}
+
+                />
+
+            </FitFusionLayout>
+
+        );
+
+    }
+
+
+    /*
+     * =========================================
+     * FALLBACK
+     * =========================================
+     */
 
     return (
 
-        <FitFusionLayout
-            user={data?.user}
-        >
+        <div className="app-message">
 
-            <ProgressDashboard
-                progress={data}
-            />
+            <div>
 
-        </FitFusionLayout>
+                <h2>
+                    Page not found
+                </h2>
+
+                <button
+                    onClick={() => {
+                        navigate("/");
+                    }}
+                >
+                    Go to Progress
+                </button>
+
+            </div>
+
+        </div>
 
     );
 
