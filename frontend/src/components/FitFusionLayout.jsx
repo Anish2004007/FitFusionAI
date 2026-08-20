@@ -42,7 +42,7 @@ function FitFusionLayout({ children, user }) {
 
                     <li className={isDashboard ? "active" : ""}>
 
-                        <a href="http://localhost:5173/dashboard/">
+                        <a href="/dashboard/">
 
                             <i className="bi bi-grid-fill"></i>
 
@@ -70,16 +70,17 @@ function FitFusionLayout({ children, user }) {
 
                     {/* Workout */}
 
-                    <li>
-
-                        <a href="http://localhost:8000/workout/">
-
+                    <li
+                        className={
+                            window.location.pathname.startsWith("/workout")
+                                ? "active"
+                                : ""
+                        }
+                    >
+                        <a href="/workout/">
                             <i className="bi bi-heart-pulse"></i>
-
-                            Workout
-
+                            <span>Workout</span>
                         </a>
-
                     </li>
 
 
@@ -117,7 +118,7 @@ function FitFusionLayout({ children, user }) {
 
                     <li className={isProgress ? "active" : ""}>
 
-                        <a href="http://localhost:5173/">
+                        <a href="/">
 
                             <i className="bi bi-graph-up-arrow"></i>
 
