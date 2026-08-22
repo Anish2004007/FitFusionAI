@@ -6,18 +6,12 @@ import {
 } from "../../services/api";
 
 
-function DietHome({
-    onUserLoaded,
-}) {
+function DietHome({ onUserLoaded }) {
 
     const [diet, setDiet] = useState(null);
-
     const [loading, setLoading] = useState(true);
-
     const [error, setError] = useState("");
-
-    const [updatingMeal, setUpdatingMeal] =
-        useState(null);
+    const [updatingMeal, setUpdatingMeal] = useState(null);
 
 
     /* =========================================
@@ -30,29 +24,17 @@ function DietHome({
 
             try {
 
-                const data =
-                    await getDiet();
-
+                const data = await getDiet();
 
                 if (data.success) {
 
                     setDiet(data);
 
-
-                    /*
-                     * Keep navbar user information
-                     * synchronized with Django.
-                     */
-
                     if (
                         onUserLoaded &&
                         data.user
                     ) {
-
-                        onUserLoaded(
-                            data.user
-                        );
-
+                        onUserLoaded(data.user);
                     }
 
                 } else {
@@ -80,7 +62,6 @@ function DietHome({
 
         };
 
-
         loadDiet();
 
     }, [onUserLoaded]);
@@ -90,24 +71,15 @@ function DietHome({
        COMPLETE / UNCOMPLETE MEAL
     ========================================= */
 
-    const handleMealComplete = async (
-        mealId
-    ) => {
+    const handleMealComplete = async (mealId) => {
 
         try {
 
-            setUpdatingMeal(
-                mealId
-            );
-
+            setUpdatingMeal(mealId);
             setError("");
 
-
             const data =
-                await completeMeal(
-                    mealId
-                );
-
+                await completeMeal(mealId);
 
             if (!data.success) {
 
@@ -121,65 +93,45 @@ function DietHome({
             }
 
 
-            /*
-             * Update the meal locally.
-             */
+            /* Update meal locally */
 
             setDiet((previous) => {
 
                 if (!previous) {
-
                     return previous;
-
                 }
 
-
                 const updatedMeals =
-                    previous.meals.map(
-                        (meal) => {
+                    previous.meals.map((meal) => {
 
-                            if (
-                                meal.id ===
-                                mealId
-                            ) {
+                        if (meal.id === mealId) {
 
-                                return {
-
-                                    ...meal,
-
-                                    completed:
-                                        data.completed,
-
-                                };
-
-                            }
-
-                            return meal;
+                            return {
+                                ...meal,
+                                completed:
+                                    data.completed,
+                            };
 
                         }
-                    );
+
+                        return meal;
+
+                    });
 
 
                 return {
-
                     ...previous,
 
-                    meals:
-                        updatedMeals,
+                    meals: updatedMeals,
 
                     diet_day: {
-
                         ...previous.diet_day,
-
                         completed:
                             data.diet_completed,
-
                     },
-
                 };
 
             });
-
 
         } catch (error) {
 
@@ -205,7 +157,6 @@ function DietHome({
     if (loading) {
 
         return (
-
             <div className="diet-message">
 
                 <div className="diet-message-icon">
@@ -223,7 +174,6 @@ function DietHome({
                 </p>
 
             </div>
-
         );
 
     }
@@ -236,7 +186,6 @@ function DietHome({
     if (error && !diet) {
 
         return (
-
             <div className="diet-message diet-error">
 
                 <div className="diet-message-icon">
@@ -254,16 +203,13 @@ function DietHome({
                 </p>
 
             </div>
-
         );
 
     }
 
 
     if (!diet) {
-
         return null;
-
     }
 
 
@@ -274,14 +220,11 @@ function DietHome({
     const meals =
         diet.meals || [];
 
-
     const nutrition =
         diet.nutrition || {};
 
-
     const calorieTarget =
         diet.diet_day?.calorie_target || 0;
-
 
     const calories =
         nutrition.calories || 0;
@@ -307,7 +250,6 @@ function DietHome({
                 meal.completed
         ).length;
 
-
     const totalMeals =
         meals.length;
 
@@ -316,39 +258,21 @@ function DietHome({
        MEAL ICON
     ========================================= */
 
-    const getMealIcon = (
-        mealType
-    ) => {
+    const getMealIcon = (mealType) => {
 
-        if (
-            mealType ===
-            "Breakfast"
-        ) {
-
+        if (mealType === "Breakfast") {
             return "bi-sunrise-fill";
-
         }
 
-        if (
-            mealType ===
-            "Lunch"
-        ) {
-
+        if (mealType === "Lunch") {
             return "bi-brightness-high-fill";
-
         }
 
-        if (
-            mealType ===
-            "Dinner"
-        ) {
-
+        if (mealType === "Dinner") {
             return "bi-moon-stars-fill";
-
         }
 
         return "bi-apple";
-
     };
 
 
@@ -377,11 +301,9 @@ function DietHome({
 
                     </span>
 
-
                     <h1>
                         Today's Diet
                     </h1>
-
 
                     <p>
                         A personalized meal plan based
@@ -431,7 +353,7 @@ function DietHome({
                             DAILY CALORIE TARGET
                         </span>
 
-                        <h2>
+                        <strong>
 
                             {calorieTarget}
 
@@ -439,7 +361,7 @@ function DietHome({
                                 kcal
                             </small>
 
-                        </h2>
+                        </strong>
 
                         <p>
                             Recommended daily intake
@@ -494,11 +416,13 @@ function DietHome({
                 <div className="nutrition-grid">
 
 
+                    {/* PROTEIN */}
+
                     <div className="nutrition-card">
 
-                        <div className="nutrition-icon protein">
+                        <div className="nutrition-icon">
 
-                            <i className="bi bi-egg-fill"></i>
+                            <i className="bi bi-egg"></i>
 
                         </div>
 
@@ -507,18 +431,25 @@ function DietHome({
                         </span>
 
                         <strong>
+
                             {nutrition.protein || 0}
-                            <small>g</small>
+
+                            <small>
+                                g
+                            </small>
+
                         </strong>
 
                     </div>
 
 
+                    {/* CARBOHYDRATES */}
+
                     <div className="nutrition-card">
 
-                        <div className="nutrition-icon carbs">
+                        <div className="nutrition-icon">
 
-                            <i className="bi bi-basket-fill"></i>
+                            <i className="bi bi-basket"></i>
 
                         </div>
 
@@ -527,18 +458,25 @@ function DietHome({
                         </span>
 
                         <strong>
+
                             {nutrition.carbohydrates || 0}
-                            <small>g</small>
+
+                            <small>
+                                g
+                            </small>
+
                         </strong>
 
                     </div>
 
 
+                    {/* FATS */}
+
                     <div className="nutrition-card">
 
-                        <div className="nutrition-icon fats">
+                        <div className="nutrition-icon">
 
-                            <i className="bi bi-droplet-fill"></i>
+                            <i className="bi bi-droplet"></i>
 
                         </div>
 
@@ -547,8 +485,13 @@ function DietHome({
                         </span>
 
                         <strong>
+
                             {nutrition.fats || 0}
-                            <small>g</small>
+
+                            <small>
+                                g
+                            </small>
+
                         </strong>
 
                     </div>
@@ -594,10 +537,36 @@ function DietHome({
                 </div>
 
 
+                {/* =================================
+                    MEAL GRID
+                ================================= */}
+
                 <div className="diet-meals-grid">
 
-                    {meals.map(
-                        (meal) => (
+                    {meals.length === 0 ? (
+
+                        <div className="empty-state">
+
+                            <div className="empty-icon">
+
+                                <i className="bi bi-egg-fried"></i>
+
+                            </div>
+
+                            <h3>
+                                No meals available
+                            </h3>
+
+                            <p>
+                                No meals are available
+                                for today's diet plan.
+                            </p>
+
+                        </div>
+
+                    ) : (
+
+                        meals.map((meal) => (
 
                             <div
                                 className={
@@ -674,10 +643,11 @@ function DietHome({
 
 
                                 {/* =================
-                                    NUTRITION
+                                    MEAL NUTRITION
                                 ================== */}
 
                                 <div className="meal-nutrition">
+
 
                                     <div>
 
@@ -686,10 +656,13 @@ function DietHome({
                                         </span>
 
                                         <strong>
-                                            {meal.nutrition.calories}
+
+                                            {meal.nutrition?.calories || 0}
+
                                             <small>
                                                 kcal
                                             </small>
+
                                         </strong>
 
                                     </div>
@@ -702,10 +675,13 @@ function DietHome({
                                         </span>
 
                                         <strong>
-                                            {meal.nutrition.protein}
+
+                                            {meal.nutrition?.protein || 0}
+
                                             <small>
                                                 g
                                             </small>
+
                                         </strong>
 
                                     </div>
@@ -718,10 +694,13 @@ function DietHome({
                                         </span>
 
                                         <strong>
-                                            {meal.nutrition.carbohydrates}
+
+                                            {meal.nutrition?.carbohydrates || 0}
+
                                             <small>
                                                 g
                                             </small>
+
                                         </strong>
 
                                     </div>
@@ -734,10 +713,13 @@ function DietHome({
                                         </span>
 
                                         <strong>
-                                            {meal.nutrition.fats}
+
+                                            {meal.nutrition?.fats || 0}
+
                                             <small>
                                                 g
                                             </small>
+
                                         </strong>
 
                                     </div>
@@ -758,7 +740,7 @@ function DietHome({
 
                                     <div className="food-list">
 
-                                        {meal.foods.map(
+                                        {(meal.foods || []).map(
                                             (food) => (
 
                                                 <div
@@ -782,7 +764,8 @@ function DietHome({
                                                     <span className="food-calories">
 
                                                         {food.calories}
-                                                        {" "}kcal
+                                                        {" "}
+                                                        kcal
 
                                                     </span>
 
@@ -851,7 +834,8 @@ function DietHome({
 
                             </div>
 
-                        )
+                        ))
+
                     )}
 
                 </div>

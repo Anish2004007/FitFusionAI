@@ -7,6 +7,26 @@ function FitFusionLayout({
     onNavigate,
 }) {
 
+const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 12) {
+        return "Good Morning";
+    }
+
+    if (hour >= 12 && hour < 17) {
+        return "Good Afternoon";
+    }
+
+    if (hour >= 17 && hour < 21) {
+        return "Good Evening";
+    }
+
+    return "Good Night";
+};
+
+const greeting = getGreeting();
+
     /*
      * =========================================
      * CURRENT PATH
@@ -42,6 +62,10 @@ function FitFusionLayout({
     const isDiet =
         currentPath === "/diet/" ||
         currentPath === "/diet";
+
+    const isProfile =
+    currentPath === "/profile/" ||
+    currentPath === "/profile";
 
 
     /*
@@ -146,21 +170,31 @@ function FitFusionLayout({
 
                     {/* PROFILE */}
 
-                    <li>
-
+                    <li
+                        className={
+                            isProfile
+                                ? "active"
+                                : ""
+                        }
+                    >
                         <a
-                            href="#"
+                            href="/profile/"
                             onClick={(e) => {
+
                                 e.preventDefault();
-                            }}
-                        >
 
-                            <i className="bi bi-person-circle"></i>
+                                navigate(
+                                    "/profile/"
+                                );
 
-                            Profile
+                        }}
+                    >
+
+                        <i className="bi bi-person-circle"></i>
+
+                        Profile
 
                         </a>
-
                     </li>
 
 
@@ -337,9 +371,7 @@ function FitFusionLayout({
                             className="greeting"
                             id="dynamicGreeting"
                         >
-
-                            👋 Good Afternoon,
-
+                            👋 {greeting},
                         </span>
 
 

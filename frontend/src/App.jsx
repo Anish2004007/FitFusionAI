@@ -14,6 +14,8 @@ import WorkoutCompleted from "./components/workout/WorkoutCompleted";
 
 import DietHome from "./components/diet/DietHome";
 
+import Profile from "./components/profile";
+
 import FitFusionLayout from "./components/FitFusionLayout";
 
 import "./App.css";
@@ -32,6 +34,9 @@ function App() {
 
     const [dietUser, setDietUser] =
         useState(null);
+
+    const [profileUser, setProfileUser] =
+    useState(null);
 
     const [loading, setLoading] =
         useState(false);
@@ -148,6 +153,9 @@ function App() {
     const isDiet =
         currentPage === "/diet/";
 
+    const isProfile =
+        currentPage === "/profile/";
+
 
     /*
      * =========================================
@@ -169,7 +177,8 @@ function App() {
 
             if (
                 isWorkout ||
-                isDiet
+                isDiet ||
+                isProfile
             ) {
 
                 setLoading(false);
@@ -625,6 +634,37 @@ function App() {
         );
 
     }
+
+  /*
+ * =========================================
+ * PROFILE
+ * =========================================
+ */
+
+if (isProfile) {
+
+    return (
+
+        <FitFusionLayout
+            user={profileUser}
+            onNavigate={navigate}
+        >
+
+            <Profile
+
+                onUserLoaded={(user) => {
+
+                    setProfileUser(user);
+
+                }}
+
+            />
+
+        </FitFusionLayout>
+
+    );
+
+}
 
 
     /*

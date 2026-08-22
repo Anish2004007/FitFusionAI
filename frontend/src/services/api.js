@@ -163,5 +163,33 @@ export const completeMeal = async (
 
 };
 
+/* =========================================
+   PROFILE API
+========================================= */
+
+export const getProfile = async () => {
+    const response = await api.get(
+        "/profile/api/"
+    );
+
+    return response.data;
+};
+
+
+export const updateProfile = async (profileData) => {
+    const response = await api.put(
+        "/profile/api/update/",
+        profileData,
+        {
+            withCredentials: true,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    return response.data;
+};
+
 
 export default api;
