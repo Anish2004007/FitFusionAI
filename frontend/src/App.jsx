@@ -16,6 +16,8 @@ import DietHome from "./components/diet/DietHome";
 
 import Profile from "./components/profile";
 
+import WaterTracker from "./components/WaterTracker";
+
 import FitFusionLayout from "./components/FitFusionLayout";
 
 import "./App.css";
@@ -36,13 +38,16 @@ function App() {
         useState(null);
 
     const [profileUser, setProfileUser] =
-    useState(null);
+        useState(null);
 
     const [loading, setLoading] =
         useState(false);
 
     const [error, setError] =
         useState("");
+
+    const [trackerUser, setTrackerUser] =
+    useState(null);
 
 
     /*
@@ -153,14 +158,22 @@ function App() {
     const isDiet =
         currentPage === "/diet/";
 
+
     const isProfile =
         currentPage === "/profile/";
 
 
+    const isTracker =
+        currentPage === "/tracker/";
+
+
     /*
      * =========================================
-     * LOAD DASHBOARD / PROGRESS
+     * LOAD DASHBOARD / PROGRESS DATA
      * =========================================
+     *
+     * Workout, Diet, Profile and Water Tracker
+     * load their own API data.
      */
 
     useEffect(() => {
@@ -171,14 +184,15 @@ function App() {
         const loadPageData = async () => {
 
             /*
-             * Workout and Diet load
-             * their own data.
+             * These pages have their own
+             * API calls.
              */
 
             if (
                 isWorkout ||
                 isDiet ||
-                isProfile
+                isProfile ||
+                isTracker
             ) {
 
                 setLoading(false);
@@ -230,8 +244,8 @@ function App() {
 
 
                 /*
-                 * Ignore an old request if
-                 * the user changed pages.
+                 * Ignore old request if
+                 * user changed page.
                  */
 
                 if (cancelled) {
@@ -304,6 +318,8 @@ function App() {
         isProgress,
         isWorkout,
         isDiet,
+        isProfile,
+        isTracker,
     ]);
 
 
@@ -364,8 +380,8 @@ function App() {
     if (isDashboard) {
 
         /*
-         * Never render Dashboard with
-         * null data.
+         * Never render Dashboard
+         * with null data.
          */
 
         if (!data) {
@@ -635,29 +651,60 @@ function App() {
 
     }
 
-  /*
- * =========================================
- * PROFILE
- * =========================================
- */
 
-if (isProfile) {
+    /*
+     * =========================================
+     * PROFILE
+     * =========================================
+     */
+
+    if (isProfile) {
+
+        return (
+
+            <FitFusionLayout
+                user={profileUser}
+                onNavigate={navigate}
+            >
+
+                <Profile
+
+                    onUserLoaded={(user) => {
+
+                        setProfileUser(user);
+
+                    }}
+
+                />
+
+            </FitFusionLayout>
+
+        );
+
+    }
+
+
+    /*
+     * =========================================
+     * WATER TRACKER
+     * =========================================
+     */
+
+   if (isTracker) {
 
     return (
 
         <FitFusionLayout
-            user={profileUser}
+            user={trackerUser}
             onNavigate={navigate}
         >
 
-            <Profile
-
+            <WaterTracker
                 onUserLoaded={(user) => {
 
-                    setProfileUser(user);
+                    setTrackerUser(user);
 
                 }}
-
             />
 
         </FitFusionLayout>

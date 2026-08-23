@@ -191,5 +191,43 @@ export const updateProfile = async (profileData) => {
     return response.data;
 };
 
+// =========================================================
+// WATER TRACKER API
+// =========================================================
+
+export const getWater = async () => {
+    const response = await api.get(
+        "/tracker/api/"
+    );
+
+    return response.data;
+};
+
+
+export const addWater = async (amount) => {
+    const response = await api.post(
+        "/tracker/api/add/",
+        {
+            amount: amount,
+        },
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+};
+
+
+export const deleteWater = async (waterId) => {
+    const response = await api.delete(
+        `/tracker/api/delete/${waterId}/`,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+};
 
 export default api;

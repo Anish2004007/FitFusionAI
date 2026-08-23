@@ -3691,3 +3691,550 @@ a {
     }
 
 }
+
+/* =========================================================
+   WATER TRACKER
+   ========================================================= */
+
+.water-tracker-page {
+    width: 100%;
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 10px 0 60px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.water-header {
+    margin-bottom: 30px;
+}
+
+.water-label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: #22c55e;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+
+.water-label-icon {
+    font-size: 20px;
+}
+
+.water-header h1 {
+    margin: 0;
+
+    color: #ffffff;
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.water-header p {
+    margin: 14px 0 0;
+
+    color: #94a3b8;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.water-error {
+    margin-bottom: 20px;
+    padding: 14px 18px;
+
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 12px;
+
+    background: rgba(239, 68, 68, 0.08);
+    color: #fca5a5;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MAIN PROGRESS CARD
+   ========================================================= */
+
+.water-progress-card {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 45px;
+
+    padding: 34px;
+
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 22px;
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   LEFT SIDE
+   ========================================================= */
+
+.water-progress-left {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.water-big-icon {
+    width: 76px;
+    height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background: rgba(34, 197, 94, 0.12);
+
+    font-size: 38px;
+
+    flex-shrink: 0;
+}
+
+.water-card-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+}
+
+.water-amount {
+    color: #ffffff;
+
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.water-amount span {
+    margin-left: 7px;
+
+    color: #94a3b8;
+
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.water-progress-left p {
+    margin: 9px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RIGHT SIDE / PROGRESS
+   ========================================================= */
+
+.water-progress-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.water-progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+}
+
+.water-progress-top span {
+    color: #94a3b8;
+    font-size: 15px;
+}
+
+.water-progress-top strong {
+    color: #22c55e;
+    font-size: 18px;
+}
+
+.water-progress-bar {
+    width: 100%;
+    height: 14px;
+
+    overflow: hidden;
+
+    background: #1e293b;
+    border-radius: 20px;
+}
+
+.water-progress-fill {
+    height: 100%;
+
+    background: #22c55e;
+
+    border-radius: 20px;
+
+    transition: width 0.4s ease;
+}
+
+.water-progress-bottom {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 11px;
+}
+
+.water-progress-bottom span {
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.water-section {
+    margin-top: 36px;
+}
+
+.water-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.water-section-heading span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #22c55e;
+
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.water-section-heading h2 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 26px;
+    font-weight: 750;
+}
+
+.water-history-count {
+    padding: 8px 14px;
+
+    border-radius: 20px;
+
+    background: #111827;
+    border: 1px solid #1e293b;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   QUICK ADD BUTTONS
+   ========================================================= */
+
+.water-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.water-buttons button {
+    min-height: 75px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    border: 1px solid #1e293b;
+    border-radius: 16px;
+
+    background: #111827;
+
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.water-buttons button span {
+    font-size: 23px;
+}
+
+.water-buttons button:hover {
+    transform: translateY(-2px);
+
+    border-color: #22c55e;
+
+    background: #14251f;
+}
+
+.water-buttons button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* =========================================================
+   HISTORY
+   ========================================================= */
+
+.water-history {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.water-history-card {
+    display: flex;
+    align-items: center;
+
+    padding: 18px 20px;
+
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 16px;
+
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.water-history-card:hover {
+    border-color: #334155;
+    transform: translateY(-1px);
+}
+
+.water-history-icon {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 15px;
+
+    border-radius: 13px;
+
+    background: rgba(34, 197, 94, 0.1);
+
+    font-size: 22px;
+}
+
+.water-history-info {
+    flex: 1;
+}
+
+.water-history-info h3 {
+    margin: 0 0 4px;
+
+    color: #ffffff;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.water-history-info p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.water-delete {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: #64748b;
+
+    font-size: 23px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.water-delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.water-empty {
+    padding: 45px 25px;
+
+    text-align: center;
+
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 18px;
+}
+
+.water-empty-icon {
+    margin-bottom: 12px;
+
+    font-size: 35px;
+}
+
+.water-empty h3 {
+    margin: 0 0 8px;
+
+    color: #ffffff;
+
+    font-size: 18px;
+}
+
+.water-empty p {
+    max-width: 500px;
+    margin: 0 auto;
+
+    color: #64748b;
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   LOADING / MESSAGE
+   ========================================================= */
+
+.water-page-message {
+    min-height: 400px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #94a3b8;
+
+    font-size: 16px;
+}
+
+.water-page-message.error {
+    color: #f87171;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .water-tracker-page {
+        padding: 25px 15px 50px;
+    }
+
+    .water-progress-card {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .water-buttons {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .water-header h1 {
+        font-size: 36px;
+    }
+
+    .water-header p {
+        font-size: 16px;
+    }
+
+    .water-progress-card {
+        padding: 24px;
+    }
+
+    .water-progress-left {
+        align-items: flex-start;
+    }
+
+    .water-big-icon {
+        width: 60px;
+        height: 60px;
+
+        font-size: 30px;
+    }
+
+    .water-amount {
+        font-size: 34px;
+    }
+
+    .water-section-heading {
+        align-items: flex-start;
+        gap: 15px;
+        flex-direction: column;
+    }
+
+}
+
+/* Reduce gap between topbar and Water Tracker */
+.water-tracker-page {
+    padding-top: 0px;
+}

@@ -266,21 +266,26 @@ const greeting = getGreeting();
 
                     {/* WATER TRACKER */}
 
-                    <li>
-
+                    <li
+                        className={
+                            window.location.pathname === "/tracker/" ||
+                            window.location.pathname === "/tracker"
+                                ? "active"
+                                : ""
+                        }
+                    >
                         <a
-                            href="#"
+                            href="/tracker/"
                             onClick={(e) => {
                                 e.preventDefault();
-                            }}
-                        >
 
+                                navigate("/tracker/");
+                            }}  
+                        >
                             <i className="bi bi-droplet-half"></i>
 
                             Water Tracker
-
                         </a>
-
                     </li>
 
 
