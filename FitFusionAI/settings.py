@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'workout',
     'progress',
     'profile_app',
+    'ai_coach',
 
     "rest_framework",
     "corsheaders",

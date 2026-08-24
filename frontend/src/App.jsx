@@ -18,6 +18,8 @@ import Profile from "./components/profile";
 
 import WaterTracker from "./components/WaterTracker";
 
+import AICoach from "./components/AICoach";
+
 import FitFusionLayout from "./components/FitFusionLayout";
 
 import "./App.css";
@@ -40,14 +42,17 @@ function App() {
     const [profileUser, setProfileUser] =
         useState(null);
 
+    const [trackerUser, setTrackerUser] =
+        useState(null);
+
+    const [aiCoachUser, setAiCoachUser] =
+        useState(null);
+
     const [loading, setLoading] =
         useState(false);
 
     const [error, setError] =
         useState("");
-
-    const [trackerUser, setTrackerUser] =
-    useState(null);
 
 
     /*
@@ -167,13 +172,17 @@ function App() {
         currentPage === "/tracker/";
 
 
+    const isAICoach =
+        currentPage === "/ai-coach/";
+
+
     /*
      * =========================================
      * LOAD DASHBOARD / PROGRESS DATA
      * =========================================
      *
-     * Workout, Diet, Profile and Water Tracker
-     * load their own API data.
+     * Workout, Diet, Profile, Water Tracker
+     * and AI Coach load their own data.
      */
 
     useEffect(() => {
@@ -192,7 +201,8 @@ function App() {
                 isWorkout ||
                 isDiet ||
                 isProfile ||
-                isTracker
+                isTracker ||
+                isAICoach
             ) {
 
                 setLoading(false);
@@ -320,6 +330,7 @@ function App() {
         isDiet,
         isProfile,
         isTracker,
+        isAICoach,
     ]);
 
 
@@ -690,28 +701,62 @@ function App() {
      * =========================================
      */
 
-   if (isTracker) {
+    if (isTracker) {
 
-    return (
+        return (
 
-        <FitFusionLayout
-            user={trackerUser}
-            onNavigate={navigate}
-        >
+            <FitFusionLayout
+                user={trackerUser}
+                onNavigate={navigate}
+            >
 
-            <WaterTracker
-                onUserLoaded={(user) => {
+                <WaterTracker
 
-                    setTrackerUser(user);
+                    onUserLoaded={(user) => {
 
-                }}
-            />
+                        setTrackerUser(user);
 
-        </FitFusionLayout>
+                    }}
 
-    );
+                />
 
-}
+            </FitFusionLayout>
+
+        );
+
+    }
+
+
+    /*
+     * =========================================
+     * AI COACH
+     * =========================================
+     */
+
+    if (isAICoach) {
+
+        return (
+
+            <FitFusionLayout
+                user={aiCoachUser}
+                onNavigate={navigate}
+            >
+
+                <AICoach
+
+                    onUserLoaded={(user) => {
+
+                        setAiCoachUser(user);
+
+                    }}
+
+                />
+
+            </FitFusionLayout>
+
+        );
+
+    }
 
 
     /*

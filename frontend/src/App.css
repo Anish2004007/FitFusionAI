@@ -4238,3 +4238,955 @@ a {
 .water-tracker-page {
     padding-top: 0px;
 }
+
+/* =========================================================
+   AI COACH
+========================================================= */
+
+.ai-coach-page {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 35px 0 60px;
+    box-sizing: border-box;
+}
+
+.ai-coach-header {
+    margin-bottom: 28px;
+}
+
+.ai-coach-label {
+    color: #20d56b;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.ai-coach-header h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 50px;
+    font-weight: 720;
+    line-height: 1.1;
+}
+
+.ai-coach-header p {
+    margin: 12px 0 0;
+    color: #a9b4c7;
+    font-size: 19px;
+}
+
+
+/* =========================================================
+   QUICK QUESTIONS
+========================================================= */
+
+.ai-quick-section {
+    margin-bottom: 24px;
+}
+
+.ai-section-title {
+    margin: 0 0 12px;
+    color: #a9b4c7;
+    font-size: 15px;
+}
+
+.ai-quick-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ai-quick-button {
+    border: 1px solid #263247;
+    background: #121c2e;
+    color: #dce4f0;
+    border-radius: 12px;
+    padding: 11px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.ai-quick-button:hover {
+    border-color: #20d56b;
+    color: #20d56b;
+    transform: translateY(-1px);
+}
+
+.ai-quick-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   CHAT CARD
+========================================================= */
+
+.ai-chat-card {
+    background: #111a2a;
+    border: 1px solid #202c40;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
+}
+
+.ai-chat-messages {
+    min-height: 460px;
+    max-height: 580px;
+    overflow-y: auto;
+    padding: 22px;
+}
+
+
+/* =========================================================
+   MESSAGE ROWS
+========================================================= */
+
+.ai-message-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.user-message-row {
+    justify-content: flex-end;
+}
+
+
+/* =========================================================
+   AVATARS
+========================================================= */
+
+.ai-avatar,
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.ai-avatar {
+    background: #17352a;
+    font-size: 19px;
+}
+
+.user-avatar {
+    background: #20b95c;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   MESSAGE BUBBLES
+========================================================= */
+
+.ai-message {
+    max-width: 75%;
+    padding: 14px 17px;
+    border-radius: 17px;
+    font-size: 15px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.coach-message {
+    background: #182337;
+    color: #e7edf7;
+    border-bottom-left-radius: 5px;
+}
+
+.user-message {
+    background: #20b95c;
+    color: #ffffff;
+    border-bottom-right-radius: 5px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.ai-loading {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    min-width: 55px;
+}
+
+.ai-loading span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #8f9bb0;
+    animation: aiTyping 1.2s infinite ease-in-out;
+}
+
+.ai-loading span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.ai-loading span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes aiTyping {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+
+    30% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.ai-chat-input-area {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 18px 22px;
+    border-top: 1px solid #202c40;
+    background: #0e1726;
+}
+
+.ai-chat-input-area textarea {
+    flex: 1;
+    min-height: 48px;
+    max-height: 130px;
+    resize: none;
+    box-sizing: border-box;
+    border: 1px solid #2a374c;
+    outline: none;
+    border-radius: 14px;
+    background: #141f31;
+    color: #ffffff;
+    padding: 13px 15px;
+    font-family: inherit;
+    font-size: 15px;
+}
+
+.ai-chat-input-area textarea::placeholder {
+    color: #718096;
+}
+
+.ai-chat-input-area textarea:focus {
+    border-color: #20d56b;
+}
+
+
+.ai-send-button {
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 14px;
+    background: #20b95c;
+    color: #ffffff;
+    font-size: 22px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.ai-send-button:hover:not(:disabled) {
+    background: #20d56b;
+    transform: translateY(-1px);
+}
+
+.ai-send-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   DISCLAIMER
+========================================================= */
+
+.ai-disclaimer {
+    margin: 0;
+    padding: 0 22px 18px;
+    background: #0e1726;
+    color: #66748a;
+    font-size: 12px;
+    text-align: center;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .ai-coach-page {
+        padding: 35px 25px 50px;
+    }
+
+    .ai-coach-header h1 {
+        font-size: 42px;
+    }
+
+    .ai-message {
+        max-width: 85%;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .ai-coach-page {
+        padding: 25px 16px 40px;
+    }
+
+    .ai-coach-header h1 {
+        font-size: 34px;
+    }
+
+    .ai-coach-header p {
+        font-size: 16px;
+    }
+
+    .ai-chat-messages {
+        min-height: 420px;
+        padding: 18px;
+    }
+
+    .ai-message {
+        max-width: 82%;
+        font-size: 14px;
+    }
+
+    .ai-quick-buttons {
+        flex-direction: column;
+    }
+
+    .ai-quick-button {
+        width: 100%;
+        text-align: left;
+    }
+}
+
+/* =========================================================
+   AI COACH - TIGHT MARKDOWN SPACING
+========================================================= */
+
+.ai-message .ai-markdown-heading {
+    margin: 8px 0 6px !important;
+    padding: 0 !important;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 750;
+    line-height: 1.3;
+}
+
+.ai-message .ai-markdown-paragraph {
+    margin: 0 0 6px !important;
+    padding: 0 !important;
+    line-height: 1.5;
+}
+
+.ai-message .ai-markdown-paragraph:last-child {
+    margin-bottom: 0 !important;
+}
+
+
+/* Lists */
+
+.ai-message .ai-markdown-list {
+    margin: 4px 0 7px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 21px !important;
+}
+
+.ai-message .ai-markdown-list li {
+    margin: 2px 0 !important;
+    padding: 0 !important;
+    line-height: 1.45;
+}
+
+/* Bold text */
+
+.ai-message .ai-markdown-bold {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+
+/* Quote */
+
+.ai-message .ai-markdown-quote {
+    margin: 6px 0 !important;
+    padding: 7px 11px !important;
+}
+
+
+/* Code */
+
+.ai-message .ai-markdown-code {
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+
+/* =========================================================
+   REMOVE EXTRA SPACING FROM MARKDOWN CONTAINER
+========================================================= */
+
+.ai-message > *:first-child {
+    margin-top: 0 !important;
+}
+
+.ai-message > *:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* =========================================================
+   AI COACH - FINAL COMPACT MARKDOWN
+========================================================= */
+
+.ai-message {
+    line-height: 1.45 !important;
+}
+
+
+/* Remove default spacing from all markdown blocks */
+
+.ai-message > * {
+    margin-top: 0 !important;
+    margin-bottom: 6px !important;
+}
+
+
+/* Paragraphs */
+
+.ai-message .ai-markdown-paragraph {
+    margin: 0 0 7px !important;
+    padding: 0 !important;
+    line-height: 1.45 !important;
+}
+
+
+/* Headings */
+
+.ai-message .ai-markdown-heading {
+    margin: 10px 0 6px !important;
+    padding: 0 !important;
+    line-height: 1.3 !important;
+    font-size: 18px;
+}
+
+
+/* First heading should not have top spacing */
+
+.ai-message > .ai-markdown-heading:first-child {
+    margin-top: 0 !important;
+}
+
+
+/* Lists */
+
+.ai-message .ai-markdown-list {
+    margin: 3px 0 7px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 21px !important;
+}
+
+.ai-message .ai-markdown-list li {
+    margin: 2px 0 !important;
+    padding: 0 !important;
+    line-height: 1.4 !important;
+}
+
+
+/* Bold */
+
+.ai-message .ai-markdown-bold {
+    font-weight: 700;
+    color: #ffffff;
+}
+
+
+/* Blockquotes */
+
+.ai-message .ai-markdown-quote {
+    margin: 6px 0 !important;
+    padding: 6px 10px !important;
+}
+
+
+/* Last element */
+
+.ai-message > *:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* =========================================================
+   AI COACH - REMOVE TOP GAP
+========================================================= */
+
+.ai-coach-page {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* =========================================================
+   AI FITNESS SCORE
+========================================================= */
+
+.ai-score-card {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 22px;
+    padding: 24px;
+    border: 1px solid #202c40;
+    border-radius: 20px;
+    background: #111a2a;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.14);
+}
+
+.ai-score-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.ai-score-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #20d56b;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.ai-score-header h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 750;
+}
+
+.ai-score-badge {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #17352a;
+    color: #20d56b;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.ai-score-main {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 25px;
+}
+
+.ai-score-circle {
+    width: 125px;
+    height: 125px;
+    min-width: 125px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(
+            circle at center,
+            #111a2a 57%,
+            transparent 58%
+        ),
+        conic-gradient(
+            #20d56b 0deg,
+            #20d56b 280deg,
+            #263247 280deg,
+            #263247 360deg
+        );
+}
+
+.ai-score-circle > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.ai-score-circle strong {
+    color: #ffffff;
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.ai-score-circle span {
+    margin-left: 2px;
+    color: #8996aa;
+    font-size: 14px;
+}
+
+.ai-score-summary {
+    flex: 1;
+}
+
+.ai-score-rating {
+    display: inline-block;
+    margin-bottom: 7px;
+    color: #20d56b;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.ai-score-summary p {
+    max-width: 600px;
+    margin: 0;
+    color: #9ca9bc;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   SCORE BREAKDOWN
+========================================================= */
+
+.ai-score-breakdown {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+}
+
+.ai-score-item {
+    min-width: 0;
+}
+
+.ai-score-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+.ai-score-item-top span {
+    color: #aeb9c9;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.ai-score-item-top strong {
+    color: #ffffff;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.ai-score-progress {
+    width: 100%;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #263247;
+}
+
+.ai-score-progress span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #20d56b;
+    transition: width 0.7s ease;
+}
+
+
+/* =========================================================
+   SCORE LOADING
+========================================================= */
+
+.ai-score-loading {
+    min-height: 125px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #8996aa;
+    font-size: 14px;
+}
+
+.ai-score-spinner {
+    width: 22px;
+    height: 22px;
+    border: 3px solid #263247;
+    border-top-color: #20d56b;
+    border-radius: 50%;
+    animation: aiScoreSpin 0.8s linear infinite;
+}
+
+@keyframes aiScoreSpin {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* =========================================================
+   SCORE LEVELS
+========================================================= */
+
+.score-excellent .ai-score-circle {
+    background:
+        radial-gradient(
+            circle at center,
+            #111a2a 57%,
+            transparent 58%
+        ),
+        conic-gradient(
+            #20d56b 0deg,
+            #20d56b 324deg,
+            #263247 324deg,
+            #263247 360deg
+        );
+}
+
+.score-very-good .ai-score-circle {
+    background:
+        radial-gradient(
+            circle at center,
+            #111a2a 57%,
+            transparent 58%
+        ),
+        conic-gradient(
+            #20d56b 0deg,
+            #20d56b 270deg,
+            #263247 270deg,
+            #263247 360deg
+        );
+}
+
+.score-good .ai-score-circle {
+    background:
+        radial-gradient(
+            circle at center,
+            #111a2a 57%,
+            transparent 58%
+        ),
+        conic-gradient(
+            #20d56b 0deg,
+            #20d56b 216deg,
+            #263247 216deg,
+            #263247 360deg
+        );
+}
+
+.score-needs-work .ai-score-circle {
+    background:
+        radial-gradient(
+            circle at center,
+            #111a2a 57%,
+            transparent 58%
+        ),
+        conic-gradient(
+            #20d56b 0deg,
+            #20d56b 144deg,
+            #263247 144deg,
+            #263247 360deg
+        );
+}
+
+.score-starting .ai-score-circle {
+    background:
+        radial-gradient(
+            circle at center,
+            #111a2a 57%,
+            transparent 58%
+        ),
+        conic-gradient(
+            #20d56b 0deg,
+            #20d56b 72deg,
+            #263247 72deg,
+            #263247 360deg
+        );
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .ai-score-main {
+        gap: 20px;
+    }
+
+    .ai-score-breakdown {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .ai-score-card {
+        padding: 18px;
+    }
+
+    .ai-score-main {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ai-score-circle {
+        width: 110px;
+        height: 110px;
+        min-width: 110px;
+    }
+
+    .ai-score-circle strong {
+        font-size: 34px;
+    }
+
+    .ai-score-breakdown {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* =========================================================
+   AI DAILY PLAN
+   ========================================================= */
+
+.ai-daily-plan {
+    margin-top: 28px;
+    padding: 30px;
+    border: 1px solid #202d42;
+    border-radius: 24px;
+    background: #111b2c;
+}
+
+.ai-daily-plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.ai-section-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #20d26b;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.ai-daily-plan-header h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.ai-daily-plan-header p {
+    margin: 8px 0 0;
+    color: #91a0b8;
+    font-size: 16px;
+}
+
+.ai-plan-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    border-radius: 15px;
+
+    background: rgba(32, 210, 107, 0.14);
+    color: #20d26b;
+
+    font-weight: 800;
+}
+
+.ai-daily-plan-content {
+    padding-top: 4px;
+}
+
+.ai-plan-markdown {
+    color: #d8e0ed;
+    font-size: 17px;
+    line-height: 1.65;
+}
+
+.ai-plan-markdown h3 {
+    margin: 22px 0 8px;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.ai-plan-markdown h3:first-child {
+    margin-top: 0;
+}
+
+.ai-plan-markdown p {
+    margin: 8px 0;
+}
+
+.ai-plan-markdown ul {
+    margin: 8px 0 16px;
+    padding-left: 24px;
+}
+
+.ai-plan-markdown li {
+    margin-bottom: 6px;
+}
+
+.ai-plan-markdown strong {
+    color: #ffffff;
+}
+
+.ai-plan-loading {
+    padding: 20px 0;
+    color: #91a0b8;
+    font-size: 16px;
+}
+
+.ai-loading-dot {
+    margin-right: 8px;
+}
+
+.ai-plan-error {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 80, 80, 0.08);
+    color: #ff8585;
+}

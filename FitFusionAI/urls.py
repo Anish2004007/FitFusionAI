@@ -44,4 +44,9 @@ urlpatterns = [
         include("tracker.urls")
     ),
 
+    path(
+        "ai-coach/",
+        include("ai_coach.urls")
+    ),
+
 ]

@@ -1,31 +1,33 @@
 import React from "react";
 
-
 function FitFusionLayout({
     children,
     user,
     onNavigate,
 }) {
 
-const getGreeting = () => {
-    const hour = new Date().getHours();
+    const getGreeting = () => {
 
-    if (hour >= 5 && hour < 12) {
-        return "Good Morning";
-    }
+        const hour = new Date().getHours();
 
-    if (hour >= 12 && hour < 17) {
-        return "Good Afternoon";
-    }
+        if (hour >= 5 && hour < 12) {
+            return "Good Morning";
+        }
 
-    if (hour >= 17 && hour < 21) {
-        return "Good Evening";
-    }
+        if (hour >= 12 && hour < 17) {
+            return "Good Afternoon";
+        }
 
-    return "Good Night";
-};
+        if (hour >= 17 && hour < 21) {
+            return "Good Evening";
+        }
 
-const greeting = getGreeting();
+        return "Good Night";
+    };
+
+
+    const greeting = getGreeting();
+
 
     /*
      * =========================================
@@ -54,18 +56,27 @@ const greeting = getGreeting();
 
 
     const isWorkout =
-        currentPath.startsWith(
-            "/workout"
-        );
+        currentPath.startsWith("/workout");
 
 
     const isDiet =
         currentPath === "/diet/" ||
         currentPath === "/diet";
 
+
     const isProfile =
-    currentPath === "/profile/" ||
-    currentPath === "/profile";
+        currentPath === "/profile/" ||
+        currentPath === "/profile";
+
+
+    const isTracker =
+        currentPath === "/tracker/" ||
+        currentPath === "/tracker";
+
+
+    const isAICoach =
+        currentPath === "/ai-coach/" ||
+        currentPath === "/ai-coach";
 
 
     /*
@@ -93,9 +104,7 @@ const greeting = getGreeting();
 
 
         window.dispatchEvent(
-            new PopStateEvent(
-                "popstate"
-            )
+            new PopStateEvent("popstate")
         );
 
     };
@@ -152,16 +161,16 @@ const greeting = getGreeting();
 
                                 e.preventDefault();
 
-                                navigate(
-                                    "/dashboard/"
-                                );
+                                navigate("/dashboard/");
 
                             }}
                         >
 
                             <i className="bi bi-grid-fill"></i>
 
-                            Dashboard
+                            <span>
+                                Dashboard
+                            </span>
 
                         </a>
 
@@ -177,24 +186,26 @@ const greeting = getGreeting();
                                 : ""
                         }
                     >
+
                         <a
                             href="/profile/"
                             onClick={(e) => {
 
                                 e.preventDefault();
 
-                                navigate(
-                                    "/profile/"
-                                );
+                                navigate("/profile/");
 
-                        }}
-                    >
+                            }}
+                        >
 
-                        <i className="bi bi-person-circle"></i>
+                            <i className="bi bi-person-circle"></i>
 
-                        Profile
+                            <span>
+                                Profile
+                            </span>
 
                         </a>
+
                     </li>
 
 
@@ -214,9 +225,7 @@ const greeting = getGreeting();
 
                                 e.preventDefault();
 
-                                navigate(
-                                    "/workout/"
-                                );
+                                navigate("/workout/");
 
                             }}
                         >
@@ -248,16 +257,16 @@ const greeting = getGreeting();
 
                                 e.preventDefault();
 
-                                navigate(
-                                    "/diet/"
-                                );
+                                navigate("/diet/");
 
                             }}
                         >
 
                             <i className="bi bi-egg-fried"></i>
 
-                            Diet
+                            <span>
+                                Diet
+                            </span>
 
                         </a>
 
@@ -268,24 +277,31 @@ const greeting = getGreeting();
 
                     <li
                         className={
-                            window.location.pathname === "/tracker/" ||
-                            window.location.pathname === "/tracker"
+                            isTracker
                                 ? "active"
                                 : ""
                         }
                     >
+
                         <a
                             href="/tracker/"
                             onClick={(e) => {
+
                                 e.preventDefault();
 
                                 navigate("/tracker/");
-                            }}  
+
+                            }}
                         >
+
                             <i className="bi bi-droplet-half"></i>
 
-                            Water Tracker
+                            <span>
+                                Water Tracker
+                            </span>
+
                         </a>
+
                     </li>
 
 
@@ -312,7 +328,9 @@ const greeting = getGreeting();
 
                             <i className="bi bi-graph-up-arrow"></i>
 
-                            Progress
+                            <span>
+                                Progress
+                            </span>
 
                         </a>
 
@@ -321,18 +339,30 @@ const greeting = getGreeting();
 
                     {/* AI COACH */}
 
-                    <li>
+                    <li
+                        className={
+                            isAICoach
+                                ? "active"
+                                : ""
+                        }
+                    >
 
                         <a
-                            href="#"
+                            href="/ai-coach/"
                             onClick={(e) => {
+
                                 e.preventDefault();
+
+                                navigate("/ai-coach/");
+
                             }}
                         >
 
                             <i className="bi bi-robot"></i>
 
-                            AI Coach
+                            <span>
+                                AI Coach
+                            </span>
 
                         </a>
 
@@ -351,7 +381,9 @@ const greeting = getGreeting();
 
                     <i className="bi bi-box-arrow-left"></i>
 
-                    Logout
+                    <span>
+                        Logout
+                    </span>
 
                 </a>
 
@@ -376,7 +408,9 @@ const greeting = getGreeting();
                             className="greeting"
                             id="dynamicGreeting"
                         >
+
                             👋 {greeting},
+
                         </span>
 
 
@@ -384,7 +418,7 @@ const greeting = getGreeting();
 
                             {
                                 user?.full_name ||
-                                "User"
+                                "Loading..."
                             }
 
                         </h2>
@@ -396,6 +430,7 @@ const greeting = getGreeting();
                             You're doing great!
 
                         </p>
+
 
                     </div>
 
@@ -457,6 +492,7 @@ const greeting = getGreeting();
 
 
             </main>
+
 
         </div>
 
