@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+
 
 function FitFusionLayout({
     children,
     user,
     onNavigate,
 }) {
+
+    /*
+     * =========================================
+     * DJANGO API BASE URL
+     * =========================================
+     */
+
+    const API_BASE_URL =
+        "http://localhost:8000";
+
+
+    /*
+     * =========================================
+     * GREETING
+     * =========================================
+     */
 
     const getGreeting = () => {
 
@@ -27,6 +44,310 @@ function FitFusionLayout({
 
 
     const greeting = getGreeting();
+
+
+    /*
+     * =========================================
+     * NOTIFICATION STATE
+     * =========================================
+     */
+
+    const [notifications, setNotifications] =
+        useState([]);
+
+    const [unreadCount, setUnreadCount] =
+        useState(0);
+
+    const [showNotifications, setShowNotifications] =
+        useState(false);
+
+    const [notificationLoading, setNotificationLoading] =
+        useState(false);
+
+    const notificationRef = useRef(null);
+
+
+    /*
+     * =========================================
+     * LOAD NOTIFICATIONS
+     * =========================================
+     */
+
+    const loadNotifications = async () => {
+
+        try {
+
+            setNotificationLoading(true);
+
+            const response = await fetch(
+                `${API_BASE_URL}/notifications/api/`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `Notification API returned ${response.status}`
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                data &&
+                data.success
+            ) {
+
+                setNotifications(
+                    data.notifications || []
+                );
+
+                setUnreadCount(
+                    data.unread_count || 0
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Notification API error:",
+                error
+            );
+
+        } finally {
+
+            setNotificationLoading(false);
+
+        }
+
+    };
+
+
+    /*
+     * =========================================
+     * LOAD ON PAGE LOAD
+     * =========================================
+     */
+
+    useEffect(() => {
+
+        loadNotifications();
+
+    }, []);
+
+
+    /*
+     * =========================================
+     * AUTO REFRESH EVERY 30 SECONDS
+     * =========================================
+     */
+
+    useEffect(() => {
+
+        const interval =
+            setInterval(() => {
+
+                loadNotifications();
+
+            }, 30000);
+
+
+        return () => {
+
+            clearInterval(interval);
+
+        };
+
+    }, []);
+
+
+    /*
+     * =========================================
+     * CLOSE DROPDOWN WHEN CLICKING OUTSIDE
+     * =========================================
+     */
+
+    useEffect(() => {
+
+        const handleClickOutside = (event) => {
+
+            if (
+                notificationRef.current &&
+                !notificationRef.current.contains(
+                    event.target
+                )
+            ) {
+
+                setShowNotifications(false);
+
+            }
+
+        };
+
+
+        document.addEventListener(
+            "mousedown",
+            handleClickOutside
+        );
+
+
+        return () => {
+
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
+
+        };
+
+    }, []);
+
+
+    /*
+     * =========================================
+     * MARK ONE NOTIFICATION AS READ
+     * =========================================
+     */
+
+    const markNotificationRead = async (
+        notificationId
+    ) => {
+
+        try {
+
+            const response = await fetch(
+                `${API_BASE_URL}/notifications/api/${notificationId}/read/`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `Mark read returned ${response.status}`
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                data &&
+                data.success
+            ) {
+
+                setNotifications((previous) =>
+                    previous.map(
+                        (notification) =>
+                            notification.id ===
+                            notificationId
+                                ? {
+                                    ...notification,
+                                    is_read: true,
+                                }
+                                : notification
+                    )
+                );
+
+
+                setUnreadCount((previous) =>
+                    Math.max(
+                        previous - 1,
+                        0
+                    )
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Mark notification read error:",
+                error
+            );
+
+        }
+
+    };
+
+
+    /*
+     * =========================================
+     * MARK ALL NOTIFICATIONS AS READ
+     * =========================================
+     */
+
+    const markAllNotificationsRead =
+        async () => {
+
+            try {
+
+                const response = await fetch(
+                    `${API_BASE_URL}/notifications/api/read-all/`,
+                    {
+                        method: "POST",
+                        credentials: "include",
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `Mark all read returned ${response.status}`
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    data &&
+                    data.success
+                ) {
+
+                    setNotifications((previous) =>
+                        previous.map(
+                            (notification) => ({
+                                ...notification,
+                                is_read: true,
+                            })
+                        )
+                    );
+
+
+                    setUnreadCount(0);
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Mark all notifications read error:",
+                    error
+                );
+
+            }
+
+        };
 
 
     /*
@@ -56,7 +377,9 @@ function FitFusionLayout({
 
 
     const isWorkout =
-        currentPath.startsWith("/workout");
+        currentPath.startsWith(
+            "/workout"
+        );
 
 
     const isDiet =
@@ -110,6 +433,50 @@ function FitFusionLayout({
     };
 
 
+    /*
+     * =========================================
+     * NOTIFICATION ICON
+     * =========================================
+     */
+
+    const getNotificationIcon = (
+        type
+    ) => {
+
+        switch (type) {
+
+            case "hydration":
+                return "💧";
+
+            case "workout":
+                return "💪";
+
+            case "diet":
+                return "🍽️";
+
+            case "goal":
+                return "🎯";
+
+            case "ai":
+                return "🤖";
+
+            case "system":
+                return "🔔";
+
+            default:
+                return "🔔";
+
+        }
+
+    };
+
+
+    /*
+     * =========================================
+     * RENDER
+     * =========================================
+     */
+
     return (
 
         <div className="dashboard-layout">
@@ -161,7 +528,9 @@ function FitFusionLayout({
 
                                 e.preventDefault();
 
-                                navigate("/dashboard/");
+                                navigate(
+                                    "/dashboard/"
+                                );
 
                             }}
                         >
@@ -193,7 +562,9 @@ function FitFusionLayout({
 
                                 e.preventDefault();
 
-                                navigate("/profile/");
+                                navigate(
+                                    "/profile/"
+                                );
 
                             }}
                         >
@@ -225,7 +596,9 @@ function FitFusionLayout({
 
                                 e.preventDefault();
 
-                                navigate("/workout/");
+                                navigate(
+                                    "/workout/"
+                                );
 
                             }}
                         >
@@ -257,7 +630,9 @@ function FitFusionLayout({
 
                                 e.preventDefault();
 
-                                navigate("/diet/");
+                                navigate(
+                                    "/diet/"
+                                );
 
                             }}
                         >
@@ -289,7 +664,9 @@ function FitFusionLayout({
 
                                 e.preventDefault();
 
-                                navigate("/tracker/");
+                                navigate(
+                                    "/tracker/"
+                                );
 
                             }}
                         >
@@ -353,7 +730,9 @@ function FitFusionLayout({
 
                                 e.preventDefault();
 
-                                navigate("/ai-coach/");
+                                navigate(
+                                    "/ai-coach/"
+                                );
 
                             }}
                         >
@@ -447,13 +826,217 @@ function FitFusionLayout({
                         </div>
 
 
-                        {/* NOTIFICATION */}
+                        {/* ================= NOTIFICATIONS ================= */}
 
-                        <div className="icon-btn">
+                        <div
+                            className="notification-wrapper"
+                            ref={notificationRef}
+                        >
 
-                            <i className="bi bi-bell"></i>
+                            <button
+                                type="button"
+                                className="icon-btn notification-button"
+                                onClick={() => {
 
-                            <span className="notification-dot"></span>
+                                    setShowNotifications(
+                                        (previous) =>
+                                            !previous
+                                    );
+
+                                }}
+                                aria-label="Notifications"
+                            >
+
+                                <i className="bi bi-bell"></i>
+
+
+                                {unreadCount > 0 && (
+
+                                    <span className="notification-count">
+
+                                        {
+                                            unreadCount > 99
+                                                ? "99+"
+                                                : unreadCount
+                                        }
+
+                                    </span>
+
+                                )}
+
+                            </button>
+
+
+                            {/* ================= NOTIFICATION PANEL ================= */}
+
+                            {showNotifications && (
+
+                                <div className="notification-panel">
+
+
+                                    {/* HEADER */}
+
+                                    <div className="notification-panel-header">
+
+                                        <div>
+
+                                            <h3>
+                                                Notifications
+                                            </h3>
+
+                                            <span>
+                                                {unreadCount} unread
+                                            </span>
+
+                                        </div>
+
+
+                                        {unreadCount > 0 && (
+
+                                            <button
+                                                type="button"
+                                                className="mark-all-button"
+                                                onClick={
+                                                    markAllNotificationsRead
+                                                }
+                                            >
+
+                                                Mark all as read
+
+                                            </button>
+
+                                        )}
+
+                                    </div>
+
+
+                                    {/* LIST */}
+
+                                    <div className="notification-list">
+
+
+                                        {notificationLoading ? (
+
+                                            <div className="notification-empty">
+
+                                                Loading notifications...
+
+                                            </div>
+
+                                        ) : notifications.length === 0 ? (
+
+                                            <div className="notification-empty">
+
+                                                <i className="bi bi-bell-slash"></i>
+
+                                                <strong>
+                                                    No notifications
+                                                </strong>
+
+                                                <span>
+                                                    You're all caught up!
+                                                </span>
+
+                                            </div>
+
+                                        ) : (
+
+                                            notifications.map(
+                                                (notification) => (
+
+                                                    <button
+                                                        type="button"
+                                                        key={
+                                                            notification.id
+                                                        }
+                                                        className={
+                                                            `notification-item ${
+                                                                notification.is_read
+                                                                    ? "read"
+                                                                    : "unread"
+                                                            }`
+                                                        }
+                                                        onClick={() => {
+
+                                                            if (
+                                                                !notification.is_read
+                                                            ) {
+
+                                                                markNotificationRead(
+                                                                    notification.id
+                                                                );
+
+                                                            }
+
+                                                        }}
+                                                    >
+
+                                                        {/* ICON */}
+
+                                                        <div className="notification-item-icon">
+
+                                                            {
+                                                                getNotificationIcon(
+                                                                    notification.type
+                                                                )
+                                                            }
+
+                                                        </div>
+
+
+                                                        {/* CONTENT */}
+
+                                                        <div className="notification-item-content">
+
+                                                            <div className="notification-item-title">
+
+                                                                {
+                                                                    notification.title
+                                                                }
+
+                                                            </div>
+
+
+                                                            <div className="notification-item-message">
+
+                                                                {
+                                                                    notification.message
+                                                                }
+
+                                                            </div>
+
+
+                                                            <div className="notification-item-time">
+
+                                                                {
+                                                                    notification.time
+                                                                }
+
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        {/* UNREAD DOT */}
+
+                                                        {!notification.is_read && (
+
+                                                            <span className="notification-unread-dot"></span>
+
+                                                        )}
+
+                                                    </button>
+
+                                                )
+                                            )
+
+                                        )}
+
+                                    </div>
+
+                                </div>
+
+                            )}
 
                         </div>
 
@@ -492,7 +1075,6 @@ function FitFusionLayout({
 
 
             </main>
-
 
         </div>
 

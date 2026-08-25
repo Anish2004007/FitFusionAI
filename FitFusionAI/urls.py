@@ -49,4 +49,9 @@ urlpatterns = [
         include("ai_coach.urls")
     ),
 
+    path(
+        "notifications/",
+        include("notifications.urls"),
+    ),
+
 ]
