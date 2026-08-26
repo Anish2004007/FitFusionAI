@@ -1,9 +1,119 @@
+from datetime import timedelta
+
 from django.utils import timezone
 
 from notifications.models import Notification
 from tracker.models import WaterIntake
 from workout.models import WorkoutSession
 from diet.models import DietMeal
+
+
+# =========================================================
+# NOTIFICATION PRIORITY
+# =========================================================
+
+PRIORITY_HIGH = "high"
+PRIORITY_MEDIUM = "medium"
+PRIORITY_LOW = "low"
+
+
+def get_notification_priority(
+    notification_type,
+    title="",
+    message="",
+):
+    """
+    Determine the importance of a notification.
+
+    HIGH:
+        Important actions, missed activities,
+        achievements, or goal-related information.
+
+    MEDIUM:
+        Useful reminders that require attention.
+
+    LOW:
+        General encouragement or informational messages.
+    """
+
+    title_lower = title.lower()
+    message_lower = message.lower()
+
+    # =====================================================
+    # HIGH PRIORITY
+    # =====================================================
+
+    high_keywords = [
+        "goal achieved",
+        "workout complete",
+        "meals completed",
+        "daily target reached",
+        "target reached",
+        "missed",
+        "overdue",
+        "important",
+    ]
+
+    for keyword in high_keywords:
+
+        if (
+            keyword in title_lower
+            or keyword in message_lower
+        ):
+            return PRIORITY_HIGH
+
+    # Goal notifications are important because
+    # they directly relate to the user's fitness objective.
+
+    if notification_type == "goal":
+        return PRIORITY_HIGH
+
+    # System notifications may contain important
+    # application-level information.
+
+    if notification_type == "system":
+        return PRIORITY_HIGH
+
+    # =====================================================
+    # LOW PRIORITY
+    # =====================================================
+
+    low_keywords = [
+        "great job",
+        "keep it up",
+        "stay consistent",
+        "well done",
+        "good work",
+        "encouragement",
+    ]
+
+    for keyword in low_keywords:
+
+        if (
+            keyword in title_lower
+            or keyword in message_lower
+        ):
+            return PRIORITY_LOW
+
+    # =====================================================
+    # MEDIUM PRIORITY
+    # =====================================================
+
+    medium_types = {
+        "hydration",
+        "workout",
+        "diet",
+        "ai",
+    }
+
+    if notification_type in medium_types:
+        return PRIORITY_MEDIUM
+
+    # =====================================================
+    # DEFAULT
+    # =====================================================
+
+    return PRIORITY_LOW
 
 
 # =========================================================
@@ -17,27 +127,171 @@ def create_notification(
     message,
 ):
     """
-    Create a notification only once per day
-    for the same user, type and title.
+    Create a relevant notification while preventing
+    unnecessary repeated notifications.
+
+    Phase 5E.2:
+        - Exact duplicate prevention
+        - Type-based cooldown
+        - Previous unread notifications become read
+          when a new relevant notification is created.
+
+    Phase 5E.3:
+        - Notification priority
+        - Intelligent filtering
+        - High-priority notifications can bypass
+          normal low-value filtering.
     """
 
-    today = timezone.localdate()
+    now = timezone.now()
 
-    exists = Notification.objects.filter(
-        user=user,
+    # =====================================================
+    # DETERMINE PRIORITY
+    # =====================================================
+
+    priority = get_notification_priority(
         notification_type=notification_type,
         title=title,
-        created_at__date=today,
-    ).exists()
+        message=message,
+    )
 
-    if exists:
-        return None
+    # =====================================================
+    # COOLDOWN PERIODS
+    # =====================================================
+
+    cooldowns = {
+        "hydration": timedelta(hours=4),
+        "workout": timedelta(hours=12),
+        "diet": timedelta(hours=6),
+        "goal": timedelta(hours=24),
+        "ai": timedelta(hours=12),
+        "system": timedelta(hours=24),
+    }
+
+    cooldown = cooldowns.get(
+        notification_type,
+        timedelta(hours=24),
+    )
+
+    # =====================================================
+    # GET MOST RECENT NOTIFICATION
+    # =====================================================
+
+    latest_notification = (
+        Notification.objects
+        .filter(
+            user=user,
+            notification_type=notification_type,
+        )
+        .order_by("-created_at")
+        .first()
+    )
+
+    # =====================================================
+    # EXACT DUPLICATE CHECK
+    # =====================================================
+
+    if latest_notification:
+
+        if (
+            latest_notification.title == title
+            and latest_notification.message == message
+        ):
+            return latest_notification
+
+    # =====================================================
+    # COOLDOWN CHECK
+    # =====================================================
+
+    if latest_notification:
+
+        next_allowed_time = (
+            latest_notification.created_at
+            + cooldown
+        )
+
+        if now < next_allowed_time:
+
+            return latest_notification
+
+    # =====================================================
+    # INTELLIGENT FILTERING
+    # =====================================================
+
+    # Count recent notifications across all types.
+    #
+    # This prevents the notification system from
+    # generating too many low-value notifications
+    # in a short period.
+
+    recent_window = now - timedelta(hours=2)
+
+    recent_notifications = (
+        Notification.objects
+        .filter(
+            user=user,
+            created_at__gte=recent_window,
+        )
+    )
+
+    recent_count = recent_notifications.count()
+
+    # =====================================================
+    # LOW PRIORITY FILTER
+    # =====================================================
+
+    # If several notifications were already generated
+    # recently, don't add another low-priority message.
+
+    if (
+        priority == PRIORITY_LOW
+        and recent_count >= 3
+    ):
+        return latest_notification
+
+    # =====================================================
+    # MEDIUM PRIORITY FILTER
+    # =====================================================
+
+    # Avoid flooding the user with multiple medium
+    # priority notifications within a short period.
+
+    if (
+        priority == PRIORITY_MEDIUM
+        and recent_count >= 5
+    ):
+        return latest_notification
+
+    # =====================================================
+    # HIGH PRIORITY NOTIFICATIONS
+    # =====================================================
+
+    # High-priority notifications are allowed through
+    # the volume filter because they contain information
+    # that should not be silently suppressed.
+
+    # =====================================================
+    # MARK PREVIOUS SAME-TYPE NOTIFICATIONS READ
+    # =====================================================
+
+    Notification.objects.filter(
+        user=user,
+        notification_type=notification_type,
+        is_read=False,
+    ).update(
+        is_read=True
+    )
+
+    # =====================================================
+    # CREATE NEW NOTIFICATION
+    # =====================================================
 
     return Notification.objects.create(
         user=user,
         notification_type=notification_type,
         title=title,
         message=message,
+        priority=priority,
         is_read=False,
     )
 
@@ -75,10 +329,6 @@ def get_time_period():
 # =========================================================
 
 def check_hydration(user, period):
-    """
-    Generate hydration notifications based on
-    current water intake and time of day.
-    """
 
     today = timezone.localdate()
 
@@ -98,10 +348,9 @@ def check_hydration(user, period):
 
     daily_target = 2000
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # GOAL ACHIEVED
-    # -----------------------------------------------------
+    # =====================================================
 
     if total_water >= daily_target:
 
@@ -118,10 +367,9 @@ def check_hydration(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # MORNING
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "morning":
 
@@ -140,10 +388,9 @@ def check_hydration(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # AFTERNOON
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "afternoon":
 
@@ -164,10 +411,9 @@ def check_hydration(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # EVENING
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "evening":
 
@@ -188,10 +434,9 @@ def check_hydration(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # NIGHT
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "night":
 
@@ -215,10 +460,6 @@ def check_hydration(user, period):
 # =========================================================
 
 def check_workout(user, period):
-    """
-    Generate workout notifications only during
-    appropriate parts of the day.
-    """
 
     today = timezone.localdate()
 
@@ -232,10 +473,9 @@ def check_workout(user, period):
         .exists()
     )
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # WORKOUT COMPLETED
-    # -----------------------------------------------------
+    # =====================================================
 
     if completed_today:
 
@@ -251,10 +491,9 @@ def check_workout(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # MORNING
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "morning":
 
@@ -270,10 +509,9 @@ def check_workout(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # AFTERNOON
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "afternoon":
 
@@ -290,10 +528,9 @@ def check_workout(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # EVENING
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "evening":
 
@@ -310,10 +547,9 @@ def check_workout(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # NIGHT
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "night":
 
@@ -334,10 +570,6 @@ def check_workout(user, period):
 # =========================================================
 
 def check_diet(user, period):
-    """
-    Generate meal notifications according to
-    the time of day.
-    """
 
     today = timezone.localdate()
 
@@ -352,10 +584,16 @@ def check_diet(user, period):
         completed=True
     ).count()
 
+    # =====================================================
+    # NO MEALS
+    # =====================================================
 
     if total_meals == 0:
         return
 
+    # =====================================================
+    # ALL MEALS COMPLETED
+    # =====================================================
 
     if completed_meals == total_meals:
 
@@ -371,13 +609,13 @@ def check_diet(user, period):
 
         return
 
+    remaining = (
+        total_meals - completed_meals
+    )
 
-    remaining = total_meals - completed_meals
-
-
-    # -----------------------------------------------------
+    # =====================================================
     # MORNING
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "morning":
 
@@ -393,10 +631,9 @@ def check_diet(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # AFTERNOON
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "afternoon":
 
@@ -413,10 +650,9 @@ def check_diet(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # EVENING
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "evening":
 
@@ -433,10 +669,9 @@ def check_diet(user, period):
 
         return
 
-
-    # -----------------------------------------------------
+    # =====================================================
     # NIGHT
-    # -----------------------------------------------------
+    # =====================================================
 
     if period == "night":
 
@@ -457,57 +692,65 @@ def check_diet(user, period):
 # =========================================================
 
 def check_goal(user, period):
-    """
-    Generate goal-related encouragement.
-    """
 
     if not user.goal:
         return
 
+    if period != "morning":
+        return
 
-    # Goal message should not appear repeatedly
-    # during the same day.
+    goal = user.goal.lower()
 
-    if period == "morning":
+    # =====================================================
+    # WEIGHT LOSS
+    # =====================================================
 
-        if "lose" in user.goal.lower():
+    if "lose" in goal:
 
-            create_notification(
-                user=user,
-                notification_type="goal",
-                title="🎯 Weight Loss Focus",
-                message=(
-                    "Start your day focused on your goal. "
-                    "Stay consistent with your meals, "
-                    "hydration and workouts."
-                ),
-            )
+        create_notification(
+            user=user,
+            notification_type="goal",
+            title="🎯 Weight Loss Focus",
+            message=(
+                "Start your day focused on your goal. "
+                "Stay consistent with your meals, "
+                "hydration and workouts."
+            ),
+        )
 
-        elif "gain" in user.goal.lower():
+    # =====================================================
+    # MUSCLE GAIN
+    # =====================================================
 
-            create_notification(
-                user=user,
-                notification_type="goal",
-                title="🎯 Muscle Gain Focus",
-                message=(
-                    "Stay consistent with your workouts "
-                    "and nutrition to support your "
-                    "muscle-building goal."
-                ),
-            )
+    elif "gain" in goal:
 
-        else:
+        create_notification(
+            user=user,
+            notification_type="goal",
+            title="🎯 Muscle Gain Focus",
+            message=(
+                "Stay consistent with your workouts "
+                "and nutrition to support your "
+                "muscle-building goal."
+            ),
+        )
 
-            create_notification(
-                user=user,
-                notification_type="goal",
-                title="🎯 Fitness Goal Focus",
-                message=(
-                    "Stay consistent with your daily "
-                    "fitness habits and keep moving "
-                    "toward your goal."
-                ),
-            )
+    # =====================================================
+    # OTHER GOALS
+    # =====================================================
+
+    else:
+
+        create_notification(
+            user=user,
+            notification_type="goal",
+            title="🎯 Fitness Goal Focus",
+            message=(
+                "Stay consistent with your daily "
+                "fitness habits and keep moving "
+                "toward your goal."
+            ),
+        )
 
 
 # =========================================================
@@ -517,6 +760,15 @@ def check_goal(user, period):
 def generate_smart_notifications(user):
     """
     Run all time-aware FitFusion notification checks.
+
+    Phase 5E.2:
+        - Relevance
+        - Cooldowns
+        - Deduplication
+
+    Phase 5E.3:
+        - Priority
+        - Intelligent notification filtering
     """
 
     period = get_time_period()

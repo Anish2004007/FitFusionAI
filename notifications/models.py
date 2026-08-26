@@ -36,6 +36,16 @@ class Notification(models.Model):
         default=False
     )
 
+    priority = models.CharField(
+    max_length=10,
+    choices=[
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
+    ],
+    default="medium",
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )

@@ -64,6 +64,9 @@ function FitFusionLayout({
     const [notificationLoading, setNotificationLoading] =
         useState(false);
 
+    const [notificationFilter, setNotificationFilter] =
+        useState("all");
+
     const notificationRef = useRef(null);
 
 
@@ -348,6 +351,81 @@ function FitFusionLayout({
             }
 
         };
+
+
+    /*
+     * =========================================
+     * FILTER NOTIFICATIONS
+     * =========================================
+     */
+
+    const filteredNotifications =
+        notifications.filter(
+            (notification) => {
+
+                if (
+                    notificationFilter ===
+                    "all"
+                ) {
+
+                    return true;
+
+                }
+
+
+                if (
+                    notificationFilter ===
+                    "unread"
+                ) {
+
+                    return !notification.is_read;
+
+                }
+
+
+                if (
+                    notificationFilter ===
+                    "high"
+                ) {
+
+                    return (
+                        notification.priority ===
+                        "high"
+                    );
+
+                }
+
+
+                if (
+                    notificationFilter ===
+                    "medium"
+                ) {
+
+                    return (
+                        notification.priority ===
+                        "medium"
+                    );
+
+                }
+
+
+                if (
+                    notificationFilter ===
+                    "low"
+                ) {
+
+                    return (
+                        notification.priority ===
+                        "low"
+                    );
+
+                }
+
+
+                return true;
+
+            }
+        );
 
 
     /*
@@ -910,7 +988,103 @@ function FitFusionLayout({
                                     </div>
 
 
-                                    {/* LIST */}
+                                    {/* ================= FILTERS ================= */}
+
+                                    <div className="notification-filters">
+
+                                        <button
+                                            type="button"
+                                            className={
+                                                notificationFilter ===
+                                                "all"
+                                                    ? "active"
+                                                    : ""
+                                            }
+                                            onClick={() =>
+                                                setNotificationFilter(
+                                                    "all"
+                                                )
+                                            }
+                                        >
+                                            All
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            className={
+                                                notificationFilter ===
+                                                "unread"
+                                                    ? "active"
+                                                    : ""
+                                            }
+                                            onClick={() =>
+                                                setNotificationFilter(
+                                                    "unread"
+                                                )
+                                            }
+                                        >
+                                            Unread
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            className={
+                                                notificationFilter ===
+                                                "high"
+                                                    ? "active"
+                                                    : ""
+                                            }
+                                            onClick={() =>
+                                                setNotificationFilter(
+                                                    "high"
+                                                )
+                                            }
+                                        >
+                                            High
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            className={
+                                                notificationFilter ===
+                                                "medium"
+                                                    ? "active"
+                                                    : ""
+                                            }
+                                            onClick={() =>
+                                                setNotificationFilter(
+                                                    "medium"
+                                                )
+                                            }
+                                        >
+                                            Medium
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            className={
+                                                notificationFilter ===
+                                                "low"
+                                                    ? "active"
+                                                    : ""
+                                            }
+                                            onClick={() =>
+                                                setNotificationFilter(
+                                                    "low"
+                                                )
+                                            }
+                                        >
+                                            Low
+                                        </button>
+
+                                    </div>
+
+
+                                    {/* ================= LIST ================= */}
 
                                     <div className="notification-list">
 
@@ -923,7 +1097,7 @@ function FitFusionLayout({
 
                                             </div>
 
-                                        ) : notifications.length === 0 ? (
+                                        ) : filteredNotifications.length === 0 ? (
 
                                             <div className="notification-empty">
 
@@ -934,14 +1108,14 @@ function FitFusionLayout({
                                                 </strong>
 
                                                 <span>
-                                                    You're all caught up!
+                                                    No notifications match this filter.
                                                 </span>
 
                                             </div>
 
                                         ) : (
 
-                                            notifications.map(
+                                            filteredNotifications.map(
                                                 (notification) => (
 
                                                     <button
@@ -949,13 +1123,14 @@ function FitFusionLayout({
                                                         key={
                                                             notification.id
                                                         }
-                                                        className={
-                                                            `notification-item ${
-                                                                notification.is_read
-                                                                    ? "read"
-                                                                    : "unread"
-                                                            }`
-                                                        }
+                                                        className={`notification-item ${
+                                                            notification.is_read
+                                                                ? "read"
+                                                                : "unread"
+                                                        } priority-${
+                                                            notification.priority ||
+                                                            "medium"
+                                                        }`}
                                                         onClick={() => {
 
                                                             if (
@@ -970,6 +1145,7 @@ function FitFusionLayout({
 
                                                         }}
                                                     >
+
 
                                                         {/* ICON */}
 
@@ -988,14 +1164,40 @@ function FitFusionLayout({
 
                                                         <div className="notification-item-content">
 
-                                                            <div className="notification-item-title">
 
-                                                                {
-                                                                    notification.title
-                                                                }
+                                                            {/* TITLE + PRIORITY */}
+
+                                                            <div className="notification-item-title-row">
+
+                                                                <div className="notification-item-title">
+
+                                                                    {
+                                                                        notification.title
+                                                                    }
+
+                                                                </div>
+
+
+                                                                <span
+                                                                    className={`notification-priority priority-${
+                                                                        notification.priority ||
+                                                                        "medium"
+                                                                    }`}
+                                                                >
+
+                                                                    {
+                                                                        (
+                                                                            notification.priority ||
+                                                                            "medium"
+                                                                        ).toUpperCase()
+                                                                    }
+
+                                                                </span>
 
                                                             </div>
 
+
+                                                            {/* MESSAGE */}
 
                                                             <div className="notification-item-message">
 
@@ -1005,6 +1207,8 @@ function FitFusionLayout({
 
                                                             </div>
 
+
+                                                            {/* TIME */}
 
                                                             <div className="notification-item-time">
 

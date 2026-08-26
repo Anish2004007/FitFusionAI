@@ -1,12 +1,11 @@
-import json
-
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.db.models import Case, When, Value, IntegerField
+
 from .notification_engine import generate_smart_notifications
 from accounts.models import User
-
 from .models import Notification
 
 
@@ -40,7 +39,6 @@ def notifications_api(request):
     user = get_logged_in_user(request)
 
     if not user:
-
         return JsonResponse(
             {
                 "success": False,
@@ -49,8 +47,10 @@ def notifications_api(request):
             status=401,
         )
 
-    # Generate smart notifications based on
-    # the user's current FitFusion data.
+    # =====================================================
+    # GENERATE SMART NOTIFICATIONS
+    # =====================================================
+
     try:
 
         generate_smart_notifications(user)
@@ -62,15 +62,60 @@ def notifications_api(request):
             repr(e)
         )
 
-    notifications = Notification.objects.filter(
-        user=user
-    ).order_by(
-        "-created_at"
+    # =====================================================
+    # PRIORITY ORDER
+    # =====================================================
+
+    priority_order = Case(
+
+        When(
+            priority="high",
+            then=Value(3)
+        ),
+
+        When(
+            priority="medium",
+            then=Value(2)
+        ),
+
+        When(
+            priority="low",
+            then=Value(1)
+        ),
+
+        default=Value(0),
+
+        output_field=IntegerField(),
     )
+
+    # =====================================================
+    # GET USER NOTIFICATIONS
+    # =====================================================
+
+    notifications = (
+        Notification.objects
+        .filter(user=user)
+        .annotate(
+            priority_order=priority_order
+        )
+        .order_by(
+            "is_read",
+            "-priority_order",
+            "-created_at",
+        )
+    )
+
+    # =====================================================
+    # UNREAD COUNT
+    # =====================================================
 
     unread_count = notifications.filter(
         is_read=False
     ).count()
+
+    # =====================================================
+    # BUILD RESPONSE
+    # =====================================================
 
     notification_list = []
 
@@ -93,6 +138,9 @@ def notifications_api(request):
                 "message":
                     notification.message,
 
+                "priority":
+                    notification.priority,
+
                 "is_read":
                     notification.is_read,
 
@@ -105,6 +153,10 @@ def notifications_api(request):
                     ),
             }
         )
+
+    # =====================================================
+    # RETURN RESPONSE
+    # =====================================================
 
     return JsonResponse(
         {
