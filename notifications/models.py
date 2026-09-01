@@ -1,4 +1,5 @@
 from django.db import models
+
 from accounts.models import User
 
 
@@ -11,6 +12,12 @@ class Notification(models.Model):
         ("goal", "Goal"),
         ("ai", "AI Coach"),
         ("system", "System"),
+    ]
+
+    PRIORITY_CHOICES = [
+        ("high", "High"),
+        ("medium", "Medium"),
+        ("low", "Low"),
     ]
 
     user = models.ForeignKey(
@@ -32,18 +39,14 @@ class Notification(models.Model):
 
     message = models.TextField()
 
-    is_read = models.BooleanField(
-        default=False
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default="medium",
     )
 
-    priority = models.CharField(
-    max_length=10,
-    choices=[
-        ("low", "Low"),
-        ("medium", "Medium"),
-        ("high", "High"),
-    ],
-    default="medium",
+    is_read = models.BooleanField(
+        default=False
     )
 
     created_at = models.DateTimeField(

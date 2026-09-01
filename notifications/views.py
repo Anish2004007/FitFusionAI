@@ -4,10 +4,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db.models import Case, When, Value, IntegerField
 
-from .notification_engine import generate_smart_notifications
 from accounts.models import User
 from .models import Notification
+from .notification_engine import generate_smart_notifications
 
+
+# =========================================================
+# GET LOGGED-IN USER
+# =========================================================
 
 def get_logged_in_user(request):
     """
@@ -52,18 +56,20 @@ def notifications_api(request):
     # =====================================================
 
     try:
-
         generate_smart_notifications(user)
 
     except Exception as e:
-
         print(
             "SMART NOTIFICATION ERROR:",
             repr(e)
         )
 
     # =====================================================
-    # PRIORITY ORDER
+    # PRIORITY SORTING
+    #
+    # High   = 3
+    # Medium = 2
+    # Low    = 1
     # =====================================================
 
     priority_order = Case(
@@ -89,12 +95,20 @@ def notifications_api(request):
     )
 
     # =====================================================
-    # GET USER NOTIFICATIONS
+    # GET NOTIFICATIONS
+    #
+    # 1. Unread first
+    # 2. High priority
+    # 3. Medium priority
+    # 4. Low priority
+    # 5. Newest first
     # =====================================================
 
     notifications = (
         Notification.objects
-        .filter(user=user)
+        .filter(
+            user=user
+        )
         .annotate(
             priority_order=priority_order
         )
@@ -155,7 +169,7 @@ def notifications_api(request):
         )
 
     # =====================================================
-    # RETURN RESPONSE
+    # RESPONSE
     # =====================================================
 
     return JsonResponse(
@@ -185,7 +199,6 @@ def mark_notification_read(
     user = get_logged_in_user(request)
 
     if not user:
-
         return JsonResponse(
             {
                 "success": False,
@@ -206,11 +219,15 @@ def mark_notification_read(
         return JsonResponse(
             {
                 "success": False,
-                "error":
-                    "Notification not found.",
+                "error": "Notification not found.",
             },
             status=404,
         )
+
+    # Remember whether this notification
+    # was actually unread.
+
+    was_unread = not notification.is_read
 
     notification.is_read = True
 
@@ -224,6 +241,9 @@ def mark_notification_read(
 
             "message":
                 "Notification marked as read.",
+
+            "was_unread":
+                was_unread,
         }
     )
 
@@ -239,7 +259,6 @@ def mark_all_notifications_read(request):
     user = get_logged_in_user(request)
 
     if not user:
-
         return JsonResponse(
             {
                 "success": False,
@@ -248,11 +267,15 @@ def mark_all_notifications_read(request):
             status=401,
         )
 
-    updated_count = Notification.objects.filter(
-        user=user,
-        is_read=False,
-    ).update(
-        is_read=True
+    updated_count = (
+        Notification.objects
+        .filter(
+            user=user,
+            is_read=False,
+        )
+        .update(
+            is_read=True
+        )
     )
 
     return JsonResponse(
@@ -269,7 +292,52 @@ def mark_all_notifications_read(request):
 
 
 # =========================================================
-# DELETE NOTIFICATION
+# CLEAR COMPLETED NOTIFICATIONS
+#
+# Deletes ONLY READ notifications.
+#
+# UNREAD notifications are NOT deleted.
+# =========================================================
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def clear_completed_notifications(request):
+
+    user = get_logged_in_user(request)
+
+    if not user:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "User is not logged in.",
+            },
+            status=401,
+        )
+
+    deleted_count, _ = (
+        Notification.objects
+        .filter(
+            user=user,
+            is_read=True,
+        )
+        .delete()
+    )
+
+    return JsonResponse(
+        {
+            "success": True,
+
+            "message":
+                "Completed notifications cleared successfully.",
+
+            "deleted_count":
+                deleted_count,
+        }
+    )
+
+
+# =========================================================
+# DELETE ONE NOTIFICATION
 # =========================================================
 
 @csrf_exempt
@@ -282,7 +350,6 @@ def delete_notification(
     user = get_logged_in_user(request)
 
     if not user:
-
         return JsonResponse(
             {
                 "success": False,
@@ -303,8 +370,7 @@ def delete_notification(
         return JsonResponse(
             {
                 "success": False,
-                "error":
-                    "Notification not found.",
+                "error": "Notification not found.",
             },
             status=404,
         )
