@@ -1,4 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 
 
 function FitFusionLayout({
@@ -7,35 +12,41 @@ function FitFusionLayout({
     onNavigate,
 }) {
 
-    /*
-     * =========================================
-     * DJANGO API BASE URL
-     * =========================================
-     */
+    // =====================================================
+    // API
+    // =====================================================
 
     const API_BASE_URL =
         "http://localhost:8000";
 
 
-    /*
-     * =========================================
-     * GREETING
-     * =========================================
-     */
+    // =====================================================
+    // GREETING
+    // =====================================================
 
     const getGreeting = () => {
 
-        const hour = new Date().getHours();
+        const hour =
+            new Date().getHours();
 
-        if (hour >= 5 && hour < 12) {
+        if (
+            hour >= 5 &&
+            hour < 12
+        ) {
             return "Good Morning";
         }
 
-        if (hour >= 12 && hour < 17) {
+        if (
+            hour >= 12 &&
+            hour < 17
+        ) {
             return "Good Afternoon";
         }
 
-        if (hour >= 17 && hour < 21) {
+        if (
+            hour >= 17 &&
+            hour < 21
+        ) {
             return "Good Evening";
         }
 
@@ -43,158 +54,337 @@ function FitFusionLayout({
     };
 
 
-    const greeting = getGreeting();
+    const greeting =
+        getGreeting();
 
 
-    /*
-     * =========================================
-     * NOTIFICATION STATE
-     * =========================================
-     */
+    // =====================================================
+    // NOTIFICATION STATE
+    // =====================================================
 
-    const [notifications, setNotifications] =
-        useState([]);
-
-    const [unreadCount, setUnreadCount] =
-        useState(0);
-
-    const [showNotifications, setShowNotifications] =
-        useState(false);
-
-    const [notificationLoading, setNotificationLoading] =
-        useState(false);
-
-    const [notificationFilter, setNotificationFilter] =
-        useState("all");
-
-    const notificationRef = useRef(null);
+    const [
+        notifications,
+        setNotifications,
+    ] = useState([]);
 
 
-    /*
-     * =========================================
-     * LOAD NOTIFICATIONS
-     * =========================================
-     */
-
-    const loadNotifications = async () => {
-
-        try {
-
-            setNotificationLoading(true);
-
-            const response = await fetch(
-                `${API_BASE_URL}/notifications/api/`,
-                {
-                    method: "GET",
-                    credentials: "include",
-                }
-            );
+    const [
+        unreadCount,
+        setUnreadCount,
+    ] = useState(0);
 
 
-            if (!response.ok) {
-
-                throw new Error(
-                    `Notification API returned ${response.status}`
-                );
-
-            }
+    const [
+        showNotifications,
+        setShowNotifications,
+    ] = useState(false);
 
 
-            const data =
-                await response.json();
+    const [
+        notificationLoading,
+        setNotificationLoading,
+    ] = useState(false);
 
 
-            if (
-                data &&
-                data.success
-            ) {
+    const [
+        notificationActionLoading,
+        setNotificationActionLoading,
+    ] = useState(false);
 
-                setNotifications(
-                    data.notifications || []
-                );
 
-                setUnreadCount(
-                    data.unread_count || 0
-                );
+    const [
+        notificationFilter,
+        setNotificationFilter,
+    ] = useState("all");
 
-            }
 
-        } catch (error) {
+    const notificationRef =
+        useRef(null);
 
-            console.error(
-                "Notification API error:",
-                error
-            );
 
-        } finally {
+    // =====================================================
+    // SAFE BOOLEAN CONVERSION
+    // =====================================================
 
-            setNotificationLoading(false);
+    const normalizeBoolean = (
+        value
+    ) => {
 
+        if (
+            typeof value ===
+            "boolean"
+        ) {
+            return value;
         }
 
+
+        if (
+            typeof value ===
+            "number"
+        ) {
+            return value === 1;
+        }
+
+
+        if (
+            typeof value ===
+            "string"
+        ) {
+
+            const normalized =
+                value
+                    .trim()
+                    .toLowerCase();
+
+            return (
+                normalized === "true" ||
+                normalized === "1"
+            );
+        }
+
+
+        return false;
     };
 
 
-    /*
-     * =========================================
-     * LOAD ON PAGE LOAD
-     * =========================================
-     */
+    // =====================================================
+    // LOAD NOTIFICATIONS
+    // =====================================================
+
+    const loadNotifications =
+        useCallback(
+            async () => {
+
+                try {
+
+                    setNotificationLoading(
+                        true
+                    );
+
+
+                    const response =
+                        await fetch(
+                            `${API_BASE_URL}/notifications/api/`,
+                            {
+                                method: "GET",
+
+                                credentials:
+                                    "include",
+
+                                headers: {
+                                    "Accept":
+                                        "application/json",
+                                },
+
+                                cache:
+                                    "no-store",
+                            }
+                        );
+
+
+                    if (
+                        !response.ok
+                    ) {
+
+                        throw new Error(
+                            `Notification API returned ${response.status}`
+                        );
+
+                    }
+
+
+                    const data =
+                        await response.json();
+
+
+                    console.log(
+                        "NOTIFICATION API RESPONSE:",
+                        data
+                    );
+
+
+                    if (
+                        !data ||
+                        !data.success
+                    ) {
+
+                        throw new Error(
+                            data?.error ||
+                            "Unable to load notifications."
+                        );
+
+                    }
+
+
+                    const rawNotifications =
+                        Array.isArray(
+                            data.notifications
+                        )
+                            ? data.notifications
+                            : [];
+
+
+                    // -----------------------------------------
+                    // NORMALIZE NOTIFICATIONS
+                    // -----------------------------------------
+
+                    const normalized =
+                        rawNotifications.map(
+                            (
+                                notification
+                            ) => {
+
+                                const type =
+                                    notification.type ||
+                                    notification.notification_type ||
+                                    "system";
+
+
+                                const priority =
+                                    String(
+                                        notification.priority ||
+                                        "medium"
+                                    ).toLowerCase();
+
+
+                                return {
+
+                                    ...notification,
+
+                                    id:
+                                        Number(
+                                            notification.id
+                                        ),
+
+                                    type:
+
+                                        type,
+
+                                    notification_type:
+
+                                        notification.notification_type ||
+                                        type,
+
+                                    priority:
+
+                                        priority,
+
+                                    is_read:
+
+                                        normalizeBoolean(
+                                            notification.is_read
+                                        ),
+
+                                };
+
+                            }
+                        );
+
+
+                    // -----------------------------------------
+                    // UPDATE STATE
+                    // -----------------------------------------
+
+                    setNotifications(
+                        normalized
+                    );
+
+
+                    setUnreadCount(
+                        Number(
+                            data.unread_count
+                        ) || 0
+                    );
+
+
+                } catch (
+                    error
+                ) {
+
+                    console.error(
+                        "Notification API error:",
+                        error
+                    );
+
+                } finally {
+
+                    setNotificationLoading(
+                        false
+                    );
+
+                }
+
+            },
+            []
+        );
+
+
+    // =====================================================
+    // LOAD NOTIFICATIONS ON PAGE LOAD
+    // =====================================================
 
     useEffect(() => {
 
         loadNotifications();
 
-    }, []);
+    }, [
+        loadNotifications,
+    ]);
 
 
-    /*
-     * =========================================
-     * AUTO REFRESH EVERY 30 SECONDS
-     * =========================================
-     */
+    // =====================================================
+    // AUTO REFRESH EVERY 30 SECONDS
+    // =====================================================
 
     useEffect(() => {
 
         const interval =
-            setInterval(() => {
+            setInterval(
+                () => {
 
-                loadNotifications();
+                    loadNotifications();
 
-            }, 30000);
+                },
+                30000
+            );
 
 
         return () => {
 
-            clearInterval(interval);
+            clearInterval(
+                interval
+            );
 
         };
 
-    }, []);
+    }, [
+        loadNotifications,
+    ]);
 
 
-    /*
-     * =========================================
-     * CLOSE DROPDOWN WHEN CLICKING OUTSIDE
-     * =========================================
-     */
+    // =====================================================
+    // CLOSE PANEL WHEN CLICKING OUTSIDE
+    // =====================================================
 
     useEffect(() => {
 
-        const handleClickOutside = (event) => {
+        const handleClickOutside =
+            (event) => {
 
-            if (
-                notificationRef.current &&
-                !notificationRef.current.contains(
-                    event.target
-                )
-            ) {
+                if (
+                    notificationRef.current &&
+                    !notificationRef.current.contains(
+                        event.target
+                    )
+                ) {
 
-                setShowNotifications(false);
+                    setShowNotifications(
+                        false
+                    );
 
-            }
+                }
 
-        };
+            };
 
 
         document.addEventListener(
@@ -215,104 +405,52 @@ function FitFusionLayout({
     }, []);
 
 
-    /*
-     * =========================================
-     * MARK ONE NOTIFICATION AS READ
-     * =========================================
-     */
+    // =====================================================
+    // MARK ONE NOTIFICATION AS READ
+    // =====================================================
 
-    const markNotificationRead = async (
-        notificationId
-    ) => {
-
-        try {
-
-            const response = await fetch(
-                `${API_BASE_URL}/notifications/api/${notificationId}/read/`,
-                {
-                    method: "POST",
-                    credentials: "include",
-                }
-            );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    `Mark read returned ${response.status}`
-                );
-
-            }
-
-
-            const data =
-                await response.json();
-
+    const markNotificationRead =
+        async (
+            notificationId
+        ) => {
 
             if (
-                data &&
-                data.success
+                notificationActionLoading
             ) {
-
-                setNotifications((previous) =>
-                    previous.map(
-                        (notification) =>
-                            notification.id ===
-                            notificationId
-                                ? {
-                                    ...notification,
-                                    is_read: true,
-                                }
-                                : notification
-                    )
-                );
-
-
-                setUnreadCount((previous) =>
-                    Math.max(
-                        previous - 1,
-                        0
-                    )
-                );
-
+                return;
             }
 
-        } catch (error) {
-
-            console.error(
-                "Mark notification read error:",
-                error
-            );
-
-        }
-
-    };
-
-
-    /*
-     * =========================================
-     * MARK ALL NOTIFICATIONS AS READ
-     * =========================================
-     */
-
-    const markAllNotificationsRead =
-        async () => {
 
             try {
 
-                const response = await fetch(
-                    `${API_BASE_URL}/notifications/api/read-all/`,
-                    {
-                        method: "POST",
-                        credentials: "include",
-                    }
+                setNotificationActionLoading(
+                    true
                 );
 
 
-                if (!response.ok) {
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/notifications/api/${notificationId}/read/`,
+                        {
+                            method: "POST",
+
+                            credentials:
+                                "include",
+
+                            headers: {
+                                "Accept":
+                                    "application/json",
+                            },
+                        }
+                    );
+
+
+                if (
+                    !response.ok
+                ) {
 
                     throw new Error(
-                        `Mark all read returned ${response.status}`
+                        `Mark read API returned ${response.status}`
                     );
 
                 }
@@ -322,30 +460,77 @@ function FitFusionLayout({
                     await response.json();
 
 
+                console.log(
+                    "MARK READ RESPONSE:",
+                    data
+                );
+
+
                 if (
-                    data &&
-                    data.success
+                    !data ||
+                    !data.success
                 ) {
 
-                    setNotifications((previous) =>
-                        previous.map(
-                            (notification) => ({
-                                ...notification,
-                                is_read: true,
-                            })
-                        )
+                    throw new Error(
+                        data?.error ||
+                        "Unable to mark notification as read."
                     );
-
-
-                    setUnreadCount(0);
 
                 }
 
-            } catch (error) {
+
+                // -----------------------------------------
+                // UPDATE LOCAL STATE IMMEDIATELY
+                // -----------------------------------------
+
+                setNotifications(
+                    (
+                        previous
+                    ) =>
+                        previous.map(
+                            (
+                                notification
+                            ) =>
+                                Number(
+                                    notification.id
+                                ) ===
+                                Number(
+                                    notificationId
+                                )
+                                    ? {
+                                        ...notification,
+                                        is_read:
+                                            true,
+                                    }
+                                    : notification
+                        )
+                );
+
+
+                // -----------------------------------------
+                // USE SERVER COUNT
+                // -----------------------------------------
+
+                setUnreadCount(
+                    Number(
+                        data.unread_count
+                    ) || 0
+                );
+
+
+            } catch (
+                error
+            ) {
 
                 console.error(
-                    "Mark all notifications read error:",
+                    "Mark notification read error:",
                     error
+                );
+
+            } finally {
+
+                setNotificationActionLoading(
+                    false
                 );
 
             }
@@ -353,24 +538,417 @@ function FitFusionLayout({
         };
 
 
-    /*
-     * =========================================
-     * FILTER NOTIFICATIONS
-     * =========================================
-     */
+    // =====================================================
+    // MARK ALL NOTIFICATIONS AS READ
+    // =====================================================
+
+    const markAllNotificationsRead =
+        async () => {
+
+            if (
+                notificationActionLoading
+            ) {
+                return;
+            }
+
+
+            if (
+                unreadCount <= 0
+            ) {
+                return;
+            }
+
+
+            try {
+
+                setNotificationActionLoading(
+                    true
+                );
+
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/notifications/api/read-all/`,
+                        {
+                            method: "POST",
+
+                            credentials:
+                                "include",
+
+                            headers: {
+                                "Accept":
+                                    "application/json",
+                            },
+                        }
+                    );
+
+
+                if (
+                    !response.ok
+                ) {
+
+                    throw new Error(
+                        `Mark all API returned ${response.status}`
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "MARK ALL RESPONSE:",
+                    data
+                );
+
+
+                if (
+                    !data ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data?.error ||
+                        "Unable to mark all notifications as read."
+                    );
+
+                }
+
+
+                // -----------------------------------------
+                // UPDATE LOCAL STATE
+                // -----------------------------------------
+
+                setNotifications(
+                    (
+                        previous
+                    ) =>
+                        previous.map(
+                            (
+                                notification
+                            ) => ({
+                                ...notification,
+                                is_read:
+                                    true,
+                            })
+                        )
+                );
+
+
+                setUnreadCount(
+                    0
+                );
+
+
+            } catch (
+                error
+            ) {
+
+                console.error(
+                    "Mark all notifications read error:",
+                    error
+                );
+
+            } finally {
+
+                setNotificationActionLoading(
+                    false
+                );
+
+            }
+
+        };
+
+
+    // =====================================================
+    // CLEAR COMPLETED / READ NOTIFICATIONS
+    // =====================================================
+
+    const clearCompletedNotifications =
+        async () => {
+
+            if (
+                notificationActionLoading
+            ) {
+                return;
+            }
+
+
+            const hasReadNotifications =
+                notifications.some(
+                    (
+                        notification
+                    ) =>
+                        notification.is_read ===
+                        true
+                );
+
+
+            if (
+                !hasReadNotifications
+            ) {
+
+                return;
+
+            }
+
+
+            try {
+
+                setNotificationActionLoading(
+                    true
+                );
+
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/notifications/api/clear-completed/`,
+                        {
+                            method: "DELETE",
+
+                            credentials:
+                                "include",
+
+                            headers: {
+                                "Accept":
+                                    "application/json",
+                            },
+                        }
+                    );
+
+
+                if (
+                    !response.ok
+                ) {
+
+                    throw new Error(
+                        `Clear completed API returned ${response.status}`
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "CLEAR COMPLETED RESPONSE:",
+                    data
+                );
+
+
+                if (
+                    !data ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data?.error ||
+                        "Unable to clear completed notifications."
+                    );
+
+                }
+
+
+                // -----------------------------------------
+                // REMOVE READ NOTIFICATIONS LOCALLY
+                // -----------------------------------------
+
+                setNotifications(
+                    (
+                        previous
+                    ) =>
+                        previous.filter(
+                            (
+                                notification
+                            ) =>
+                                notification.is_read !==
+                                true
+                        )
+                );
+
+
+                // -----------------------------------------
+                // SERVER COUNT
+                // -----------------------------------------
+
+                setUnreadCount(
+                    Number(
+                        data.unread_count
+                    ) || 0
+                );
+
+
+                // -----------------------------------------
+                // ALWAYS SHOW ALL AFTER CLEARING
+                // -----------------------------------------
+
+                setNotificationFilter(
+                    "all"
+                );
+
+
+            } catch (
+                error
+            ) {
+
+                console.error(
+                    "Clear completed notifications error:",
+                    error
+                );
+
+            } finally {
+
+                setNotificationActionLoading(
+                    false
+                );
+
+            }
+
+        };
+
+
+    // =====================================================
+    // DELETE ONE NOTIFICATION
+    // =====================================================
+
+    const deleteNotification =
+        async (
+            notificationId
+        ) => {
+
+            if (
+                notificationActionLoading
+            ) {
+                return;
+            }
+
+
+            try {
+
+                setNotificationActionLoading(
+                    true
+                );
+
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/notifications/api/${notificationId}/`,
+                        {
+                            method: "DELETE",
+
+                            credentials:
+                                "include",
+
+                            headers: {
+                                "Accept":
+                                    "application/json",
+                            },
+                        }
+                    );
+
+
+                if (
+                    !response.ok
+                ) {
+
+                    throw new Error(
+                        `Delete API returned ${response.status}`
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "DELETE RESPONSE:",
+                    data
+                );
+
+
+                if (
+                    !data ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data?.error ||
+                        "Unable to delete notification."
+                    );
+
+                }
+
+
+                // -----------------------------------------
+                // REMOVE FROM LOCAL STATE
+                // -----------------------------------------
+
+                setNotifications(
+                    (
+                        previous
+                    ) =>
+                        previous.filter(
+                            (
+                                notification
+                            ) =>
+                                Number(
+                                    notification.id
+                                ) !==
+                                Number(
+                                    notificationId
+                                )
+                        )
+                );
+
+
+                setUnreadCount(
+                    Number(
+                        data.unread_count
+                    ) || 0
+                );
+
+
+            } catch (
+                error
+            ) {
+
+                console.error(
+                    "Delete notification error:",
+                    error
+                );
+
+            } finally {
+
+                setNotificationActionLoading(
+                    false
+                );
+
+            }
+
+        };
+
+
+    // =====================================================
+    // FILTER NOTIFICATIONS
+    // =====================================================
 
     const filteredNotifications =
         notifications.filter(
-            (notification) => {
+            (
+                notification
+            ) => {
 
-                if (
-                    notificationFilter ===
-                    "all"
-                ) {
-
-                    return true;
-
-                }
+                const priority =
+                    String(
+                        notification.priority ||
+                        "medium"
+                    ).toLowerCase();
 
 
                 if (
@@ -378,7 +956,10 @@ function FitFusionLayout({
                     "unread"
                 ) {
 
-                    return !notification.is_read;
+                    return (
+                        notification.is_read ===
+                        false
+                    );
 
                 }
 
@@ -389,7 +970,7 @@ function FitFusionLayout({
                 ) {
 
                     return (
-                        notification.priority ===
+                        priority ===
                         "high"
                     );
 
@@ -402,7 +983,7 @@ function FitFusionLayout({
                 ) {
 
                     return (
-                        notification.priority ===
+                        priority ===
                         "medium"
                     );
 
@@ -415,7 +996,7 @@ function FitFusionLayout({
                 ) {
 
                     return (
-                        notification.priority ===
+                        priority ===
                         "low"
                     );
 
@@ -428,30 +1009,44 @@ function FitFusionLayout({
         );
 
 
-    /*
-     * =========================================
-     * CURRENT PATH
-     * =========================================
-     */
+    // =====================================================
+    // READ NOTIFICATIONS EXIST
+    // =====================================================
+
+    const hasCompletedNotifications =
+        notifications.some(
+            (
+                notification
+            ) =>
+                notification.is_read ===
+                true
+        );
+
+
+    // =====================================================
+    // NAVIGATION PATH
+    // =====================================================
 
     const currentPath =
         window.location.pathname;
 
 
-    /*
-     * =========================================
-     * ACTIVE MENU
-     * =========================================
-     */
+    // =====================================================
+    // ACTIVE MENU
+    // =====================================================
 
     const isDashboard =
-        currentPath === "/dashboard/" ||
-        currentPath === "/dashboard";
+        currentPath ===
+            "/dashboard/" ||
+        currentPath ===
+            "/dashboard";
 
 
     const isProgress =
-        currentPath === "/" ||
-        currentPath === "";
+        currentPath ===
+            "/" ||
+        currentPath ===
+            "";
 
 
     const isWorkout =
@@ -461,133 +1056,170 @@ function FitFusionLayout({
 
 
     const isDiet =
-        currentPath === "/diet/" ||
-        currentPath === "/diet";
+        currentPath ===
+            "/diet/" ||
+        currentPath ===
+            "/diet";
 
 
     const isProfile =
-        currentPath === "/profile/" ||
-        currentPath === "/profile";
+        currentPath ===
+            "/profile/" ||
+        currentPath ===
+            "/profile";
 
 
     const isTracker =
-        currentPath === "/tracker/" ||
-        currentPath === "/tracker";
+        currentPath ===
+            "/tracker/" ||
+        currentPath ===
+            "/tracker";
 
 
     const isAICoach =
-        currentPath === "/ai-coach/" ||
-        currentPath === "/ai-coach";
+        currentPath ===
+            "/ai-coach/" ||
+        currentPath ===
+            "/ai-coach";
 
 
-    /*
-     * =========================================
-     * NAVIGATION
-     * =========================================
-     */
+    // =====================================================
+    // NAVIGATION
+    // =====================================================
 
-    const navigate = (url) => {
+    const navigate =
+        (url) => {
 
-        if (onNavigate) {
+            if (
+                onNavigate
+            ) {
 
-            onNavigate(url);
+                onNavigate(
+                    url
+                );
 
-            return;
+                return;
 
-        }
-
-
-        window.history.pushState(
-            {},
-            "",
-            url
-        );
+            }
 
 
-        window.dispatchEvent(
-            new PopStateEvent("popstate")
-        );
-
-    };
-
-
-    /*
-     * =========================================
-     * NOTIFICATION ICON
-     * =========================================
-     */
-
-    const getNotificationIcon = (
-        type
-    ) => {
-
-        switch (type) {
-
-            case "hydration":
-                return "💧";
-
-            case "workout":
-                return "💪";
-
-            case "diet":
-                return "🍽️";
-
-            case "goal":
-                return "🎯";
-
-            case "ai":
-                return "🤖";
-
-            case "system":
-                return "🔔";
-
-            default:
-                return "🔔";
-
-        }
-
-    };
+            window.history.pushState(
+                {},
+                "",
+                url
+            );
 
 
-    /*
-     * =========================================
-     * RENDER
-     * =========================================
-     */
+            window.dispatchEvent(
+                new PopStateEvent(
+                    "popstate"
+                )
+            );
+
+        };
+
+
+    // =====================================================
+    // NOTIFICATION ICON
+    // =====================================================
+
+    const getNotificationIcon =
+        (type) => {
+
+            switch (
+                type
+            ) {
+
+                case "hydration":
+
+                    return "💧";
+
+
+                case "workout":
+
+                    return "💪";
+
+
+                case "diet":
+
+                    return "🍽️";
+
+
+                case "goal":
+
+                    return "🎯";
+
+
+                case "ai":
+
+                    return "🤖";
+
+
+                case "system":
+
+                    return "🔔";
+
+
+                default:
+
+                    return "🔔";
+
+            }
+
+        };
+
+
+    // =====================================================
+    // RENDER
+    // =====================================================
 
     return (
 
-        <div className="dashboard-layout">
+        <div
+            className="dashboard-layout"
+        >
 
 
-            {/* ================= SIDEBAR ================= */}
+            {/* =================================================
+                SIDEBAR
+            ================================================= */}
 
-            <aside className="sidebar">
+            <aside
+                className="sidebar"
+            >
 
 
                 {/* LOGO */}
 
-                <div className="logo">
+                <div
+                    className="logo"
+                >
 
-                    <span className="logo-icon">
+                    <span
+                        className="logo-icon"
+                    >
 
                         <i className="bi bi-heart-pulse-fill"></i>
 
                     </span>
 
 
-                    <span className="logo-text">
-
+                    <span
+                        className="logo-text"
+                    >
                         FitFusion AI
-
                     </span>
 
                 </div>
 
 
-                {/* ================= NAVIGATION ================= */}
+                {/* =================================================
+                    MENU
+                ================================================= */}
 
-                <ul className="menu">
+                <ul
+                    className="menu"
+                >
 
 
                     {/* DASHBOARD */}
@@ -776,7 +1408,9 @@ function FitFusionLayout({
 
                                 e.preventDefault();
 
-                                navigate("/");
+                                navigate(
+                                    "/"
+                                );
 
                             }}
                         >
@@ -829,7 +1463,9 @@ function FitFusionLayout({
                 </ul>
 
 
-                {/* ================= LOGOUT ================= */}
+                {/* =================================================
+                    LOGOUT
+                ================================================= */}
 
                 <a
                     href="http://localhost:8000/logout/"
@@ -848,81 +1484,116 @@ function FitFusionLayout({
             </aside>
 
 
-            {/* ================= MAIN ================= */}
+            {/* =================================================
+                MAIN CONTENT
+            ================================================= */}
 
-            <main className="main-content">
+            <main
+                className="main-content"
+            >
 
 
-                {/* ================= TOPBAR ================= */}
+                {/* =================================================
+                    TOPBAR
+                ================================================= */}
 
-                <header className="topbar">
+                <header
+                    className="topbar"
+                >
 
 
-                    <div className="topbar-left">
+                    {/* TOPBAR LEFT */}
 
+                    <div
+                        className="topbar-left"
+                    >
 
                         <span
                             className="greeting"
                             id="dynamicGreeting"
                         >
-
                             👋 {greeting},
-
                         </span>
 
 
                         <h2>
-
                             {
                                 user?.full_name ||
-                                "Loading..."
+                                "User"
                             }
-
                         </h2>
 
 
                         <p>
-
                             Stay consistent.
                             You're doing great!
-
                         </p>
-
 
                     </div>
 
 
-                    <div className="topbar-right">
+                    {/* =================================================
+                        TOPBAR RIGHT
+                    ================================================= */}
+
+                    <div
+                        className="topbar-right"
+                    >
 
 
                         {/* SEARCH */}
 
-                        <div className="icon-btn">
+                        <div
+                            className="icon-btn"
+                        >
 
                             <i className="bi bi-search"></i>
 
                         </div>
 
 
-                        {/* ================= NOTIFICATIONS ================= */}
+                        {/* =================================================
+                            NOTIFICATIONS
+                        ================================================= */}
 
                         <div
                             className="notification-wrapper"
                             ref={notificationRef}
                         >
 
+
+                            {/* BELL BUTTON */}
+
                             <button
                                 type="button"
                                 className="icon-btn notification-button"
                                 onClick={() => {
 
+                                    const nextState =
+                                        !showNotifications;
+
+
                                     setShowNotifications(
-                                        (previous) =>
-                                            !previous
+                                        nextState
                                     );
+
+
+                                    /*
+                                     * Always reload when
+                                     * opening the panel.
+                                     */
+
+                                    if (
+                                        nextState
+                                    ) {
+
+                                        loadNotifications();
+
+                                    }
 
                                 }}
                                 aria-label="Notifications"
+                                title="Notifications"
                             >
 
                                 <i className="bi bi-bell"></i>
@@ -930,7 +1601,9 @@ function FitFusionLayout({
 
                                 {unreadCount > 0 && (
 
-                                    <span className="notification-count">
+                                    <span
+                                        className="notification-count"
+                                    >
 
                                         {
                                             unreadCount > 99
@@ -945,16 +1618,24 @@ function FitFusionLayout({
                             </button>
 
 
-                            {/* ================= NOTIFICATION PANEL ================= */}
+                            {/* =================================================
+                                NOTIFICATION PANEL
+                            ================================================= */}
 
                             {showNotifications && (
 
-                                <div className="notification-panel">
+                                <div
+                                    className="notification-panel"
+                                >
 
 
-                                    {/* HEADER */}
+                                    {/* =================================================
+                                        HEADER
+                                    ================================================= */}
 
-                                    <div className="notification-panel-header">
+                                    <div
+                                        className="notification-panel-header"
+                                    >
 
                                         <div>
 
@@ -963,40 +1644,91 @@ function FitFusionLayout({
                                             </h3>
 
                                             <span>
-                                                {unreadCount} unread
+                                                {
+                                                    unreadCount
+                                                } unread
                                             </span>
 
                                         </div>
 
 
-                                        {unreadCount > 0 && (
+                                        {/* HEADER ACTIONS */}
 
-                                            <button
-                                                type="button"
-                                                className="mark-all-button"
-                                                onClick={
-                                                    markAllNotificationsRead
-                                                }
-                                            >
+                                        <div
+                                            className="notification-header-actions"
+                                        >
 
-                                                Mark all as read
 
-                                            </button>
+                                            {/* MARK ALL */}
 
-                                        )}
+                                            {unreadCount > 0 && (
+
+                                                <button
+                                                    type="button"
+                                                    className="mark-all-button"
+                                                    onClick={
+                                                        markAllNotificationsRead
+                                                    }
+                                                    disabled={
+                                                        notificationActionLoading
+                                                    }
+                                                >
+
+                                                    {
+                                                        notificationActionLoading
+                                                            ? "Working..."
+                                                            : "Mark all read"
+                                                    }
+
+                                                </button>
+
+                                            )}
+
+
+                                            {/* CLEAR COMPLETED */}
+
+                                            {hasCompletedNotifications && (
+
+                                                <button
+                                                    type="button"
+                                                    className="clear-completed-button"
+                                                    onClick={
+                                                        clearCompletedNotifications
+                                                    }
+                                                    disabled={
+                                                        notificationActionLoading
+                                                    }
+                                                    title="Remove all read notifications"
+                                                >
+
+                                                    {
+                                                        notificationActionLoading
+                                                            ? "Clearing..."
+                                                            : "Clear completed"
+                                                    }
+
+                                                </button>
+
+                                            )}
+
+                                        </div>
 
                                     </div>
 
 
-                                    {/* ================= FILTERS ================= */}
+                                    {/* =================================================
+                                        FILTERS
+                                    ================================================= */}
 
-                                    <div className="notification-filters">
+                                    <div
+                                        className="notification-filters"
+                                    >
 
                                         <button
                                             type="button"
                                             className={
                                                 notificationFilter ===
-                                                "all"
+                                                    "all"
                                                     ? "active"
                                                     : ""
                                             }
@@ -1014,7 +1746,7 @@ function FitFusionLayout({
                                             type="button"
                                             className={
                                                 notificationFilter ===
-                                                "unread"
+                                                    "unread"
                                                     ? "active"
                                                     : ""
                                             }
@@ -1032,7 +1764,7 @@ function FitFusionLayout({
                                             type="button"
                                             className={
                                                 notificationFilter ===
-                                                "high"
+                                                    "high"
                                                     ? "active"
                                                     : ""
                                             }
@@ -1050,7 +1782,7 @@ function FitFusionLayout({
                                             type="button"
                                             className={
                                                 notificationFilter ===
-                                                "medium"
+                                                    "medium"
                                                     ? "active"
                                                     : ""
                                             }
@@ -1068,7 +1800,7 @@ function FitFusionLayout({
                                             type="button"
                                             className={
                                                 notificationFilter ===
-                                                "low"
+                                                    "low"
                                                     ? "active"
                                                     : ""
                                             }
@@ -1084,22 +1816,38 @@ function FitFusionLayout({
                                     </div>
 
 
-                                    {/* ================= LIST ================= */}
+                                    {/* =================================================
+                                        NOTIFICATION LIST
+                                    ================================================= */}
 
-                                    <div className="notification-list">
-
+                                    <div
+                                        className="notification-list"
+                                    >
 
                                         {notificationLoading ? (
 
-                                            <div className="notification-empty">
+                                            <div
+                                                className="notification-empty"
+                                            >
 
-                                                Loading notifications...
+                                                <i className="bi bi-arrow-repeat"></i>
+
+                                                <strong>
+                                                    Loading notifications...
+                                                </strong>
+
+                                                <span>
+                                                    Please wait.
+                                                </span>
 
                                             </div>
 
-                                        ) : filteredNotifications.length === 0 ? (
+                                        ) : filteredNotifications.length ===
+                                          0 ? (
 
-                                            <div className="notification-empty">
+                                            <div
+                                                className="notification-empty"
+                                            >
 
                                                 <i className="bi bi-bell-slash"></i>
 
@@ -1108,7 +1856,14 @@ function FitFusionLayout({
                                                 </strong>
 
                                                 <span>
-                                                    No notifications match this filter.
+
+                                                    {
+                                                        notificationFilter ===
+                                                            "all"
+                                                            ? "You're all caught up!"
+                                                            : "No notifications match this filter."
+                                                    }
+
                                                 </span>
 
                                             </div>
@@ -1116,122 +1871,182 @@ function FitFusionLayout({
                                         ) : (
 
                                             filteredNotifications.map(
-                                                (notification) => (
+                                                (
+                                                    notification
+                                                ) => {
 
-                                                    <button
-                                                        type="button"
-                                                        key={
-                                                            notification.id
-                                                        }
-                                                        className={`notification-item ${
-                                                            notification.is_read
-                                                                ? "read"
-                                                                : "unread"
-                                                        } priority-${
+                                                    const priority =
+                                                        String(
                                                             notification.priority ||
                                                             "medium"
-                                                        }`}
-                                                        onClick={() => {
+                                                        ).toLowerCase();
 
-                                                            if (
-                                                                !notification.is_read
-                                                            ) {
 
-                                                                markNotificationRead(
-                                                                    notification.id
-                                                                );
+                                                    return (
 
+                                                        <div
+                                                            key={
+                                                                notification.id
                                                             }
-
-                                                        }}
-                                                    >
-
-
-                                                        {/* ICON */}
-
-                                                        <div className="notification-item-icon">
-
-                                                            {
-                                                                getNotificationIcon(
-                                                                    notification.type
-                                                                )
+                                                            className={
+                                                                `notification-item ${
+                                                                    notification.is_read
+                                                                        ? "read"
+                                                                        : "unread"
+                                                                } priority-${priority}`
                                                             }
-
-                                                        </div>
-
-
-                                                        {/* CONTENT */}
-
-                                                        <div className="notification-item-content">
+                                                        >
 
 
-                                                            {/* TITLE + PRIORITY */}
+                                                            {/* ICON */}
 
-                                                            <div className="notification-item-title-row">
+                                                            <div
+                                                                className="notification-item-icon"
+                                                            >
 
-                                                                <div className="notification-item-title">
+                                                                {
+                                                                    getNotificationIcon(
+                                                                        notification.type
+                                                                    )
+                                                                }
+
+                                                            </div>
+
+
+                                                            {/* CONTENT */}
+
+                                                            <div
+                                                                className="notification-item-content"
+                                                            >
+
+
+                                                                {/* TITLE + PRIORITY */}
+
+                                                                <div
+                                                                    className="notification-item-title-row"
+                                                                >
+
+                                                                    <div
+                                                                        className="notification-item-title"
+                                                                    >
+
+                                                                        {
+                                                                            notification.title
+                                                                        }
+
+                                                                    </div>
+
+
+                                                                    <span
+                                                                        className={
+                                                                            `notification-priority priority-${priority}`
+                                                                        }
+                                                                    >
+
+                                                                        {
+                                                                            priority.toUpperCase()
+                                                                        }
+
+                                                                    </span>
+
+                                                                </div>
+
+
+                                                                {/* MESSAGE */}
+
+                                                                <div
+                                                                    className="notification-item-message"
+                                                                >
 
                                                                     {
-                                                                        notification.title
+                                                                        notification.message
                                                                     }
 
                                                                 </div>
 
 
-                                                                <span
-                                                                    className={`notification-priority priority-${
-                                                                        notification.priority ||
-                                                                        "medium"
-                                                                    }`}
+                                                                {/* TIME */}
+
+                                                                <div
+                                                                    className="notification-item-time"
                                                                 >
 
                                                                     {
-                                                                        (
-                                                                            notification.priority ||
-                                                                            "medium"
-                                                                        ).toUpperCase()
+                                                                        notification.time
                                                                     }
 
-                                                                </span>
+                                                                </div>
+
+
+                                                                {/* ACTIONS */}
+
+                                                                <div
+                                                                    className="notification-item-actions"
+                                                                >
+
+
+                                                                    {/* MARK READ */}
+
+                                                                    {!notification.is_read && (
+
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() =>
+                                                                                markNotificationRead(
+                                                                                    notification.id
+                                                                                )
+                                                                            }
+                                                                            disabled={
+                                                                                notificationActionLoading
+                                                                            }
+                                                                        >
+
+                                                                            Mark as read
+
+                                                                        </button>
+
+                                                                    )}
+
+
+                                                                    {/* DELETE */}
+
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            deleteNotification(
+                                                                                notification.id
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            notificationActionLoading
+                                                                        }
+                                                                        title="Delete notification"
+                                                                    >
+
+                                                                        <i className="bi bi-trash"></i>
+
+                                                                    </button>
+
+                                                                </div>
 
                                                             </div>
 
 
-                                                            {/* MESSAGE */}
+                                                            {/* UNREAD DOT */}
 
-                                                            <div className="notification-item-message">
+                                                            {!notification.is_read && (
 
-                                                                {
-                                                                    notification.message
-                                                                }
+                                                                <span
+                                                                    className="notification-unread-dot"
+                                                                ></span>
 
-                                                            </div>
-
-
-                                                            {/* TIME */}
-
-                                                            <div className="notification-item-time">
-
-                                                                {
-                                                                    notification.time
-                                                                }
-
-                                                            </div>
+                                                            )}
 
                                                         </div>
 
+                                                    );
 
-                                                        {/* UNREAD DOT */}
-
-                                                        {!notification.is_read && (
-
-                                                            <span className="notification-unread-dot"></span>
-
-                                                        )}
-
-                                                    </button>
-
-                                                )
+                                                }
                                             )
 
                                         )}
@@ -1245,16 +2060,25 @@ function FitFusionLayout({
                         </div>
 
 
-                        {/* PROFILE */}
+                        {/* =================================================
+                            PROFILE
+                        ================================================= */}
 
-                        <div className="profile-mini">
+                        <div
+                            className="profile-mini"
+                        >
 
-                            <div className="mini-avatar">
+                            <div
+                                className="mini-avatar"
+                            >
 
                                 {
                                     user?.full_name
                                         ? user.full_name
-                                            .slice(0, 1)
+                                            .slice(
+                                                0,
+                                                1
+                                            )
                                             .toUpperCase()
                                         : "U"
                                 }
@@ -1269,9 +2093,13 @@ function FitFusionLayout({
                 </header>
 
 
-                {/* ================= PAGE CONTENT ================= */}
+                {/* =================================================
+                    CONTENT
+                ================================================= */}
 
-                <section className="content">
+                <section
+                    className="content"
+                >
 
                     {children}
 

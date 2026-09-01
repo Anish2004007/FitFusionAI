@@ -5589,3 +5589,278 @@ a {
     background: #222;
     color: white;
 }
+
+/* =========================================================
+   NOTIFICATION ACTIONS
+   ========================================================= */
+
+.notification-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #25334a;
+    background: #111b2c;
+}
+
+.clear-completed-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    border: 1px solid #2d405c;
+    background: #18263b;
+    color: #9fb0c8;
+
+    padding: 7px 11px;
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.clear-completed-button:hover {
+    background: #1e3049;
+    color: #ffffff;
+    border-color: #3b5272;
+}
+
+.clear-completed-button i {
+    font-size: 13px;
+}
+
+.notification-panel {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    width: 420px;
+    max-width: calc(100vw - 30px);
+    background: #111b2c;
+    border: 1px solid #25334a;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.notification-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #25334a;
+}
+
+.notification-panel-header h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.notification-panel-header span {
+    display: block;
+    margin-top: 4px;
+    color: #8fa1bd;
+    font-size: 12px;
+}
+
+.notification-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mark-all-button,
+.clear-completed-button {
+    border: 0;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.mark-all-button {
+    background: transparent;
+    color: #19d66b;
+}
+
+.clear-completed-button {
+    background: #24344c;
+    color: #ffb4b4;
+}
+
+.mark-all-button:hover {
+    color: #42e987;
+}
+
+.clear-completed-button:hover {
+    background: #30435e;
+}
+
+.mark-all-button:disabled,
+.clear-completed-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.notification-list {
+    max-height: 470px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px 18px;
+    border: none;
+    border-bottom: 1px solid #202d42;
+    background: transparent;
+    text-align: left;
+    position: relative;
+}
+
+.notification-item.unread {
+    background: #152238;
+}
+
+.notification-item.read {
+    opacity: 0.72;
+}
+
+.notification-item:hover {
+    background: #182338;
+}
+
+.notification-item-icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1c2b42;
+    border-radius: 12px;
+    font-size: 18px;
+}
+
+.notification-item-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.notification-item-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.notification-item-title {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.notification-item-message {
+    margin-top: 4px;
+    color: #9aaac1;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.notification-item-time {
+    margin-top: 7px;
+    color: #61738f;
+    font-size: 11px;
+}
+
+.notification-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.notification-item-actions button {
+    border: 0;
+    border-radius: 7px;
+    padding: 5px 8px;
+    background: #22334b;
+    color: #9fb1ca;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.notification-item-actions button:hover {
+    background: #2c405d;
+    color: #fff;
+}
+
+.notification-unread-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    margin-top: 6px;
+    border-radius: 50%;
+    background: #19d66b;
+}
+
+.notification-empty {
+    min-height: 170px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 30px;
+    color: #8495ae;
+    text-align: center;
+}
+
+.notification-empty i {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.notification-empty strong {
+    color: #fff;
+    font-size: 14px;
+}
+
+.notification-empty span {
+    color: #71839d;
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+
+    .notification-panel {
+        position: fixed;
+        top: 75px;
+        left: 15px;
+        right: 15px;
+        width: auto;
+        max-width: none;
+    }
+
+    .notification-panel-header {
+        align-items: flex-start;
+    }
+
+    .notification-header-actions {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+}
