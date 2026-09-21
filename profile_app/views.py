@@ -1,28 +1,35 @@
 import json
+
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.dateparse import parse_date
+from django.utils import timezone
+from django.core.files.storage import default_storage
+
+from PIL import Image
+
 from accounts.models import User
 from .forms import UserProfileForm
 from .models import UserProfile
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.utils.dateparse import parse_date
-from django.views.decorators.csrf import csrf_exempt
+
+
+# =========================================================
+# PROFILE SETUP
+# =========================================================
 
 def profile_setup(request):
 
-    # Check if user is logged in
     user_id = request.session.get("user_id")
 
     if not user_id:
         return redirect("login")
 
-    # Get logged-in user
     user = User.objects.get(user_id=user_id)
-    print("PROFILE:", user.user_id, user.full_name, user.email)
-    # Check if profile already exists
+
     try:
         profile = UserProfile.objects.get(user=user)
-
     except UserProfile.DoesNotExist:
         profile = None
 
@@ -45,7 +52,6 @@ def profile_setup(request):
             profile = form.save(commit=False)
 
             profile.user = user
-
             profile.profile_completed = True
 
             profile.save()
@@ -60,19 +66,21 @@ def profile_setup(request):
             form = UserProfileForm()
 
     return render(
-    request,
-    "profile_app/profile_setup.html",
-    {
-        "form": form,
-        "user": user,
-    },
-)
+        request,
+        "profile_app/profile_setup.html",
+        {
+            "form": form,
+            "user": user,
+        },
+    )
 
+
+# =========================================================
+# GET PROFILE API
+# =========================================================
+
+@require_http_methods(["GET"])
 def profile_api(request):
-    """
-    Return the currently logged-in user's
-    User + UserProfile information.
-    """
 
     user_id = request.session.get("user_id")
 
@@ -86,6 +94,7 @@ def profile_api(request):
         )
 
     try:
+
         user = User.objects.get(
             user_id=user_id
         )
@@ -103,6 +112,25 @@ def profile_api(request):
                 status=404
             )
 
+        # =================================================
+        # PROFILE IMAGE URL
+        # =================================================
+
+        profile_picture = None
+
+        if profile.profile_picture:
+
+            try:
+                profile_picture = request.build_absolute_uri(
+                    profile.profile_picture.url
+                )
+            except Exception:
+                profile_picture = None
+
+        # =================================================
+        # RESPONSE
+        # =================================================
+
         return JsonResponse(
             {
                 "success": True,
@@ -115,33 +143,32 @@ def profile_api(request):
                 },
 
                 "profile": {
-                    "date_of_birth": (
+
+                    "date_of_birth":
                         profile.date_of_birth.isoformat()
                         if profile.date_of_birth
-                        else None
-                    ),
+                        else None,
 
-                    "gender": profile.gender,
+                    "gender":
+                        profile.gender,
 
-                    "height": (
+                    "height":
                         float(profile.height)
                         if profile.height is not None
-                        else None
-                    ),
+                        else None,
 
-                    "weight": (
+                    "weight":
                         float(profile.weight)
                         if profile.weight is not None
-                        else None
-                    ),
+                        else None,
 
-                    "target_weight": (
+                    "target_weight":
                         float(profile.target_weight)
                         if profile.target_weight is not None
-                        else None
-                    ),
+                        else None,
 
-                    "fitness_goal": profile.fitness_goal,
+                    "fitness_goal":
+                        profile.fitness_goal,
 
                     "activity_level":
                         profile.activity_level,
@@ -155,11 +182,8 @@ def profile_api(request):
                     "allergies":
                         profile.allergies,
 
-                    "profile_picture": (
-                        profile.profile_picture.url
-                        if profile.profile_picture
-                        else None
-                    ),
+                    "profile_picture":
+                        profile_picture,
 
                     "profile_completed":
                         profile.profile_completed,
@@ -177,14 +201,29 @@ def profile_api(request):
             status=404
         )
 
+    except Exception as error:
+
+        print(
+            "PROFILE API ERROR:",
+            error
+        )
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "Unable to load profile."
+            },
+            status=500
+        )
+
+
+# =========================================================
+# UPDATE PROFILE API
+# =========================================================
 
 @csrf_exempt
 @require_http_methods(["PUT"])
 def update_profile_api(request):
-    """
-    Update the currently logged-in user's
-    User and UserProfile information.
-    """
 
     user_id = request.session.get("user_id")
 
@@ -198,6 +237,7 @@ def update_profile_api(request):
         )
 
     try:
+
         user = User.objects.get(
             user_id=user_id
         )
@@ -215,16 +255,16 @@ def update_profile_api(request):
                 status=404
             )
 
-        # =====================================
+        # =================================================
         # READ JSON
-        # =====================================
-
-        import json
+        # =================================================
 
         try:
+
             data = json.loads(
                 request.body
             )
+
         except json.JSONDecodeError:
 
             return JsonResponse(
@@ -235,9 +275,9 @@ def update_profile_api(request):
                 status=400
             )
 
-        # =====================================
+        # =================================================
         # USER INFORMATION
-        # =====================================
+        # =================================================
 
         full_name = data.get("full_name")
 
@@ -261,13 +301,14 @@ def update_profile_api(request):
             user.full_name = full_name
 
         if "phone" in data:
-            user.phone = (
-                str(data.get("phone") or "").strip()
-            )
 
-        # =====================================
+            user.phone = str(
+                data.get("phone") or ""
+            ).strip()
+
+        # =================================================
         # PROFILE INFORMATION
-        # =====================================
+        # =================================================
 
         if "date_of_birth" in data:
 
@@ -292,127 +333,85 @@ def update_profile_api(request):
                         status=400
                     )
 
-                profile.date_of_birth = (
-                    parsed_date
-                )
+                profile.date_of_birth = parsed_date
 
         if "gender" in data:
+
             profile.gender = (
                 data.get("gender") or ""
             )
 
         if "height" in data:
 
-            try:
-                profile.height = data.get(
-                    "height"
-                )
-            except (TypeError, ValueError):
-
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "error": "Invalid height."
-                    },
-                    status=400
-                )
+            profile.height = data.get(
+                "height"
+            )
 
         if "weight" in data:
 
-            try:
-                profile.weight = data.get(
-                    "weight"
-                )
-            except (TypeError, ValueError):
-
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "error": "Invalid weight."
-                    },
-                    status=400
-                )
+            profile.weight = data.get(
+                "weight"
+            )
 
         if "target_weight" in data:
 
-            try:
-                profile.target_weight = data.get(
-                    "target_weight"
-                )
-            except (TypeError, ValueError):
-
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "error":
-                            "Invalid target weight."
-                    },
-                    status=400
-                )
+            profile.target_weight = data.get(
+                "target_weight"
+            )
 
         if "fitness_goal" in data:
+
             profile.fitness_goal = (
                 data.get("fitness_goal") or ""
             )
 
         if "activity_level" in data:
+
             profile.activity_level = (
                 data.get("activity_level") or ""
             )
 
         if "diet_preference" in data:
+
             profile.diet_preference = (
                 data.get("diet_preference") or ""
             )
 
         if "medical_conditions" in data:
-            profile.medical_conditions = (
-                str(
-                    data.get(
-                        "medical_conditions"
-                    ) or ""
-                ).strip()
-            )
+
+            profile.medical_conditions = str(
+                data.get(
+                    "medical_conditions"
+                ) or ""
+            ).strip()
 
         if "allergies" in data:
-            profile.allergies = (
-                str(
-                    data.get("allergies")
-                    or ""
-                ).strip()
-            )
 
-        # =====================================
-        # SAVE USER
-        # =====================================
+            profile.allergies = str(
+                data.get(
+                    "allergies"
+                ) or ""
+            ).strip()
 
-        from django.utils import timezone
+        # =================================================
+        # SAVE
+        # =================================================
 
         user.updated_at = timezone.now()
-
         user.save()
 
-        # =====================================
-        # SAVE PROFILE
-        # =====================================
-
         profile.profile_completed = True
-
         profile.save()
 
-        # =====================================
-        # UPDATE SESSION NAME
-        # =====================================
+        # =================================================
+        # UPDATE SESSION
+        # =================================================
 
         request.session["user_name"] = (
             user.full_name
         )
 
         request.session.save()
-
-        # =====================================
-        # SUCCESS
-        # =====================================
 
         return JsonResponse(
             {
@@ -444,6 +443,352 @@ def update_profile_api(request):
                 "success": False,
                 "error":
                     "Unable to update profile."
+            },
+            status=500
+        )
+
+
+# =========================================================
+# UPLOAD PROFILE PICTURE
+# =========================================================
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def upload_profile_picture(request):
+
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "User is not logged in."
+            },
+            status=401
+        )
+
+    try:
+
+        user = User.objects.get(
+            user_id=user_id
+        )
+
+        profile = UserProfile.objects.filter(
+            user=user
+        ).first()
+
+        if not profile:
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Profile not found."
+                },
+                status=404
+            )
+
+        uploaded_file = request.FILES.get(
+            "profile_picture"
+        )
+
+        if not uploaded_file:
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error":
+                        "Please select an image."
+                },
+                status=400
+            )
+
+        # =================================================
+        # FILE SIZE
+        # =================================================
+
+        max_size = 5 * 1024 * 1024
+
+        if uploaded_file.size > max_size:
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error":
+                        "Image size must be less than 5 MB."
+                },
+                status=400
+            )
+
+        # =================================================
+        # VALIDATE IMAGE
+        # =================================================
+
+        try:
+
+            image = Image.open(
+                uploaded_file
+            )
+
+            image.verify()
+
+        except Exception:
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error":
+                        "Invalid image file."
+                },
+                status=400
+            )
+
+        # =================================================
+        # VALIDATE FORMAT
+        # =================================================
+
+        image_format = (
+            image.format
+            if image
+            else None
+        )
+
+        allowed_formats = {
+            "JPEG",
+            "PNG",
+            "WEBP",
+        }
+
+        if image_format not in allowed_formats:
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error":
+                        "Only JPG, PNG and WEBP images are allowed."
+                },
+                status=400
+            )
+
+        # =================================================
+        # RESET FILE POINTER
+        # =================================================
+
+        uploaded_file.seek(0)
+
+        # =================================================
+        # DELETE OLD IMAGE
+        # =================================================
+
+        old_picture = profile.profile_picture
+
+        if old_picture:
+
+            try:
+
+                old_picture.delete(
+                    save=False
+                )
+
+            except Exception as error:
+
+                print(
+                    "OLD PROFILE IMAGE DELETE WARNING:",
+                    error
+                )
+
+        # =================================================
+        # SAVE NEW IMAGE
+        # =================================================
+
+        profile.profile_picture = uploaded_file
+
+        profile.save(
+            update_fields=[
+                "profile_picture",
+                "updated_at",
+            ]
+        )
+
+        # =================================================
+        # IMAGE URL
+        # =================================================
+
+        image_url = request.build_absolute_uri(
+            profile.profile_picture.url
+        )
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message":
+                    "Profile picture updated successfully.",
+                "profile_picture":
+                    image_url,
+            }
+        )
+
+    except User.DoesNotExist:
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "User not found."
+            },
+            status=404
+        )
+
+    except Exception as error:
+
+        print(
+            "PROFILE PICTURE UPLOAD ERROR:",
+            error
+        )
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error":
+                    "Unable to upload profile picture."
+            },
+            status=500
+        )
+
+
+# =========================================================
+# REMOVE PROFILE PICTURE
+# =========================================================
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def remove_profile_picture(request):
+
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "User is not logged in."
+            },
+            status=401
+        )
+
+    try:
+
+        user = User.objects.get(
+            user_id=user_id
+        )
+
+        profile = UserProfile.objects.filter(
+            user=user
+        ).first()
+
+        if not profile:
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Profile not found."
+                },
+                status=404
+            )
+
+        # =================================================
+        # REMEMBER OLD FILE
+        # =================================================
+
+        old_file_name = None
+
+        if profile.profile_picture:
+
+            old_file_name = (
+                profile.profile_picture.name
+            )
+
+        # =================================================
+        # IMPORTANT:
+        # CLEAR DATABASE FIELD FIRST
+        # =================================================
+
+        profile.profile_picture = None
+
+        profile.save(
+            update_fields=[
+                "profile_picture",
+                "updated_at",
+            ]
+        )
+
+        # =================================================
+        # DELETE PHYSICAL FILE
+        # =================================================
+        #
+        # This is intentionally done AFTER the database
+        # field has been cleared.
+        #
+        # Even if the physical file is already missing,
+        # the profile will still successfully have no
+        # profile picture.
+        #
+
+        if old_file_name:
+
+            try:
+
+                if default_storage.exists(
+                    old_file_name
+                ):
+
+                    default_storage.delete(
+                        old_file_name
+                    )
+
+            except Exception as error:
+
+                # Do not fail the API just because the
+                # physical file could not be deleted.
+                print(
+                    "PROFILE IMAGE FILE DELETE WARNING:",
+                    error
+                )
+
+        # =================================================
+        # SUCCESS
+        # =================================================
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message":
+                    "Profile picture removed successfully.",
+                "profile_picture": None,
+            }
+        )
+
+    except User.DoesNotExist:
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "User not found."
+            },
+            status=404
+        )
+
+    except Exception as error:
+
+        print(
+            "PROFILE PICTURE REMOVE ERROR:",
+            error
+        )
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error":
+                    "Unable to remove profile picture."
             },
             status=500
         )

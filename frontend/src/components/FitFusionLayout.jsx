@@ -101,6 +101,68 @@ function FitFusionLayout({
     const notificationRef =
         useRef(null);
 
+    // =====================================================
+// HEADER PROFILE PICTURE
+// =====================================================
+
+const rawProfilePicture =
+    user?.profile_picture_url ||
+    user?.profile_picture ||
+    user?.profile_image ||
+    user?.profile?.profile_picture_url ||
+    user?.profile?.profile_picture ||
+    null;
+
+
+const getProfilePictureUrl = (picture) => {
+
+    if (
+        !picture ||
+        typeof picture !== "string"
+    ) {
+        return null;
+    }
+
+    /*
+     * Already a complete URL.
+     */
+    if (
+        picture.startsWith("http://") ||
+        picture.startsWith("https://")
+    ) {
+        return picture;
+    }
+
+    /*
+     * Django media URL.
+     *
+     * Example:
+     * /media/profile_pictures/photo.jpg
+     */
+    if (
+        picture.startsWith("/")
+    ) {
+        return (
+            "http://localhost:8000" +
+            picture
+        );
+    }
+
+    /*
+     * Relative media path.
+     */
+    return (
+        "http://localhost:8000/" +
+        picture
+    );
+};
+
+
+const headerProfilePicture =
+    getProfilePictureUrl(
+        rawProfilePicture
+    );
+
 
     // =====================================================
     // SAFE BOOLEAN CONVERSION
@@ -1032,6 +1094,108 @@ function FitFusionLayout({
 
 
     // =====================================================
+    // HEADER PROFILE PICTURE STATE
+    // =====================================================
+
+    const [layoutProfilePicture, setLayoutProfilePicture] =
+        useState(headerProfilePicture);
+
+
+    // Keep the navbar in sync when the parent user object changes.
+    useEffect(() => {
+
+        setLayoutProfilePicture(
+            headerProfilePicture
+        );
+
+    }, [headerProfilePicture]);
+
+
+    // Load the latest profile picture from Django whenever the
+    // layout is first loaded or the user navigates to another page.
+    useEffect(() => {
+
+        let cancelled = false;
+
+
+        const loadHeaderProfilePicture = async () => {
+
+            try {
+
+                const response = await fetch(
+                    `${API_BASE_URL}/profile/api/`,
+                    {
+                        method: "GET",
+                        credentials: "include",
+                        headers: {
+                            "Accept": "application/json",
+                        },
+                        cache: "no-store",
+                    }
+                );
+
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Profile API returned ${response.status}`
+                    );
+                }
+
+
+                const data = await response.json();
+
+
+                if (cancelled) {
+                    return;
+                }
+
+
+                const profilePicture =
+                    data?.profile_picture_url ||
+                    data?.profile_picture ||
+                    data?.profile_image ||
+                    data?.profile?.profile_picture_url ||
+                    data?.profile?.profile_picture ||
+                    data?.user?.profile_picture_url ||
+                    data?.user?.profile_picture ||
+                    data?.user?.profile_image ||
+                    null;
+
+
+                setLayoutProfilePicture(
+                    getProfilePictureUrl(
+                        profilePicture
+                    )
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Header profile picture API error:",
+                    error
+                );
+
+            }
+
+        };
+
+
+        loadHeaderProfilePicture();
+
+
+        return () => {
+
+            cancelled = true;
+
+        };
+
+    }, [
+        currentPath,
+        user?.user_id,
+    ]);
+
+
+    // =====================================================
     // ACTIVE MENU
     // =====================================================
 
@@ -1540,11 +1704,10 @@ function FitFusionLayout({
                         className="topbar-right"
                     >
 
-
                         {/* SEARCH */}
 
                         <div
-                            className="icon-btn"
+                            className="icon-btn search-button"
                         >
 
                             <i className="bi bi-search"></i>
@@ -2060,33 +2223,65 @@ function FitFusionLayout({
                         </div>
 
 
-                        {/* =================================================
-                            PROFILE
-                        ================================================= */}
+              {/* =================================================
+    PROFILE MINI AVATAR
+    ================================================= */}
 
-                        <div
-                            className="profile-mini"
-                        >
+<div className="profile-mini">
 
-                            <div
-                                className="mini-avatar"
-                            >
+    <div
+        className="mini-avatar"
+        style={{
+            width: "72px",
+            height: "72px",
+            minWidth: "72px",
+            minHeight: "72px",
+            maxWidth: "72px",
+            maxHeight: "72px",
+            overflow: "hidden",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flex: "0 0 72px"
+        }}
+    >
 
-                                {
-                                    user?.full_name
-                                        ? user.full_name
-                                            .slice(
-                                                0,
-                                                1
-                                            )
-                                            .toUpperCase()
-                                        : "U"
-                                }
+        {layoutProfilePicture ? (
 
-                            </div>
+            <img
+                src={layoutProfilePicture}
+                alt="Profile"
+                className="mini-avatar-image"
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    minWidth: 0,
+                    minHeight: 0,
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                    flex: "0 0 auto"
+                }}
+                onError={(event) => {
+                    event.currentTarget.style.display = "none";
+                }}
+            />
 
-                        </div>
+        ) : (
 
+            user?.full_name
+                ? user.full_name
+                    .slice(0, 1)
+                    .toUpperCase()
+                : "U"
+
+        )}
+
+    </div>
+
+</div>
 
                     </div>
 

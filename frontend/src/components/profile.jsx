@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import {
     getProfile,
     updateProfile,
+    uploadProfilePicture,
+    removeProfilePicture,
 } from "../services/api";
-
 
 function Profile({ onUserLoaded }) {
 
@@ -34,6 +35,12 @@ function Profile({ onUserLoaded }) {
         allergies: "",
     });
 
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
+
+    const [showImageActions, setShowImageActions] = useState(false);
+
 
     /* =========================================
        LOAD PROFILE
@@ -58,11 +65,23 @@ function Profile({ onUserLoaded }) {
             setUser(data.user);
             setProfile(data.profile);
 
+            /*
+             * IMPORTANT:
+             * profile_picture is returned inside
+             * data.profile, not data.user.
+             *
+             * Pass it to the parent so the navbar
+             * can display the same profile picture.
+             */
             if (
                 onUserLoaded &&
                 data.user
             ) {
-                onUserLoaded(data.user);
+                onUserLoaded({
+                    ...data.user,
+                    profile_picture:
+                        data.profile?.profile_picture || null,
+                });
             }
 
             setForm({
@@ -183,6 +202,14 @@ function Profile({ onUserLoaded }) {
                 ...user,
                 full_name: form.full_name,
                 phone: form.phone,
+
+                /*
+                 * Preserve the current profile
+                 * picture while updating other
+                 * user information.
+                 */
+                profile_picture:
+                    profile?.profile_picture || null,
             };
 
 
@@ -305,13 +332,20 @@ function Profile({ onUserLoaded }) {
                 });
 
 
+                /*
+                 * Keep navbar synchronized with
+                 * the latest Django profile data.
+                 */
                 if (
                     onUserLoaded &&
                     refreshed.user
                 ) {
-                    onUserLoaded(
-                        refreshed.user
-                    );
+                    onUserLoaded({
+                        ...refreshed.user,
+                        profile_picture:
+                            refreshed.profile?.profile_picture ||
+                            null,
+                    });
                 }
 
             }
@@ -388,6 +422,304 @@ function Profile({ onUserLoaded }) {
         setEditing(false);
         setError("");
         setMessage("");
+    };
+
+
+    /* =========================================
+       PROFILE PICTURE
+    ========================================= */
+
+    const handleImageSelect = (event) => {
+
+        const file = event.target.files?.[0];
+
+        if (!file) {
+            return;
+        }
+
+        setError("");
+        setMessage("");
+
+        // 5 MB limit
+        if (file.size > 5 * 1024 * 1024) {
+
+            setError(
+                "Image size must be less than 5 MB."
+            );
+
+            event.target.value = "";
+            return;
+        }
+
+        // File type validation
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+
+            setError(
+                "Only JPG, PNG and WEBP images are allowed."
+            );
+
+            event.target.value = "";
+            return;
+        }
+
+        setSelectedImage(file);
+
+        const previewUrl =
+            URL.createObjectURL(file);
+
+        setImagePreview(previewUrl);
+    };
+
+
+    const handleUploadImage = async () => {
+
+        if (!selectedImage) {
+            return;
+        }
+
+        setUploadingImage(true);
+        setError("");
+        setMessage("");
+
+        try {
+
+            const data =
+                await uploadProfilePicture(
+                    selectedImage
+                );
+
+            if (!data.success) {
+
+                setError(
+                    data.error ||
+                    "Unable to upload profile picture."
+                );
+
+                return;
+            }
+
+            const newImageUrl =
+                data.profile_picture;
+
+
+            /*
+             * Update profile page immediately.
+             */
+            setProfile((previous) => ({
+                ...previous,
+                profile_picture: newImageUrl,
+            }));
+
+
+            setSelectedImage(null);
+            setImagePreview(null);
+            setShowImageActions(false);
+
+
+            setMessage(
+                "Profile picture updated successfully."
+            );
+
+
+            /*
+             * IMPORTANT:
+             * Send the new profile picture to
+             * the parent so the navbar updates
+             * immediately.
+             */
+            if (
+                onUserLoaded &&
+                user
+            ) {
+
+                onUserLoaded({
+                    ...user,
+                    profile_picture:
+                        newImageUrl,
+                });
+
+            }
+
+        } catch (err) {
+
+            console.error(
+                "PROFILE PICTURE UPLOAD ERROR:",
+                err
+            );
+
+            setError(
+                err.response?.data?.error ||
+                "Unable to upload profile picture."
+            );
+
+        } finally {
+
+            setUploadingImage(false);
+
+        }
+    };
+
+
+    const handleRemoveImage = async () => {
+
+        if (uploadingImage) {
+            return;
+        }
+
+        setUploadingImage(true);
+        setError("");
+        setMessage("");
+
+        try {
+
+            const data =
+                await removeProfilePicture();
+
+            if (!data.success) {
+
+                setError(
+                    data.error ||
+                    "Unable to remove profile picture."
+                );
+
+                return;
+            }
+
+
+            /*
+             * Immediately remove the picture
+             * from the Profile page.
+             */
+            setProfile((previous) => {
+
+                if (!previous) {
+                    return previous;
+                }
+
+                return {
+                    ...previous,
+                    profile_picture: null,
+                };
+            });
+
+
+            setSelectedImage(null);
+            setImagePreview(null);
+            setShowImageActions(false);
+
+
+            setMessage(
+                "Profile picture removed successfully."
+            );
+
+
+            /*
+             * IMPORTANT:
+             * Immediately remove the picture
+             * from the navbar as well.
+             */
+            if (
+                onUserLoaded &&
+                user
+            ) {
+
+                onUserLoaded({
+                    ...user,
+                    profile_picture: null,
+                });
+
+            }
+
+
+            /*
+             * Refresh from Django so the frontend
+             * and database are guaranteed to be
+             * synchronized.
+             */
+            try {
+
+                const refreshed =
+                    await getProfile();
+
+                if (
+                    refreshed.success
+                ) {
+
+                    setUser(
+                        refreshed.user
+                    );
+
+                    setProfile(
+                        refreshed.profile
+                    );
+
+
+                    /*
+                     * Send the refreshed picture
+                     * value to the parent.
+                     *
+                     * After removal this should be null.
+                     */
+                    if (
+                        onUserLoaded &&
+                        refreshed.user
+                    ) {
+
+                        onUserLoaded({
+                            ...refreshed.user,
+                            profile_picture:
+                                refreshed.profile?.profile_picture ||
+                                null,
+                        });
+
+                    }
+
+                }
+
+            } catch (refreshError) {
+
+                console.error(
+                    "PROFILE REFRESH AFTER REMOVE ERROR:",
+                    refreshError
+                );
+
+                /*
+                 * Do not show an error here because
+                 * the removal itself already succeeded.
+                 */
+            }
+
+        } catch (err) {
+
+            console.error(
+                "PROFILE PICTURE REMOVE ERROR:",
+                err
+            );
+
+            setError(
+                err.response?.data?.error ||
+                "Unable to remove profile picture."
+            );
+
+        } finally {
+
+            setUploadingImage(false);
+        }
+    };
+
+
+    const cancelImageSelection = () => {
+
+        setSelectedImage(null);
+        setImagePreview(null);
+        setShowImageActions(false);
+
     };
 
 
@@ -545,16 +877,60 @@ function Profile({ onUserLoaded }) {
 
             <div className="profile-hero-card">
 
-                <div className="profile-avatar">
+        <div className="profile-avatar-wrapper">
 
-                    {user.full_name
-                        ? user.full_name
-                            .slice(0, 1)
-                            .toUpperCase()
-                        : "U"
-                    }
+    <div className="profile-avatar">
 
-                </div>
+        {imagePreview || profile.profile_picture ? (
+
+            <img
+                src={
+                    imagePreview ||
+                    profile.profile_picture
+                }
+                alt="Profile"
+                className="profile-avatar-image"
+                style={{
+                    width: "88px",
+                    height: "88px",
+                    maxWidth: "88px",
+                    maxHeight: "88px",
+                    minWidth: "88px",
+                    minHeight: "88px",
+                    objectFit: "cover",
+                    objectPosition: "center",
+                    display: "block",
+                    borderRadius: "50%",
+                }}
+            />
+
+        ) : (
+
+            user.full_name
+                ? user.full_name
+                    .slice(0, 1)
+                    .toUpperCase()
+                : "U"
+
+        )}
+
+    </div>
+
+
+    <button
+        type="button"
+        className="profile-picture-edit-btn"
+        onClick={() => {
+            setShowImageActions(true);
+            setError("");
+            setMessage("");
+        }}
+        title="Change profile picture"
+    >
+        <i className="bi bi-camera-fill"></i>
+    </button>
+
+</div>
 
 
                 <div className="profile-hero-info">
@@ -581,6 +957,139 @@ function Profile({ onUserLoaded }) {
                 </div>
 
             </div>
+
+
+            {showImageActions && (
+
+                <div className="profile-picture-card">
+
+                    <div className="profile-picture-card-header">
+
+                        <div>
+
+                            <span className="profile-label">
+
+                                <i className="bi bi-camera"></i>
+
+                                PROFILE PICTURE
+
+                            </span>
+
+                            <h3>
+                                Change Profile Picture
+                            </h3>
+
+                            <p>
+                                Upload a JPG, PNG or WEBP image.
+                                Maximum size is 5 MB.
+                            </p>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            className="profile-picture-close"
+                            onClick={cancelImageSelection}
+                            disabled={uploadingImage}
+                        >
+
+                            <i className="bi bi-x-lg"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    <div className="profile-picture-actions">
+
+                        <label
+                            htmlFor="profile-picture-input"
+                            className="profile-picture-select-btn"
+                        >
+
+                            <i className="bi bi-image"></i>
+
+                            Choose Photo
+
+                        </label>
+
+
+                        <input
+                            id="profile-picture-input"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={handleImageSelect}
+                            hidden
+                        />
+
+
+                        {selectedImage && (
+
+                            <>
+
+                                <button
+                                    type="button"
+                                    className="profile-save-btn"
+                                    onClick={handleUploadImage}
+                                    disabled={uploadingImage}
+                                >
+
+                                    <i
+                                        className={
+                                            uploadingImage
+                                                ? "bi bi-hourglass-split"
+                                                : "bi bi-cloud-arrow-up"
+                                        }
+                                    ></i>
+
+                                    {uploadingImage
+                                        ? "Uploading..."
+                                        : "Save Photo"
+                                    }
+
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    className="profile-cancel-btn"
+                                    onClick={cancelImageSelection}
+                                    disabled={uploadingImage}
+                                >
+
+                                    Cancel
+
+                                </button>
+
+                            </>
+
+                        )}
+
+
+                        {!selectedImage &&
+                            profile.profile_picture && (
+
+                                <button
+                                    type="button"
+                                    className="profile-remove-picture-btn"
+                                    onClick={handleRemoveImage}
+                                    disabled={uploadingImage}
+                                >
+
+                                    <i className="bi bi-trash3"></i>
+
+                                    Remove Photo
+
+                                </button>
+
+                            )}
+
+                    </div>
+
+                </div>
+
+            )}
 
 
             {/* =================================

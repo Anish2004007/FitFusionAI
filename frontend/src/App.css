@@ -5864,3 +5864,501 @@ a {
         align-items: flex-end;
     }
 }
+
+/* =========================================================
+   PROFILE PICTURE STYLES
+   ========================================================= */
+
+.profile-avatar-wrapper {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    flex-shrink: 0;
+}
+
+.profile-avatar-wrapper .profile-avatar {
+    width: 88px;
+    height: 88px;
+
+    border-radius: 50%;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #22c55e,
+        #16a34a
+    );
+
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 700;
+
+    box-shadow:
+        0 0 30px rgba(34, 197, 94, 0.20);
+}
+
+.profile-avatar-image {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+
+/* Camera button */
+
+.profile-picture-edit-btn {
+    position: absolute;
+
+    right: -4px;
+    bottom: -4px;
+
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+
+    border: 3px solid #111827;
+    border-radius: 50%;
+
+    background: #19d66b;
+    color: #06120b;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    z-index: 5;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.profile-picture-edit-btn:hover {
+    transform: scale(1.08);
+
+    background: #42e987;
+
+    box-shadow:
+        0 0 15px rgba(25, 214, 107, 0.35);
+}
+
+.profile-picture-edit-btn i {
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CHANGE PROFILE PICTURE CARD
+   ========================================================= */
+
+.profile-picture-card {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin-top: 20px;
+    margin-bottom: 24px;
+
+    padding: 24px;
+
+    background: #111827;
+
+    border: 1px solid #25334a;
+    border-radius: 16px;
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.20);
+}
+
+.profile-picture-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.profile-picture-card-header h3 {
+    margin: 8px 0 6px;
+
+    color: #ffffff;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.profile-picture-card-header p {
+    margin: 0;
+
+    color: #8495ae;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* Close button */
+
+.profile-picture-close {
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    border: 1px solid #31445f;
+    border-radius: 9px;
+
+    background: #1c2b42;
+    color: #9aaac1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.profile-picture-close:hover {
+    background: #263750;
+    color: #ffffff;
+    border-color: #19d66b;
+}
+
+.profile-picture-close i {
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   PROFILE PICTURE ACTION BUTTONS
+   ========================================================= */
+
+.profile-picture-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 22px;
+}
+
+
+/* Choose Photo */
+
+.profile-picture-select-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 42px;
+
+    padding: 10px 17px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #31445f;
+    border-radius: 10px;
+
+    background: #1c2b42;
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.profile-picture-select-btn:hover {
+    background: #243651;
+    border-color: #19d66b;
+    transform: translateY(-1px);
+}
+
+.profile-picture-select-btn i {
+    font-size: 15px;
+}
+
+
+/* Save Photo */
+
+.profile-save-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 42px;
+
+    padding: 10px 17px;
+
+    border: 1px solid #19d66b;
+    border-radius: 10px;
+
+    background: #19d66b;
+    color: #06120b;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.profile-save-btn:hover {
+    background: #42e987;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 18px rgba(25, 214, 107, 0.20);
+}
+
+
+/* Cancel */
+
+.profile-cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 10px 17px;
+
+    border: 1px solid #31445f;
+    border-radius: 10px;
+
+    background: transparent;
+    color: #a8b5c9;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.profile-cancel-btn:hover {
+    background: #1c2b42;
+    color: #ffffff;
+    border-color: #526987;
+}
+
+
+/* Remove Photo */
+
+.profile-remove-picture-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 42px;
+
+    padding: 10px 17px;
+
+    border: 1px solid #71323b;
+    border-radius: 10px;
+
+    background: #321b23;
+    color: #ff8f9b;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.profile-remove-picture-btn:hover {
+    background: #45212b;
+    border-color: #a94b57;
+
+    transform: translateY(-1px);
+}
+
+
+/* Disabled state */
+
+.profile-picture-actions button:disabled,
+.profile-picture-close:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .profile-avatar-wrapper {
+        width: 76px;
+        height: 76px;
+    }
+
+    .profile-avatar-wrapper .profile-avatar {
+        width: 76px;
+        height: 76px;
+    }
+
+    .profile-picture-card {
+        padding: 18px;
+    }
+
+    .profile-picture-card-header {
+        gap: 12px;
+    }
+
+    .profile-picture-card-header h3 {
+        font-size: 18px;
+    }
+
+    .profile-picture-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .profile-picture-select-btn,
+    .profile-save-btn,
+    .profile-cancel-btn,
+    .profile-remove-picture-btn {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   FINAL FIX - NAVBAR PROFILE IMAGE
+   ========================================================= */
+
+header .topbar .profile-mini .mini-avatar {
+    width: 72px !important;
+    height: 72px !important;
+
+    min-width: 72px !important;
+    min-height: 72px !important;
+    max-width: 72px !important;
+    max-height: 72px !important;
+
+    border-radius: 50% !important;
+    overflow: hidden !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    flex: 0 0 72px !important;
+    position: relative !important;
+}
+
+header .topbar .profile-mini .mini-avatar .mini-avatar-image {
+    width: 72px !important;
+    height: 72px !important;
+
+    min-width: 72px !important;
+    min-height: 72px !important;
+    max-width: 72px !important;
+    max-height: 72px !important;
+
+    display: block !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+
+    border: 0 !important;
+    border-radius: 50% !important;
+
+    position: relative !important;
+    inset: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* =========================================================
+   FINAL NAVBAR CONTROL SPACING
+   ========================================================= */
+
+.topbar-right {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+
+    /* Keep a controlled small gap between navbar controls. */
+    gap: 0 !important;
+}
+
+/* Search -> Notification */
+.topbar-right > :first-child {
+    margin-right: 12px !important;
+}
+
+/* Notification -> Profile */
+.topbar-right > .notification-wrapper {
+    margin-left: 0 !important;
+    margin-right: 12px !important;
+}
+
+/* Profile */
+.topbar-right > .profile-mini {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Reset only button margins so they cannot cancel the spacing. */
+.topbar-right .search-btn,
+.topbar-right .search-button,
+.topbar-right .notification-button {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Re-apply the intended spacing after the button reset. */
+.topbar-right > :first-child {
+    margin-right: 12px !important;
+}
+
+.topbar-right > .notification-wrapper {
+    margin-right: 12px !important;
+}

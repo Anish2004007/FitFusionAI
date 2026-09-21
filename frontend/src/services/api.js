@@ -191,6 +191,40 @@ export const updateProfile = async (profileData) => {
     return response.data;
 };
 
+export const removeProfilePicture = async () => {
+    const response = await api.delete(
+        "/profile/api/remove-picture/",
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+};
+// =========================================================
+// PROFILE PICTURE API
+// =========================================================
+
+export const uploadProfilePicture = async (file) => {
+
+    const formData = new FormData();
+
+    formData.append(
+        "profile_picture",
+        file
+    );
+
+    const response = await api.post(
+        "/profile/api/picture/",
+        formData,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+};
+
 // =========================================================
 // WATER TRACKER API
 // =========================================================
