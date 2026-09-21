@@ -101,67 +101,101 @@ function FitFusionLayout({
     const notificationRef =
         useRef(null);
 
+
     // =====================================================
-// HEADER PROFILE PICTURE
-// =====================================================
+    // SEARCH STATE
+    // =====================================================
 
-const rawProfilePicture =
-    user?.profile_picture_url ||
-    user?.profile_picture ||
-    user?.profile_image ||
-    user?.profile?.profile_picture_url ||
-    user?.profile?.profile_picture ||
-    null;
+    const [
+        showSearch,
+        setShowSearch,
+    ] = useState(false);
 
 
-const getProfilePictureUrl = (picture) => {
+    const [
+        searchQuery,
+        setSearchQuery,
+    ] = useState("");
 
-    if (
-        !picture ||
-        typeof picture !== "string"
-    ) {
-        return null;
-    }
 
-    /*
-     * Already a complete URL.
-     */
-    if (
-        picture.startsWith("http://") ||
-        picture.startsWith("https://")
-    ) {
-        return picture;
-    }
+    const searchRef =
+        useRef(null);
 
-    /*
-     * Django media URL.
-     *
-     * Example:
-     * /media/profile_pictures/photo.jpg
-     */
-    if (
-        picture.startsWith("/")
-    ) {
+
+    const searchInputRef =
+        useRef(null);
+
+
+    // =====================================================
+    // HEADER PROFILE PICTURE
+    // =====================================================
+
+    const rawProfilePicture =
+        user?.profile_picture_url ||
+        user?.profile_picture ||
+        user?.profile_image ||
+        user?.profile?.profile_picture_url ||
+        user?.profile?.profile_picture ||
+        null;
+
+
+    const getProfilePictureUrl = (picture) => {
+
+        if (
+            !picture ||
+            typeof picture !== "string"
+        ) {
+            return null;
+        }
+
+
+        /*
+         * Already a complete URL.
+         */
+
+        if (
+            picture.startsWith("http://") ||
+            picture.startsWith("https://")
+        ) {
+            return picture;
+        }
+
+
+        /*
+         * Django media URL.
+         *
+         * Example:
+         * /media/profile_pictures/photo.jpg
+         */
+
+        if (
+            picture.startsWith("/")
+        ) {
+
+            return (
+                "http://localhost:8000" +
+                picture
+            );
+
+        }
+
+
+        /*
+         * Relative media path.
+         */
+
         return (
-            "http://localhost:8000" +
+            "http://localhost:8000/" +
             picture
         );
-    }
 
-    /*
-     * Relative media path.
-     */
-    return (
-        "http://localhost:8000/" +
-        picture
-    );
-};
+    };
 
 
-const headerProfilePicture =
-    getProfilePictureUrl(
-        rawProfilePicture
-    );
+    const headerProfilePicture =
+        getProfilePictureUrl(
+            rawProfilePicture
+        );
 
 
     // =====================================================
@@ -198,15 +232,147 @@ const headerProfilePicture =
                     .trim()
                     .toLowerCase();
 
+
             return (
                 normalized === "true" ||
                 normalized === "1"
             );
+
         }
 
 
         return false;
+
     };
+
+
+    // =====================================================
+    // SEARCH ITEMS
+    // =====================================================
+
+    const searchItems = [
+        {
+            label: "Dashboard",
+            path: "/dashboard/",
+            icon: "bi-grid-fill",
+            keywords: [
+                "dashboard",
+                "home",
+            ],
+        },
+
+        {
+            label: "Profile",
+            path: "/profile/",
+            icon: "bi-person-circle",
+            keywords: [
+                "profile",
+                "account",
+                "user",
+            ],
+        },
+
+        {
+            label: "Workout",
+            path: "/workout/",
+            icon: "bi-heart-pulse",
+            keywords: [
+                "workout",
+                "exercise",
+                "training",
+                "fitness",
+            ],
+        },
+
+        {
+            label: "Diet",
+            path: "/diet/",
+            icon: "bi-egg-fried",
+            keywords: [
+                "diet",
+                "food",
+                "nutrition",
+                "meal",
+            ],
+        },
+
+        {
+            label: "Water Tracker",
+            path: "/tracker/",
+            icon: "bi-droplet-half",
+            keywords: [
+                "water",
+                "hydration",
+                "tracker",
+                "drink",
+            ],
+        },
+
+        {
+            label: "Progress",
+            path: "/",
+            icon: "bi-graph-up-arrow",
+            keywords: [
+                "progress",
+                "stats",
+                "history",
+                "performance",
+            ],
+        },
+
+        {
+            label: "AI Coach",
+            path: "/ai-coach/",
+            icon: "bi-robot",
+            keywords: [
+                "ai",
+                "coach",
+                "assistant",
+                "chat",
+            ],
+        },
+    ];
+
+
+    // =====================================================
+    // FILTER SEARCH RESULTS
+    // =====================================================
+
+    const filteredSearchItems =
+        searchItems.filter(
+            (item) => {
+
+                const query =
+                    searchQuery
+                        .trim()
+                        .toLowerCase();
+
+
+                /*
+                 * Show every page when
+                 * search box is empty.
+                 */
+
+                if (!query) {
+                    return true;
+                }
+
+
+                return (
+                    item.label
+                        .toLowerCase()
+                        .includes(query) ||
+
+                    item.keywords.some(
+                        (keyword) =>
+                            keyword
+                                .toLowerCase()
+                                .includes(query)
+                    )
+                );
+
+            }
+        );
 
 
     // =====================================================
@@ -319,20 +485,16 @@ const headerProfilePicture =
                                         ),
 
                                     type:
-
                                         type,
 
                                     notification_type:
-
                                         notification.notification_type ||
                                         type,
 
                                     priority:
-
                                         priority,
 
                                     is_read:
-
                                         normalizeBoolean(
                                             notification.is_read
                                         ),
@@ -425,7 +587,7 @@ const headerProfilePicture =
 
 
     // =====================================================
-    // CLOSE PANEL WHEN CLICKING OUTSIDE
+    // CLOSE NOTIFICATION PANEL WHEN CLICKING OUTSIDE
     // =====================================================
 
     useEffect(() => {
@@ -465,6 +627,119 @@ const headerProfilePicture =
         };
 
     }, []);
+
+
+    // =====================================================
+    // SEARCH - CLOSE WHEN CLICKING OUTSIDE
+    // =====================================================
+
+    useEffect(() => {
+
+        const handleSearchOutside =
+            (event) => {
+
+                if (
+                    searchRef.current &&
+                    !searchRef.current.contains(
+                        event.target
+                    )
+                ) {
+
+                    setShowSearch(
+                        false
+                    );
+
+                }
+
+            };
+
+
+        document.addEventListener(
+            "mousedown",
+            handleSearchOutside
+        );
+
+
+        return () => {
+
+            document.removeEventListener(
+                "mousedown",
+                handleSearchOutside
+            );
+
+        };
+
+    }, []);
+
+
+    // =====================================================
+    // SEARCH - ESCAPE KEY
+    // =====================================================
+
+    useEffect(() => {
+
+        const handleSearchKeyDown =
+            (event) => {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    setShowSearch(
+                        false
+                    );
+
+                    setSearchQuery(
+                        ""
+                    );
+
+                }
+
+            };
+
+
+        document.addEventListener(
+            "keydown",
+            handleSearchKeyDown
+        );
+
+
+        return () => {
+
+            document.removeEventListener(
+                "keydown",
+                handleSearchKeyDown
+            );
+
+        };
+
+    }, []);
+
+
+    // =====================================================
+    // SEARCH - AUTO FOCUS
+    // =====================================================
+
+    useEffect(() => {
+
+        if (
+            showSearch
+        ) {
+
+            setTimeout(
+                () => {
+
+                    searchInputRef.current?.focus();
+
+                },
+                0
+            );
+
+        }
+
+    }, [
+        showSearch,
+    ]);
 
 
     // =====================================================
@@ -1097,87 +1372,115 @@ const headerProfilePicture =
     // HEADER PROFILE PICTURE STATE
     // =====================================================
 
-    const [layoutProfilePicture, setLayoutProfilePicture] =
-        useState(headerProfilePicture);
+    const [
+        layoutProfilePicture,
+        setLayoutProfilePicture,
+    ] = useState(
+        headerProfilePicture
+    );
 
 
     // Keep the navbar in sync when the parent user object changes.
+
     useEffect(() => {
 
         setLayoutProfilePicture(
             headerProfilePicture
         );
 
-    }, [headerProfilePicture]);
+    }, [
+        headerProfilePicture,
+    ]);
 
 
-    // Load the latest profile picture from Django whenever the
-    // layout is first loaded or the user navigates to another page.
+    // Load the latest profile picture from Django whenever
+    // the layout is first loaded or the user navigates.
+
     useEffect(() => {
 
         let cancelled = false;
 
 
-        const loadHeaderProfilePicture = async () => {
+        const loadHeaderProfilePicture =
+            async () => {
 
-            try {
+                try {
 
-                const response = await fetch(
-                    `${API_BASE_URL}/profile/api/`,
-                    {
-                        method: "GET",
-                        credentials: "include",
-                        headers: {
-                            "Accept": "application/json",
-                        },
-                        cache: "no-store",
+                    const response =
+                        await fetch(
+                            `${API_BASE_URL}/profile/api/`,
+                            {
+                                method: "GET",
+
+                                credentials:
+                                    "include",
+
+                                headers: {
+                                    "Accept":
+                                        "application/json",
+                                },
+
+                                cache:
+                                    "no-store",
+                            }
+                        );
+
+
+                    if (
+                        !response.ok
+                    ) {
+
+                        throw new Error(
+                            `Profile API returned ${response.status}`
+                        );
+
                     }
-                );
 
 
-                if (!response.ok) {
-                    throw new Error(
-                        `Profile API returned ${response.status}`
+                    const data =
+                        await response.json();
+
+
+                    if (
+                        cancelled
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const profilePicture =
+                        data?.profile_picture_url ||
+                        data?.profile_picture ||
+                        data?.profile_image ||
+                        data?.profile?.profile_picture_url ||
+                        data?.profile?.profile_picture ||
+                        data?.user?.profile_picture_url ||
+                        data?.user?.profile_picture ||
+                        data?.user?.profile_image ||
+                        null;
+
+
+                    setLayoutProfilePicture(
+                        getProfilePictureUrl(
+                            profilePicture
+                        )
                     );
-                }
 
 
-                const data = await response.json();
-
-
-                if (cancelled) {
-                    return;
-                }
-
-
-                const profilePicture =
-                    data?.profile_picture_url ||
-                    data?.profile_picture ||
-                    data?.profile_image ||
-                    data?.profile?.profile_picture_url ||
-                    data?.profile?.profile_picture ||
-                    data?.user?.profile_picture_url ||
-                    data?.user?.profile_picture ||
-                    data?.user?.profile_image ||
-                    null;
-
-
-                setLayoutProfilePicture(
-                    getProfilePictureUrl(
-                        profilePicture
-                    )
-                );
-
-            } catch (error) {
-
-                console.error(
-                    "Header profile picture API error:",
+                } catch (
                     error
-                );
+                ) {
 
-            }
+                    console.error(
+                        "Header profile picture API error:",
+                        error
+                    );
 
-        };
+                }
+
+            };
 
 
         loadHeaderProfilePicture();
@@ -1278,6 +1581,65 @@ const headerProfilePicture =
                 new PopStateEvent(
                     "popstate"
                 )
+            );
+
+        };
+
+
+    // =====================================================
+    // SEARCH TOGGLE
+    // =====================================================
+
+    const toggleSearch =
+        () => {
+
+            const nextState =
+                !showSearch;
+
+
+            setShowSearch(
+                nextState
+            );
+
+
+            /*
+             * Close notifications
+             * when search opens.
+             */
+
+            if (
+                nextState &&
+                showNotifications
+            ) {
+
+                setShowNotifications(
+                    false
+                );
+
+            }
+
+        };
+
+
+    // =====================================================
+    // SEARCH NAVIGATION
+    // =====================================================
+
+    const handleSearchNavigate =
+        (url) => {
+
+            navigate(
+                url
+            );
+
+
+            setShowSearch(
+                false
+            );
+
+
+            setSearchQuery(
+                ""
             );
 
         };
@@ -1704,13 +2066,165 @@ const headerProfilePicture =
                         className="topbar-right"
                     >
 
-                        {/* SEARCH */}
+
+                        {/* =================================================
+                            SEARCH
+                        ================================================= */}
 
                         <div
-                            className="icon-btn search-button"
+                            className="search-wrapper"
+                            ref={searchRef}
                         >
 
-                            <i className="bi bi-search"></i>
+                            <button
+                                type="button"
+                                className="icon-btn search-button"
+                                onClick={
+                                    toggleSearch
+                                }
+                                aria-label="Search"
+                                title="Search"
+                            >
+
+                                <i className="bi bi-search"></i>
+
+                            </button>
+
+
+                            {/* =================================================
+                                SEARCH PANEL
+                            ================================================= */}
+
+                            {showSearch && (
+
+                                <div
+                                    className="search-panel"
+                                >
+
+
+                                    {/* SEARCH INPUT */}
+
+                                    <div
+                                        className="search-input-container"
+                                    >
+
+                                        <i className="bi bi-search"></i>
+
+
+                                        <input
+                                            ref={
+                                                searchInputRef
+                                            }
+                                            type="text"
+                                            value={
+                                                searchQuery
+                                            }
+                                            onChange={
+                                                (event) =>
+                                                    setSearchQuery(
+                                                        event.target.value
+                                                    )
+                                            }
+                                            placeholder="Search FitFusion..."
+                                            autoComplete="off"
+                                        />
+
+
+                                        {searchQuery && (
+
+                                            <button
+                                                type="button"
+                                                className="search-clear-button"
+                                                onClick={() =>
+                                                    setSearchQuery(
+                                                        ""
+                                                    )
+                                                }
+                                                aria-label="Clear search"
+                                                title="Clear search"
+                                            >
+
+                                                <i className="bi bi-x"></i>
+
+                                            </button>
+
+                                        )}
+
+                                    </div>
+
+
+                                    {/* SEARCH RESULTS */}
+
+                                    <div
+                                        className="search-results"
+                                    >
+
+                                        {filteredSearchItems.length >
+                                        0 ? (
+
+                                            filteredSearchItems.map(
+                                                (
+                                                    item
+                                                ) => (
+
+                                                    <button
+                                                        key={
+                                                            item.path
+                                                        }
+                                                        type="button"
+                                                        className="search-result-item"
+                                                        onClick={() =>
+                                                            handleSearchNavigate(
+                                                                item.path
+                                                            )
+                                                        }
+                                                    >
+
+                                                        <span
+                                                            className="search-result-icon"
+                                                        >
+
+                                                            <i
+                                                                className={
+                                                                    `bi ${item.icon}`
+                                                                }
+                                                            ></i>
+
+                                                        </span>
+
+
+                                                    <span className="search-result-text">
+                                                        <span className="search-result-title">
+                                                            {item.label}
+                                                        </span>
+                                                    </span>
+
+                                                    </button>
+
+                                                )
+                                            )
+
+                                        ) : (
+
+                                            <div
+                                                className="search-empty"
+                                            >
+
+                                                <i className="bi bi-search"></i>
+
+                                                <span>
+                                                    No results found
+                                                </span>
+
+                                            </div>
+
+                                        )}
+
+                                    </div>
+
+                                </div>
+
+                            )}
 
                         </div>
 
@@ -1739,6 +2253,22 @@ const headerProfilePicture =
                                     setShowNotifications(
                                         nextState
                                     );
+
+
+                                    /*
+                                     * Close search when
+                                     * notification panel opens.
+                                     */
+
+                                    if (
+                                        nextState
+                                    ) {
+
+                                        setShowSearch(
+                                            false
+                                        );
+
+                                    }
 
 
                                     /*
@@ -2223,65 +2753,73 @@ const headerProfilePicture =
                         </div>
 
 
-              {/* =================================================
-    PROFILE MINI AVATAR
-    ================================================= */}
+                        {/* =================================================
+                            PROFILE MINI AVATAR
+                        ================================================= */}
 
-<div className="profile-mini">
+                        <div
+                            className="profile-mini"
+                        >
 
-    <div
-        className="mini-avatar"
-        style={{
-            width: "72px",
-            height: "72px",
-            minWidth: "72px",
-            minHeight: "72px",
-            maxWidth: "72px",
-            maxHeight: "72px",
-            overflow: "hidden",
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flex: "0 0 72px"
-        }}
-    >
+                            <div
+                                className="mini-avatar"
+                                style={{
+                                    width: "72px",
+                                    height: "72px",
+                                    minWidth: "72px",
+                                    minHeight: "72px",
+                                    maxWidth: "72px",
+                                    maxHeight: "72px",
+                                    overflow: "hidden",
+                                    borderRadius: "50%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flex: "0 0 72px",
+                                }}
+                            >
 
-        {layoutProfilePicture ? (
+                                {layoutProfilePicture ? (
 
-            <img
-                src={layoutProfilePicture}
-                alt="Profile"
-                className="mini-avatar-image"
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    minWidth: 0,
-                    minHeight: 0,
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                    flex: "0 0 auto"
-                }}
-                onError={(event) => {
-                    event.currentTarget.style.display = "none";
-                }}
-            />
+                                    <img
+                                        src={
+                                            layoutProfilePicture
+                                        }
+                                        alt="Profile"
+                                        className="mini-avatar-image"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            minWidth: 0,
+                                            minHeight: 0,
+                                            maxWidth: "100%",
+                                            maxHeight: "100%",
+                                            objectFit: "cover",
+                                            display: "block",
+                                            flex: "0 0 auto",
+                                        }}
+                                        onError={(event) => {
 
-        ) : (
+                                            event.currentTarget.style.display =
+                                                "none";
 
-            user?.full_name
-                ? user.full_name
-                    .slice(0, 1)
-                    .toUpperCase()
-                : "U"
+                                        }}
+                                    />
 
-        )}
+                                ) : (
 
-    </div>
+                                    user?.full_name
+                                        ? user.full_name
+                                            .slice(0, 1)
+                                            .toUpperCase()
+                                        : "U"
 
-</div>
+                                )}
+
+                            </div>
+
+                        </div>
+
 
                     </div>
 
