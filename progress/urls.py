@@ -20,4 +20,11 @@ urlpatterns = [
         name="progress_api"
     ),
 
+    # Clear workout activity
+    path(
+        "api/clear/",
+        api_views.clear_progress_api,
+        name="clear_progress_api"
+    ),
+
 ]

@@ -6270,16 +6270,25 @@ a {
 
 /* =========================================================
    FINAL FIX - NAVBAR PROFILE IMAGE
+   =========================================================
+   The previous version had a 58px width/height but still forced
+   min/max sizes, flex-basis, and the image itself to 72px.
+   Those rules made the profile picture remain large.
+
+   Navbar profile size is now consistently controlled at 58px.
    ========================================================= */
 
 header .topbar .profile-mini .mini-avatar {
-    width: 72px !important;
-    height: 72px !important;
+    width: 58px !important;
+    height: 58px !important;
 
-    min-width: 72px !important;
-    min-height: 72px !important;
-    max-width: 72px !important;
-    max-height: 72px !important;
+    min-width: 58px !important;
+    min-height: 58px !important;
+
+    max-width: 58px !important;
+    max-height: 58px !important;
+
+    flex: 0 0 58px !important;
 
     border-radius: 50% !important;
     overflow: hidden !important;
@@ -6288,18 +6297,21 @@ header .topbar .profile-mini .mini-avatar {
     align-items: center !important;
     justify-content: center !important;
 
-    flex: 0 0 72px !important;
     position: relative !important;
+    box-sizing: border-box !important;
 }
 
 header .topbar .profile-mini .mini-avatar .mini-avatar-image {
-    width: 72px !important;
-    height: 72px !important;
+    width: 58px !important;
+    height: 58px !important;
 
-    min-width: 72px !important;
-    min-height: 72px !important;
-    max-width: 72px !important;
-    max-height: 72px !important;
+    min-width: 58px !important;
+    min-height: 58px !important;
+
+    max-width: 58px !important;
+    max-height: 58px !important;
+
+    flex: 0 0 58px !important;
 
     display: block !important;
 
@@ -6314,6 +6326,28 @@ header .topbar .profile-mini .mini-avatar .mini-avatar-image {
 
     margin: 0 !important;
     padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+/* Keep the navbar profile wrapper itself from stretching the avatar. */
+header .topbar .profile-mini {
+    width: 58px !important;
+    height: 58px !important;
+
+    min-width: 58px !important;
+    min-height: 58px !important;
+
+    max-width: 58px !important;
+    max-height: 58px !important;
+
+    flex: 0 0 58px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    position: relative !important;
 }
 /* =========================================================
    FINAL NAVBAR CONTROL SPACING
@@ -6565,5 +6599,154 @@ header .topbar .profile-mini .mini-avatar .mini-avatar-image {
 
         width: auto;
         max-width: none;
+    }
+}
+
+/* =====================================================
+   PROFILE MENU
+   ===================================================== */
+
+.profile-avatar-button {
+    transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.profile-avatar-button:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+.profile-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 260px;
+    background: #111827;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 14px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.30);
+    padding: 8px;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.profile-menu-user {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 9px;
+}
+
+.profile-menu-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1f2937;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.profile-menu-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-menu-user-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.profile-menu-user-info strong {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-menu-user-info span {
+    color: #94a3b8;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 6px 2px;
+}
+
+.profile-menu-item {
+    width: 100%;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 11px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: #e5e7eb;
+    text-decoration: none;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.profile-menu-item i {
+    width: 20px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.profile-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.profile-menu-logout {
+    color: #fca5a5;
+}
+
+.profile-menu-logout:hover {
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.12);
+}
+
+@media (max-width: 600px) {
+    .profile-menu {
+        right: -4px;
+        width: 240px;
+    }
+}
+
+/* =========================================================
+   FINAL NAVBAR PROFILE SIZE - MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+    header .topbar .profile-mini,
+    header .topbar .profile-mini .mini-avatar,
+    header .topbar .profile-mini .mini-avatar .mini-avatar-image {
+        width: 52px !important;
+        height: 52px !important;
+        min-width: 52px !important;
+        min-height: 52px !important;
+        max-width: 52px !important;
+        max-height: 52px !important;
+        flex: 0 0 52px !important;
     }
 }

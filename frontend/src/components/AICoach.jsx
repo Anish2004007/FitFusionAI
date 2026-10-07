@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import {
+    useEffect,
+    useRef,
+    useState
+} from "react";
+
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -6,6 +11,10 @@ import { getDashboard } from "../services/api";
 
 
 function AICoach({ onUserLoaded }) {
+
+    // =====================================================
+    // CHAT STATE
+    // =====================================================
 
     const [messages, setMessages] = useState([
         {
@@ -18,39 +27,39 @@ function AICoach({ onUserLoaded }) {
         }
     ]);
 
-
     const [input, setInput] = useState("");
-
     const [loading, setLoading] = useState(false);
 
-    const [scoreData, setScoreData] = useState(null);
 
+    // =====================================================
+    // FITNESS SCORE
+    // =====================================================
+
+    const [scoreData, setScoreData] = useState(null);
     const [scoreLoading, setScoreLoading] = useState(true);
 
 
-    /*
-     * =========================================
-     * AI DAILY PLAN STATE
-     * =========================================
-     */
+    // =====================================================
+    // DAILY PLAN
+    // =====================================================
 
     const [dailyPlan, setDailyPlan] = useState("");
-
     const [dailyPlanLoading, setDailyPlanLoading] =
         useState(true);
-
     const [dailyPlanError, setDailyPlanError] =
         useState("");
 
 
+    // =====================================================
+    // CHAT SCROLL
+    // =====================================================
+
     const messagesEndRef = useRef(null);
 
 
-    /*
-     * =========================================
-     * LOAD USER
-     * =========================================
-     */
+    // =====================================================
+    // LOAD USER
+    // =====================================================
 
     useEffect(() => {
 
@@ -85,158 +94,235 @@ function AICoach({ onUserLoaded }) {
 
         };
 
-
         loadUser();
 
     }, [onUserLoaded]);
 
 
-    /*
-     * =========================================
-     * LOAD FITNESS SCORE
-     * =========================================
-     */
+    // =====================================================
+    // FITNESS SCORE
+    // =====================================================
 
     useEffect(() => {
 
-        const loadFitnessScore = async () => {
+        let cancelled = false;
 
-            try {
+        const loadFitnessScore =
+            async () => {
 
-                setScoreLoading(true);
+                try {
 
-                const response =
-                    await fetch(
-                        "http://localhost:8000/ai-coach/api/fitness-score/",
-                        {
-                            method: "GET",
-                            credentials: "include"
-                        }
-                    );
+                    setScoreLoading(true);
 
+                    const response =
+                        await fetch(
+                            "http://localhost:8000/ai-coach/api/fitness-score/",
+                            {
+                                method: "GET",
+                                credentials: "include",
+                                headers: {
+                                    Accept:
+                                        "application/json"
+                                }
+                            }
+                        );
 
-                const data =
-                    await response.json();
+                    const data =
+                        await response.json();
 
-
-                if (
-                    response.ok &&
-                    data.success &&
-                    data.fitness_score
-                ) {
-
-                    setScoreData(
+                    if (
+                        !cancelled &&
+                        response.ok &&
+                        data.success &&
                         data.fitness_score
-                    );
+                    ) {
 
-                } else {
+                        setScoreData(
+                            data.fitness_score
+                        );
 
-                    console.error(
-                        "Fitness score error:",
-                        data.error
-                    );
+                    }
+
+                } catch (error) {
+
+                    if (!cancelled) {
+
+                        console.error(
+                            "Unable to load fitness score:",
+                            error
+                        );
+
+                    }
+
+                } finally {
+
+                    if (!cancelled) {
+                        setScoreLoading(false);
+                    }
 
                 }
 
-            } catch (error) {
-
-                console.error(
-                    "Unable to load fitness score:",
-                    error
-                );
-
-            } finally {
-
-                setScoreLoading(false);
-
-            }
-
-        };
-
+            };
 
         loadFitnessScore();
+
+        return () => {
+            cancelled = true;
+        };
 
     }, []);
 
 
-    /*
-     * =========================================
-     * LOAD AI DAILY PLAN
-     * =========================================
-     */
+    // =====================================================
+    // DAILY PLAN
+    // =====================================================
 
     useEffect(() => {
 
-        const loadDailyPlan = async () => {
+        let cancelled = false;
 
-            try {
+        const loadDailyPlan =
+            async () => {
 
                 setDailyPlanLoading(true);
-
                 setDailyPlanError("");
+                setDailyPlan("");
 
-                const response =
-                    await fetch(
-                        "http://localhost:8000/ai-coach/api/daily-plan/",
-                        {
-                            method: "GET",
-                            credentials: "include"
-                        }
+                const controller =
+                    new AbortController();
+
+                const timeoutId =
+                    setTimeout(() => {
+
+                        controller.abort();
+
+                    }, 35000);
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "http://localhost:8000/ai-coach/api/daily-plan/",
+                            {
+                                method: "GET",
+                                credentials: "include",
+                                headers: {
+                                    Accept:
+                                        "application/json"
+                                },
+                                signal:
+                                    controller.signal
+                            }
+                        );
+
+
+                    let data;
+
+                    try {
+
+                        data =
+                            await response.json();
+
+                    } catch (error) {
+
+                        throw new Error(
+                            "Invalid response from AI Coach server."
+                        );
+
+                    }
+
+
+                    if (
+                        !cancelled &&
+                        response.ok &&
+                        data &&
+                        data.success &&
+                        data.plan
+                    ) {
+
+                        setDailyPlan(
+                            data.plan
+                        );
+
+                        setDailyPlanError("");
+
+                        return;
+
+                    }
+
+
+                    throw new Error(
+                        data?.error ||
+                        "Unable to generate today's AI plan."
                     );
 
 
-                const data =
-                    await response.json();
+                } catch (error) {
+
+                    if (cancelled) {
+                        return;
+                    }
 
 
-                if (
-                    response.ok &&
-                    data.success
-                ) {
-
-                    setDailyPlan(
-                        data.plan || ""
+                    console.error(
+                        "Daily plan error:",
+                        error
                     );
 
-                } else {
 
-                    setDailyPlanError(
-                        data.error ||
-                        "Unable to load today's AI plan."
+                    if (
+                        error?.name ===
+                        "AbortError"
+                    ) {
+
+                        setDailyPlanError(
+                            "AI Coach took too long to respond. Please try again."
+                        );
+
+                    } else {
+
+                        setDailyPlanError(
+                            error?.message ||
+                            "Unable to generate today's AI plan."
+                        );
+
+                    }
+
+                } finally {
+
+                    clearTimeout(
+                        timeoutId
                     );
+
+                    if (!cancelled) {
+
+                        setDailyPlanLoading(
+                            false
+                        );
+
+                    }
 
                 }
 
-            } catch (error) {
-
-                console.error(
-                    "Daily plan error:",
-                    error
-                );
-
-                setDailyPlanError(
-                    "Unable to connect to AI Coach."
-                );
-
-            } finally {
-
-                setDailyPlanLoading(false);
-
-            }
-
-        };
+            };
 
 
         loadDailyPlan();
 
+
+        return () => {
+
+            cancelled = true;
+
+        };
+
     }, []);
 
 
-    /*
-     * =========================================
-     * AUTO SCROLL
-     * =========================================
-     */
+    // =====================================================
+    // AUTO SCROLL
+    // =====================================================
 
     useEffect(() => {
 
@@ -247,11 +333,9 @@ function AICoach({ onUserLoaded }) {
     }, [messages, loading]);
 
 
-    /*
-     * =========================================
-     * SEND MESSAGE
-     * =========================================
-     */
+    // =====================================================
+    // SEND MESSAGE
+    // =====================================================
 
     const sendMessage = async (
         messageText = input
@@ -271,6 +355,10 @@ function AICoach({ onUserLoaded }) {
         }
 
 
+        // -------------------------------------------------
+        // USER MESSAGE
+        // -------------------------------------------------
+
         const userMessage = {
 
             id: Date.now(),
@@ -282,21 +370,41 @@ function AICoach({ onUserLoaded }) {
         };
 
 
-        setMessages((previous) => [
-
-            ...previous,
-
-            userMessage
-
-        ]);
+        setMessages(
+            previous => [
+                ...previous,
+                userMessage
+            ]
+        );
 
 
         setInput("");
-
         setLoading(true);
 
 
+        // -------------------------------------------------
+        // TIMEOUT
+        // -------------------------------------------------
+
+        const controller =
+            new AbortController();
+
+
+        const timeoutId =
+            setTimeout(() => {
+
+                controller.abort();
+
+            }, 35000);
+
+
         try {
+
+            console.log(
+                "Sending FitFusion AI message:",
+                message
+            );
+
 
             const response =
                 await fetch(
@@ -306,53 +414,118 @@ function AICoach({ onUserLoaded }) {
 
                         headers: {
                             "Content-Type":
+                                "application/json",
+
+                            Accept:
                                 "application/json"
                         },
 
-                        credentials: "include",
+                        credentials:
+                            "include",
 
-                        body: JSON.stringify({
-                            message: message
-                        })
+                        signal:
+                            controller.signal,
+
+                        body:
+                            JSON.stringify({
+                                message:
+                                    message
+                            })
                     }
                 );
 
 
-            const data =
-                await response.json();
+            let data;
 
 
-            if (
-                !response.ok ||
-                !data.success
-            ) {
+            try {
+
+                data =
+                    await response.json();
+
+            } catch (error) {
 
                 throw new Error(
-                    data.error ||
-                    "Unable to get AI response."
+                    "Invalid response from AI Coach server."
                 );
 
             }
 
 
-            const aiMessage = {
-
-                id: Date.now() + 1,
-
-                sender: "ai",
-
-                text: data.message
-
-            };
+            console.log(
+                "FitFusion AI response:",
+                data
+            );
 
 
-            setMessages((previous) => [
+            // =================================================
+            // SUCCESS
+            //
+            // This includes both:
+            //
+            // fallback: false
+            //      = Gemini response
+            //
+            // fallback: true
+            //      = local backend response
+            // =================================================
 
-                ...previous,
+            if (
+                response.ok &&
+                data.success &&
+                data.message
+            ) {
 
-                aiMessage
+                const aiMessage = {
 
-            ]);
+                    id:
+                        Date.now() + 1,
+
+                    sender:
+                        "ai",
+
+                    text:
+                        data.message
+
+                };
+
+
+                setMessages(
+                    previous => [
+                        ...previous,
+                        aiMessage
+                    ]
+                );
+
+
+                return;
+
+            }
+
+
+            // =================================================
+            // AUTHENTICATION
+            // =================================================
+
+            if (
+                response.status === 401
+            ) {
+
+                throw new Error(
+                    "Your session has expired. Please log in again."
+                );
+
+            }
+
+
+            // =================================================
+            // OTHER ERROR
+            // =================================================
+
+            throw new Error(
+                data?.error ||
+                "Unable to get AI response."
+            );
 
 
         } catch (error) {
@@ -363,29 +536,107 @@ function AICoach({ onUserLoaded }) {
             );
 
 
+            let errorText;
+
+
+            // -------------------------------------------------
+            // TIMEOUT
+            // -------------------------------------------------
+
+            if (
+                error?.name ===
+                "AbortError"
+            ) {
+
+                errorText =
+                    "⏱️ **FitFusion AI is taking too long to respond.**\n\n" +
+                    "Please try again in a moment.";
+
+            }
+
+
+            // -------------------------------------------------
+            // NETWORK ERROR
+            // -------------------------------------------------
+
+            else if (
+                error?.message &&
+                (
+                    error.message.includes(
+                        "Failed to fetch"
+                    ) ||
+                    error.message.includes(
+                        "NetworkError"
+                    )
+                )
+            ) {
+
+                errorText =
+                    "🌐 **Unable to connect to FitFusion AI.**\n\n" +
+                    "Please make sure the Django server is running " +
+                    "and try again.";
+
+            }
+
+
+            // -------------------------------------------------
+            // LOGIN ERROR
+            // -------------------------------------------------
+
+            else if (
+                error?.message &&
+                error.message.includes(
+                    "session has expired"
+                )
+            ) {
+
+                errorText =
+                    "🔐 **Your session has expired.**\n\n" +
+                    "Please log in again to use FitFusion AI.";
+
+            }
+
+
+            // -------------------------------------------------
+            // GENERAL ERROR
+            // -------------------------------------------------
+
+            else {
+
+                errorText =
+                    "⚠️ **FitFusion AI is temporarily unavailable.**\n\n" +
+                    "Please try again in a moment.";
+
+            }
+
+
             const errorMessage = {
 
-                id: Date.now() + 1,
+                id:
+                    Date.now() + 1,
 
-                sender: "ai",
+                sender:
+                    "ai",
 
                 text:
-                    "Sorry, I couldn't connect to " +
-                    "**FitFusion AI** right now.\n\n" +
-                    "Please try again in a moment."
+                    errorText
 
             };
 
 
-            setMessages((previous) => [
+            setMessages(
+                previous => [
+                    ...previous,
+                    errorMessage
+                ]
+            );
 
-                ...previous,
-
-                errorMessage
-
-            ]);
 
         } finally {
+
+            clearTimeout(
+                timeoutId
+            );
 
             setLoading(false);
 
@@ -394,13 +645,13 @@ function AICoach({ onUserLoaded }) {
     };
 
 
-    /*
-     * =========================================
-     * ENTER KEY
-     * =========================================
-     */
+    // =====================================================
+    // ENTER KEY
+    // =====================================================
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (
+        event
+    ) => {
 
         if (
             event.key === "Enter" &&
@@ -416,11 +667,9 @@ function AICoach({ onUserLoaded }) {
     };
 
 
-    /*
-     * =========================================
-     * QUICK QUESTIONS
-     * =========================================
-     */
+    // =====================================================
+    // QUICK QUESTIONS
+    // =====================================================
 
     const quickQuestions = [
 
@@ -435,11 +684,9 @@ function AICoach({ onUserLoaded }) {
     ];
 
 
-    /*
-     * =========================================
-     * MARKDOWN COMPONENTS
-     * =========================================
-     */
+    // =====================================================
+    // MARKDOWN COMPONENTS
+    // =====================================================
 
     const markdownComponents = {
 
@@ -528,13 +775,13 @@ function AICoach({ onUserLoaded }) {
     };
 
 
-    /*
-     * =========================================
-     * SCORE COLOR / CLASS
-     * =========================================
-     */
+    // =====================================================
+    // SCORE CLASS
+    // =====================================================
 
-    const getScoreClass = (score) => {
+    const getScoreClass = (
+        score
+    ) => {
 
         if (score >= 90) {
             return "score-excellent";
@@ -557,11 +804,9 @@ function AICoach({ onUserLoaded }) {
     };
 
 
-    /*
-     * =========================================
-     * FITNESS SCORE CARD
-     * =========================================
-     */
+    // =====================================================
+    // FITNESS SCORE
+    // =====================================================
 
     const renderFitnessScore = () => {
 
@@ -613,15 +858,20 @@ function AICoach({ onUserLoaded }) {
 
 
         const score =
-            Number(scoreData.score) || 0;
+            Number(
+                scoreData.score
+            ) || 0;
 
 
         const scoreClass =
-            getScoreClass(score);
+            getScoreClass(
+                score
+            );
 
 
         const breakdown =
-            scoreData.breakdown || {};
+            scoreData.breakdown ||
+            {};
 
 
         return (
@@ -631,8 +881,6 @@ function AICoach({ onUserLoaded }) {
                     `ai-score-card ${scoreClass}`
                 }
             >
-
-                {/* SCORE HEADER */}
 
                 <div className="ai-score-header">
 
@@ -655,8 +903,6 @@ function AICoach({ onUserLoaded }) {
 
                 </div>
 
-
-                {/* SCORE */}
 
                 <div className="ai-score-main">
 
@@ -695,8 +941,6 @@ function AICoach({ onUserLoaded }) {
                 </div>
 
 
-                {/* BREAKDOWN */}
-
                 <div className="ai-score-breakdown">
 
                     <div className="ai-score-item">
@@ -708,7 +952,11 @@ function AICoach({ onUserLoaded }) {
                             </span>
 
                             <strong>
-                                {breakdown.workout ?? 0}/30
+                                {
+                                    breakdown.workout ??
+                                    0
+                                }
+                                /30
                             </strong>
 
                         </div>
@@ -745,7 +993,11 @@ function AICoach({ onUserLoaded }) {
                             </span>
 
                             <strong>
-                                {breakdown.hydration ?? 0}/20
+                                {
+                                    breakdown.hydration ??
+                                    0
+                                }
+                                /20
                             </strong>
 
                         </div>
@@ -782,7 +1034,11 @@ function AICoach({ onUserLoaded }) {
                             </span>
 
                             <strong>
-                                {breakdown.nutrition ?? 0}/20
+                                {
+                                    breakdown.nutrition ??
+                                    0
+                                }
+                                /20
                             </strong>
 
                         </div>
@@ -819,7 +1075,11 @@ function AICoach({ onUserLoaded }) {
                             </span>
 
                             <strong>
-                                {breakdown.goal_progress ?? 0}/20
+                                {
+                                    breakdown.goal_progress ??
+                                    0
+                                }
+                                /20
                             </strong>
 
                         </div>
@@ -856,7 +1116,11 @@ function AICoach({ onUserLoaded }) {
                             </span>
 
                             <strong>
-                                {breakdown.activity ?? 0}/10
+                                {
+                                    breakdown.activity ??
+                                    0
+                                }
+                                /10
                             </strong>
 
                         </div>
@@ -892,11 +1156,9 @@ function AICoach({ onUserLoaded }) {
     };
 
 
-    /*
-     * =========================================
-     * AI DAILY PLAN CARD
-     * =========================================
-     */
+    // =====================================================
+    // DAILY PLAN
+    // =====================================================
 
     const renderDailyPlan = () => {
 
@@ -950,19 +1212,6 @@ function AICoach({ onUserLoaded }) {
 
 
                     {!dailyPlanLoading &&
-                        dailyPlanError && (
-
-                            <div className="ai-plan-error">
-
-                                {dailyPlanError}
-
-                            </div>
-
-                    )}
-
-
-                    {!dailyPlanLoading &&
-                        !dailyPlanError &&
                         dailyPlan && (
 
                             <div className="ai-plan-markdown">
@@ -980,7 +1229,51 @@ function AICoach({ onUserLoaded }) {
 
                             </div>
 
-                    )}
+                        )}
+
+
+                    {!dailyPlanLoading &&
+                        dailyPlanError &&
+                        !dailyPlan && (
+
+                            <div className="ai-plan-error">
+
+                                <div>
+                                    {dailyPlanError}
+                                </div>
+
+
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        window.location.reload();
+                                    }}
+                                    style={{
+                                        marginTop:
+                                            "12px",
+
+                                        padding:
+                                            "8px 16px",
+
+                                        border:
+                                            "none",
+
+                                        borderRadius:
+                                            "8px",
+
+                                        cursor:
+                                            "pointer",
+
+                                        fontWeight:
+                                            "600"
+                                    }}
+                                >
+                                    Try Again
+                                </button>
+
+                            </div>
+
+                        )}
 
 
                     {!dailyPlanLoading &&
@@ -994,7 +1287,7 @@ function AICoach({ onUserLoaded }) {
 
                             </div>
 
-                    )}
+                        )}
 
                 </div>
 
@@ -1005,20 +1298,16 @@ function AICoach({ onUserLoaded }) {
     };
 
 
-    /*
-     * =========================================
-     * PAGE
-     * =========================================
-     */
+    // =====================================================
+    // PAGE
+    // =====================================================
 
     return (
 
         <div className="ai-coach-page">
 
 
-            {/* =========================================
-                HEADER
-            ========================================= */}
+            {/* HEADER */}
 
             <div className="ai-coach-header">
 
@@ -1042,23 +1331,17 @@ function AICoach({ onUserLoaded }) {
             </div>
 
 
-            {/* =========================================
-                FITNESS SCORE
-            ========================================= */}
+            {/* FITNESS SCORE */}
 
             {renderFitnessScore()}
 
 
-            {/* =========================================
-                AI DAILY PLAN
-            ========================================= */}
+            {/* DAILY PLAN */}
 
             {renderDailyPlan()}
 
 
-            {/* =========================================
-                QUICK QUESTIONS
-            ========================================= */}
+            {/* QUICK QUESTIONS */}
 
             <div className="ai-quick-section">
 
@@ -1076,7 +1359,9 @@ function AICoach({ onUserLoaded }) {
                                 key={question}
                                 type="button"
                                 onClick={() =>
-                                    sendMessage(question)
+                                    sendMessage(
+                                        question
+                                    )
                                 }
                                 disabled={loading}
                                 className="ai-quick-button"
@@ -1092,12 +1377,9 @@ function AICoach({ onUserLoaded }) {
             </div>
 
 
-            {/* =========================================
-                CHAT CARD
-            ========================================= */}
+            {/* CHAT */}
 
             <div className="ai-chat-card">
-
 
                 <div className="ai-chat-messages">
 
@@ -1114,7 +1396,6 @@ function AICoach({ onUserLoaded }) {
                                     }`
                                 }
                             >
-
 
                                 {message.sender === "ai" && (
 
@@ -1145,7 +1426,9 @@ function AICoach({ onUserLoaded }) {
                                                 markdownComponents
                                             }
                                         >
-                                            {message.text}
+                                            {
+                                                message.text
+                                            }
                                         </ReactMarkdown>
 
                                     ) : (
@@ -1171,6 +1454,7 @@ function AICoach({ onUserLoaded }) {
                             <div className="ai-avatar">
                                 🤖
                             </div>
+
 
                             <div className="ai-message coach-message ai-loading">
 
@@ -1203,7 +1487,9 @@ function AICoach({ onUserLoaded }) {
                                 event.target.value
                             )
                         }
-                        onKeyDown={handleKeyDown}
+                        onKeyDown={
+                            handleKeyDown
+                        }
                         placeholder="Ask your AI Coach..."
                         rows={1}
                         disabled={loading}
@@ -1227,6 +1513,8 @@ function AICoach({ onUserLoaded }) {
                 </div>
 
 
+                {/* DISCLAIMER */}
+
                 <p className="ai-disclaimer">
 
                     FitFusion AI provides general fitness
@@ -1236,7 +1524,6 @@ function AICoach({ onUserLoaded }) {
                 </p>
 
             </div>
-
 
         </div>
 

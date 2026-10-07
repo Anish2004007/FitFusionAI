@@ -11,9 +11,9 @@ const api = axios.create({
 });
 
 
-/* =========================================
-   PROGRESS API
-========================================= */
+// =========================================================
+// PROGRESS API
+// =========================================================
 
 export const getProgress = async () => {
 
@@ -26,9 +26,19 @@ export const getProgress = async () => {
 };
 
 
-/* =========================================
-   DASHBOARD API
-========================================= */
+export const clearProgress = async () => {
+
+    const response = await api.delete(
+        "/progress/api/clear/"
+    );
+
+    return response.data;
+
+};
+
+// =========================================================
+// DASHBOARD API
+// =========================================================
 
 export const getDashboard = async () => {
 
@@ -41,9 +51,9 @@ export const getDashboard = async () => {
 };
 
 
-/* =========================================
-   WORKOUT API
-========================================= */
+// =========================================================
+// WORKOUT API
+// =========================================================
 
 export const getWorkout = async () => {
 
@@ -132,9 +142,9 @@ export const getWorkoutCompleted = async (
 };
 
 
-/* =========================================
-   DIET API
-========================================= */
+// =========================================================
+// DIET API
+// =========================================================
 
 export const getDiet = async () => {
 
@@ -147,9 +157,9 @@ export const getDiet = async () => {
 };
 
 
-/* =========================================
-   COMPLETE / UNCOMPLETE MEAL
-========================================= */
+// =========================================================
+// COMPLETE / UNCOMPLETE MEAL
+// =========================================================
 
 export const completeMeal = async (
     mealId
@@ -163,25 +173,32 @@ export const completeMeal = async (
 
 };
 
-/* =========================================
-   PROFILE API
-========================================= */
+
+// =========================================================
+// PROFILE API
+// =========================================================
 
 export const getProfile = async () => {
+
     const response = await api.get(
         "/profile/api/"
     );
 
     return response.data;
+
 };
 
 
-export const updateProfile = async (profileData) => {
+export const updateProfile = async (
+    profileData
+) => {
+
     const response = await api.put(
         "/profile/api/update/",
         profileData,
         {
             withCredentials: true,
+
             headers: {
                 "Content-Type": "application/json",
             },
@@ -189,9 +206,12 @@ export const updateProfile = async (profileData) => {
     );
 
     return response.data;
+
 };
 
+
 export const removeProfilePicture = async () => {
+
     const response = await api.delete(
         "/profile/api/remove-picture/",
         {
@@ -200,12 +220,17 @@ export const removeProfilePicture = async () => {
     );
 
     return response.data;
+
 };
+
+
 // =========================================================
 // PROFILE PICTURE API
 // =========================================================
 
-export const uploadProfilePicture = async (file) => {
+export const uploadProfilePicture = async (
+    file
+) => {
 
     const formData = new FormData();
 
@@ -223,22 +248,29 @@ export const uploadProfilePicture = async (file) => {
     );
 
     return response.data;
+
 };
+
 
 // =========================================================
 // WATER TRACKER API
 // =========================================================
 
 export const getWater = async () => {
+
     const response = await api.get(
         "/tracker/api/"
     );
 
     return response.data;
+
 };
 
 
-export const addWater = async (amount) => {
+export const addWater = async (
+    amount
+) => {
+
     const response = await api.post(
         "/tracker/api/add/",
         {
@@ -250,10 +282,14 @@ export const addWater = async (amount) => {
     );
 
     return response.data;
+
 };
 
 
-export const deleteWater = async (waterId) => {
+export const deleteWater = async (
+    waterId
+) => {
+
     const response = await api.delete(
         `/tracker/api/delete/${waterId}/`,
         {
@@ -262,6 +298,8 @@ export const deleteWater = async (waterId) => {
     );
 
     return response.data;
+
 };
+
 
 export default api;

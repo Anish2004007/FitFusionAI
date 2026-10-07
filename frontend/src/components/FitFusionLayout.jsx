@@ -127,6 +127,20 @@ function FitFusionLayout({
 
 
     // =====================================================
+    // PROFILE MENU STATE
+    // =====================================================
+
+    const [
+        showProfileMenu,
+        setShowProfileMenu,
+    ] = useState(false);
+
+
+    const profileMenuRef =
+        useRef(null);
+
+
+    // =====================================================
     // HEADER PROFILE PICTURE
     // =====================================================
 
@@ -709,6 +723,89 @@ function FitFusionLayout({
             document.removeEventListener(
                 "keydown",
                 handleSearchKeyDown
+            );
+
+        };
+
+    }, []);
+
+
+    // =====================================================
+    // PROFILE MENU - CLOSE WHEN CLICKING OUTSIDE
+    // =====================================================
+
+    useEffect(() => {
+
+        const handleProfileOutside =
+            (event) => {
+
+                if (
+                    profileMenuRef.current &&
+                    !profileMenuRef.current.contains(
+                        event.target
+                    )
+                ) {
+
+                    setShowProfileMenu(
+                        false
+                    );
+
+                }
+
+            };
+
+
+        document.addEventListener(
+            "mousedown",
+            handleProfileOutside
+        );
+
+
+        return () => {
+
+            document.removeEventListener(
+                "mousedown",
+                handleProfileOutside
+            );
+
+        };
+
+    }, []);
+
+
+    // =====================================================
+    // PROFILE MENU - ESCAPE KEY
+    // =====================================================
+
+    useEffect(() => {
+
+        const handleProfileKeyDown =
+            (event) => {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    setShowProfileMenu(
+                        false
+                    );
+
+                }
+
+            };
+
+
+        document.addEventListener(
+            "keydown",
+            handleProfileKeyDown
+        );
+
+
+        return () => {
+
+            document.removeEventListener(
+                "keydown",
+                handleProfileKeyDown
             );
 
         };
@@ -1617,6 +1714,83 @@ function FitFusionLayout({
                 );
 
             }
+
+
+            /*
+             * Close profile menu
+             * when search opens.
+             */
+
+            if (
+                nextState &&
+                showProfileMenu
+            ) {
+
+                setShowProfileMenu(
+                    false
+                );
+
+            }
+
+        };
+
+
+    // =====================================================
+    // PROFILE MENU TOGGLE
+    // =====================================================
+
+    const toggleProfileMenu =
+        () => {
+
+            const nextState =
+                !showProfileMenu;
+
+
+            setShowProfileMenu(
+                nextState
+            );
+
+
+            /*
+             * Close search and notifications
+             * when the profile menu opens.
+             */
+
+            if (
+                nextState
+            ) {
+
+                setShowSearch(
+                    false
+                );
+
+                setSearchQuery(
+                    ""
+                );
+
+                setShowNotifications(
+                    false
+                );
+
+            }
+
+        };
+
+
+    // =====================================================
+    // PROFILE MENU NAVIGATION
+    // =====================================================
+
+    const handleProfileNavigate =
+        (url) => {
+
+            setShowProfileMenu(
+                false
+            );
+
+            navigate(
+                url
+            );
 
         };
 
@@ -2759,64 +2933,261 @@ function FitFusionLayout({
 
                         <div
                             className="profile-mini"
+                            ref={profileMenuRef}
+                            style={{
+                                position: "relative",
+                            }}
                         >
 
-                            <div
-                                className="mini-avatar"
+                            {/* =================================================
+                                PROFILE BUTTON
+                            ================================================= */}
+
+                            <button
+                                type="button"
+                                className="profile-avatar-button"
+                                onClick={
+                                    toggleProfileMenu
+                                }
+                                aria-label="Open profile menu"
+                                aria-expanded={
+                                    showProfileMenu
+                                }
+                                title="Profile menu"
                                 style={{
-                                    width: "72px",
-                                    height: "72px",
-                                    minWidth: "72px",
-                                    minHeight: "72px",
-                                    maxWidth: "72px",
-                                    maxHeight: "72px",
-                                    overflow: "hidden",
+                                    padding: 0,
+                                    margin: 0,
+                                    border: "none",
+                                    background: "transparent",
                                     borderRadius: "50%",
+                                    cursor: "pointer",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    flex: "0 0 72px",
                                 }}
                             >
 
-                                {layoutProfilePicture ? (
+                                <div
+                                    className="mini-avatar"
+                                    style={{
+                                        width: "56px",
+                                        height: "56px",
+                                        minWidth: "56px",
+                                        minHeight: "56px",
+                                        maxWidth: "56px",
+                                        maxHeight: "56px",
+                                        overflow: "hidden",
+                                        borderRadius: "50%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        flex: "0 0 56px",
+                                    }}
+                                >
 
-                                    <img
-                                        src={
-                                            layoutProfilePicture
+                                    {layoutProfilePicture ? (
+
+                                        <img
+                                            src={
+                                                layoutProfilePicture
+                                            }
+                                            alt="Profile"
+                                            className="mini-avatar-image"
+                                            style={{
+                                                width: "56px",
+                                                height: "56px",
+                                                minWidth: "56px",
+                                                minHeight: "56px",
+                                                maxWidth: "56px",
+                                                maxHeight: "56px",
+                                                objectFit: "cover",
+                                                display: "block",
+                                                flex: "0 0 56px",
+                                            }}
+                                            onError={(event) => {
+
+                                                event.currentTarget.style.display =
+                                                    "none";
+
+                                            }}
+                                        />
+
+                                    ) : (
+
+                                        user?.full_name
+                                            ? user.full_name
+                                                .slice(0, 1)
+                                                .toUpperCase()
+                                            : "U"
+
+                                    )}
+
+                                </div>
+
+                            </button>
+
+
+                            {/* =================================================
+                                PROFILE DROPDOWN
+                            ================================================= */}
+
+                            {showProfileMenu && (
+
+                                <div
+                                    className="profile-menu"
+                                    role="menu"
+                                >
+
+                                    {/* USER INFO */}
+
+                                    <div
+                                        className="profile-menu-user"
+                                    >
+
+                                        <div
+                                            className="profile-menu-avatar"
+                                        >
+
+                                            {layoutProfilePicture ? (
+
+                                                <img
+                                                    src={
+                                                        layoutProfilePicture
+                                                    }
+                                                    alt="Profile"
+                                                />
+
+                                            ) : (
+
+                                                user?.full_name
+                                                    ? user.full_name
+                                                        .slice(0, 1)
+                                                        .toUpperCase()
+                                                    : "U"
+
+                                            )}
+
+                                        </div>
+
+
+                                        <div
+                                            className="profile-menu-user-info"
+                                        >
+
+                                            <strong>
+                                                {
+                                                    user?.full_name ||
+                                                    "User"
+                                                }
+                                            </strong>
+
+                                            <span>
+                                                {
+                                                    user?.email ||
+                                                    "FitFusion User"
+                                                }
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div
+                                        className="profile-menu-divider"
+                                    ></div>
+
+
+                                    {/* VIEW PROFILE */}
+
+                                    <button
+                                        type="button"
+                                        className="profile-menu-item"
+                                        role="menuitem"
+                                        onClick={() =>
+                                            handleProfileNavigate(
+                                                "/profile/"
+                                            )
                                         }
-                                        alt="Profile"
-                                        className="mini-avatar-image"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            minWidth: 0,
-                                            minHeight: 0,
-                                            maxWidth: "100%",
-                                            maxHeight: "100%",
-                                            objectFit: "cover",
-                                            display: "block",
-                                            flex: "0 0 auto",
-                                        }}
-                                        onError={(event) => {
+                                    >
 
-                                            event.currentTarget.style.display =
-                                                "none";
+                                        <i className="bi bi-person-circle"></i>
 
-                                        }}
-                                    />
+                                        <span>
+                                            View Profile
+                                        </span>
 
-                                ) : (
+                                    </button>
 
-                                    user?.full_name
-                                        ? user.full_name
-                                            .slice(0, 1)
-                                            .toUpperCase()
-                                        : "U"
 
-                                )}
+                                    {/* WORKOUT */}
 
-                            </div>
+                                    <button
+                                        type="button"
+                                        className="profile-menu-item"
+                                        role="menuitem"
+                                        onClick={() =>
+                                            handleProfileNavigate(
+                                                "/workout/"
+                                            )
+                                        }
+                                    >
+
+                                        <i className="bi bi-heart-pulse"></i>
+
+                                        <span>
+                                            My Workouts
+                                        </span>
+
+                                    </button>
+
+
+                                    {/* PROGRESS */}
+
+                                    <button
+                                        type="button"
+                                        className="profile-menu-item"
+                                        role="menuitem"
+                                        onClick={() =>
+                                            handleProfileNavigate(
+                                                "/"
+                                            )
+                                        }
+                                    >
+
+                                        <i className="bi bi-graph-up-arrow"></i>
+
+                                        <span>
+                                            My Progress
+                                        </span>
+
+                                    </button>
+
+
+                                    <div
+                                        className="profile-menu-divider"
+                                    ></div>
+
+
+                                    {/* LOGOUT */}
+
+                                    <a
+                                        href="http://localhost:8000/logout/"
+                                        className="profile-menu-item profile-menu-logout"
+                                        role="menuitem"
+                                    >
+
+                                        <i className="bi bi-box-arrow-left"></i>
+
+                                        <span>
+                                            Logout
+                                        </span>
+
+                                    </a>
+
+                                </div>
+
+                            )}
 
                         </div>
 

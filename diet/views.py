@@ -1,4 +1,5 @@
 from datetime import date
+import re
 
 from django.http import JsonResponse
 from django.utils import timezone
@@ -35,7 +36,6 @@ def get_logged_in_user(request):
     except User.DoesNotExist:
 
         request.session.flush()
-
         return None
 
 
@@ -83,7 +83,6 @@ def calculate_calorie_target(profile):
         profile.date_of_birth
     )
 
-
     # -----------------------------------------------------
     # BMR
     # -----------------------------------------------------
@@ -115,7 +114,6 @@ def calculate_calorie_target(profile):
             - 78
         )
 
-
     # -----------------------------------------------------
     # ACTIVITY
     # -----------------------------------------------------
@@ -134,14 +132,12 @@ def calculate_calorie_target(profile):
 
     }
 
-
     activity_multiplier = (
         activity_multipliers.get(
             profile.activity_level,
             1.2
         )
     )
-
 
     # -----------------------------------------------------
     # TDEE
@@ -151,13 +147,11 @@ def calculate_calorie_target(profile):
         bmr * activity_multiplier
     )
 
-
     # -----------------------------------------------------
     # GOAL ADJUSTMENT
     # -----------------------------------------------------
 
     adjustment = 0
-
 
     if profile.fitness_goal == "Lose Weight":
 
@@ -175,11 +169,9 @@ def calculate_calorie_target(profile):
 
         adjustment = 0
 
-
     calorie_target = (
         tdee + adjustment
     )
-
 
     # Prevent an extremely low target.
 
@@ -188,8 +180,529 @@ def calculate_calorie_target(profile):
         1200
     )
 
-
     return calorie_target
+
+
+# =========================================================
+# FOOD CLASSIFICATION
+# =========================================================
+#
+# Your Food model currently has broad categories such as
+# Protein/Dairy/Fruit/etc. It does not have a dietary type
+# field, so we identify restricted foods from their names.
+#
+# This keeps the existing database structure unchanged.
+# =========================================================
+
+MEAT_KEYWORDS = [
+
+    "chicken",
+    "mutton",
+    "lamb",
+    "goat",
+    "beef",
+    "pork",
+    "bacon",
+    "ham",
+    "sausage",
+    "salami",
+    "pepperoni",
+    "turkey",
+    "duck",
+]
+
+SEAFOOD_KEYWORDS = [
+
+    "fish",
+    "salmon",
+    "tuna",
+    "sardine",
+    "sardines",
+    "anchovy",
+    "anchovies",
+    "prawn",
+    "prawns",
+    "shrimp",
+    "crab",
+    "lobster",
+    "squid",
+    "octopus",
+    "mussel",
+    "mussels",
+    "clam",
+    "clams",
+    "seafood",
+]
+
+EGG_KEYWORDS = [
+
+    "egg",
+    "eggs",
+    "egg white",
+    "egg whites",
+    "egg yolk",
+    "egg yolks",
+    "omelette",
+    "omelet",
+    "scrambled egg",
+    "scrambled eggs",
+    "boiled egg",
+    "boiled eggs",
+    "fried egg",
+    "fried eggs",
+    "poached egg",
+    "poached eggs",
+]
+
+DAIRY_KEYWORDS = [
+
+    "milk",
+    "paneer",
+    "cheese",
+    "curd",
+    "yogurt",
+    "yoghurt",
+    "butter",
+    "ghee",
+    "cream",
+    "whey",
+    "casein",
+    "buttermilk",
+    "kefir",
+]
+
+
+def contains_food_keyword(
+    food_name,
+    keywords
+):
+
+    """
+    Check whether a food name contains one of the
+    restricted food keywords.
+
+    Word-boundary matching prevents false matches such
+    as 'eggplant' being treated as an egg.
+    """
+
+    name = (
+        str(food_name)
+        .strip()
+        .lower()
+    )
+
+    for keyword in keywords:
+
+        pattern = (
+            r"\b"
+            + re.escape(keyword.lower())
+            + r"\b"
+        )
+
+        if re.search(
+            pattern,
+            name
+        ):
+
+            return True
+
+    return False
+
+
+# =========================================================
+# CHECK FOOD AGAINST DIET PREFERENCE
+# =========================================================
+
+def is_food_allowed(
+    food,
+    diet_preference
+):
+
+    """
+    Returns True when the food is compatible with the
+    user's dietary preference.
+    """
+
+    food_name = food.name
+
+    has_meat = (
+        contains_food_keyword(
+            food_name,
+            MEAT_KEYWORDS
+        )
+    )
+
+    has_seafood = (
+        contains_food_keyword(
+            food_name,
+            SEAFOOD_KEYWORDS
+        )
+    )
+
+    has_egg = (
+        contains_food_keyword(
+            food_name,
+            EGG_KEYWORDS
+        )
+    )
+
+    has_dairy = (
+        contains_food_keyword(
+            food_name,
+            DAIRY_KEYWORDS
+        )
+    )
+
+    # -----------------------------------------------------
+    # NON-VEGETARIAN
+    # -----------------------------------------------------
+
+    if diet_preference == "Non-Vegetarian":
+
+        return True
+
+    # -----------------------------------------------------
+    # VEGETARIAN
+    # -----------------------------------------------------
+
+    if diet_preference == "Vegetarian":
+
+        if has_meat:
+            return False
+
+        if has_seafood:
+            return False
+
+        if has_egg:
+            return False
+
+        return True
+
+    # -----------------------------------------------------
+    # EGGETARIAN
+    # -----------------------------------------------------
+
+    if diet_preference == "Eggetarian":
+
+        if has_meat:
+            return False
+
+        if has_seafood:
+            return False
+
+        return True
+
+    # -----------------------------------------------------
+    # VEGAN
+    # -----------------------------------------------------
+
+    if diet_preference == "Vegan":
+
+        if has_meat:
+            return False
+
+        if has_seafood:
+            return False
+
+        if has_egg:
+            return False
+
+        if has_dairy:
+            return False
+
+        return True
+
+    # -----------------------------------------------------
+    # SAFE DEFAULT
+    # -----------------------------------------------------
+
+    # If an unexpected preference somehow exists,
+    # default to vegetarian rather than exposing
+    # potentially restricted foods.
+
+    if has_meat:
+        return False
+
+    if has_seafood:
+        return False
+
+    if has_egg:
+        return False
+
+    return True
+
+
+# =========================================================
+# GET COMPATIBLE FOODS FOR DIET PLAN
+# =========================================================
+
+def get_compatible_foods(
+    diet_plan,
+    diet_preference
+):
+
+    """
+    Returns only active foods compatible with the user's
+    dietary preference.
+    """
+
+    all_foods = (
+        diet_plan.foods
+        .filter(is_active=True)
+    )
+
+    compatible_foods = []
+
+    for food in all_foods:
+
+        if is_food_allowed(
+            food,
+            diet_preference
+        ):
+
+            compatible_foods.append(
+                food
+            )
+
+    return compatible_foods
+
+
+# =========================================================
+# CHECK WHETHER A DIET PLAN IS COMPATIBLE
+# =========================================================
+
+def is_diet_plan_compatible(
+    diet_plan,
+    diet_preference
+):
+
+    """
+    A DietPlan is considered compatible only when it has
+    at least one active food and ALL of its active foods
+    are compatible with the user's dietary preference.
+
+    This prevents a vegetarian user from receiving a meal
+    plan that contains even one restricted food.
+    """
+
+    compatible_foods = (
+        get_compatible_foods(
+            diet_plan,
+            diet_preference
+        )
+    )
+
+    all_active_foods = (
+        diet_plan.foods
+        .filter(is_active=True)
+    )
+
+    # No foods means this is not a usable meal plan.
+
+    if not all_active_foods.exists():
+
+        return False
+
+    # Every active food must be allowed.
+
+    return (
+        len(compatible_foods)
+        == all_active_foods.count()
+    )
+
+# =========================================================
+# CHECK DIET PLAN TEXT
+# =========================================================
+
+def is_diet_plan_text_compatible(
+    diet_plan,
+    diet_preference
+):
+
+    """
+    Prevents a diet plan with a misleading name or
+    description from being assigned to the user.
+
+    Example:
+        Vegetarian user should not receive a plan named
+        'Chicken Protein Bowl'.
+    """
+
+    text = (
+        f"{diet_plan.name} "
+        f"{diet_plan.description}"
+    ).lower()
+
+    restricted_for_vegetarian = [
+        "chicken",
+        "mutton",
+        "lamb",
+        "goat",
+        "beef",
+        "pork",
+        "bacon",
+        "ham",
+        "sausage",
+        "salami",
+        "pepperoni",
+        "turkey",
+        "duck",
+        "fish",
+        "salmon",
+        "tuna",
+        "sardine",
+        "anchovy",
+        "prawn",
+        "shrimp",
+        "crab",
+        "lobster",
+        "squid",
+        "octopus",
+        "seafood",
+        "egg",
+        "eggs",
+        "omelette",
+        "omelet",
+    ]
+
+    restricted_for_eggetarian = [
+        "chicken",
+        "mutton",
+        "lamb",
+        "goat",
+        "beef",
+        "pork",
+        "bacon",
+        "ham",
+        "sausage",
+        "salami",
+        "pepperoni",
+        "turkey",
+        "duck",
+        "fish",
+        "salmon",
+        "tuna",
+        "sardine",
+        "anchovy",
+        "prawn",
+        "shrimp",
+        "crab",
+        "lobster",
+        "squid",
+        "octopus",
+        "seafood",
+    ]
+
+    restricted_for_vegan = [
+        "chicken",
+        "mutton",
+        "lamb",
+        "goat",
+        "beef",
+        "pork",
+        "bacon",
+        "ham",
+        "sausage",
+        "salami",
+        "pepperoni",
+        "turkey",
+        "duck",
+        "fish",
+        "salmon",
+        "tuna",
+        "prawn",
+        "shrimp",
+        "crab",
+        "lobster",
+        "squid",
+        "octopus",
+        "seafood",
+        "egg",
+        "eggs",
+        "omelette",
+        "omelet",
+        "milk",
+        "paneer",
+        "cheese",
+        "curd",
+        "yogurt",
+        "yoghurt",
+        "butter",
+        "ghee",
+        "cream",
+        "whey",
+        "casein",
+    ]
+
+    if diet_preference == "Vegetarian":
+
+        return not any(
+            keyword in text
+            for keyword in restricted_for_vegetarian
+        )
+
+    if diet_preference == "Eggetarian":
+
+        return not any(
+            keyword in text
+            for keyword in restricted_for_eggetarian
+        )
+
+    if diet_preference == "Vegan":
+
+        return not any(
+            keyword in text
+            for keyword in restricted_for_vegan
+        )
+
+    # Non-Vegetarian has no restriction.
+
+    return True
+
+# =========================================================
+# FIND COMPATIBLE DIET PLAN
+# =========================================================
+
+def find_compatible_diet_plan(
+    profile,
+    meal_type
+):
+
+    diet_plans = (
+        DietPlan.objects
+        .filter(
+            goal=profile.fitness_goal,
+            meal_type=meal_type,
+            is_active=True
+        )
+        .prefetch_related("foods")
+    )
+
+    for diet_plan in diet_plans:
+
+        # ---------------------------------------------
+        # CHECK FOODS
+        # ---------------------------------------------
+
+        if not is_diet_plan_compatible(
+            diet_plan,
+            profile.diet_preference
+        ):
+            continue
+
+        # ---------------------------------------------
+        # CHECK NAME + DESCRIPTION
+        # ---------------------------------------------
+
+        if not is_diet_plan_text_compatible(
+            diet_plan,
+            profile.diet_preference
+        ):
+            continue
+
+        return diet_plan
+
+    return None
 
 
 # =========================================================
@@ -208,7 +721,6 @@ def get_or_create_today_diet(
             profile
         )
     )
-
 
     # -----------------------------------------------------
     # GET OR CREATE TODAY'S DIET DAY
@@ -229,7 +741,6 @@ def get_or_create_today_diet(
         )
     )
 
-
     # -----------------------------------------------------
     # UPDATE CALORIE TARGET
     # -----------------------------------------------------
@@ -246,15 +757,8 @@ def get_or_create_today_diet(
             ]
         )
 
-
     # -----------------------------------------------------
-    # ENSURE TODAY HAS ALL MEALS
-    #
-    # IMPORTANT:
-    # We do NOT only check "created".
-    #
-    # This fixes the situation where DietDay was
-    # created before DietPlan data was seeded.
+    # ENSURE TODAY'S MEALS MATCH DIET PREFERENCE
     # -----------------------------------------------------
 
     meal_types = [
@@ -269,9 +773,28 @@ def get_or_create_today_diet(
 
     ]
 
+    # -----------------------------------------------------
+    # REMOVE INCOMPATIBLE EXISTING MEALS
+    # -----------------------------------------------------
 
-    # Get meal types already assigned
-    # to today's diet.
+    existing_meals = list(
+        diet_day.meals
+        .select_related("diet_plan")
+        .all()
+    )
+
+    for diet_meal in existing_meals:
+
+        if not is_diet_plan_compatible(
+            diet_meal.diet_plan,
+            profile.diet_preference
+        ):
+
+            diet_meal.delete()
+
+    # -----------------------------------------------------
+    # GET REMAINING MEAL TYPES
+    # -----------------------------------------------------
 
     existing_meal_types = set(
 
@@ -282,8 +805,9 @@ def get_or_create_today_diet(
 
     )
 
-
-    # Create any missing meal types.
+    # -----------------------------------------------------
+    # CREATE MISSING COMPATIBLE MEALS
+    # -----------------------------------------------------
 
     for meal_type in meal_types:
 
@@ -291,21 +815,12 @@ def get_or_create_today_diet(
 
             continue
 
-
         diet_plan = (
-            DietPlan.objects
-            .filter(
-
-                goal=profile.fitness_goal,
-
-                meal_type=meal_type,
-
-                is_active=True
-
+            find_compatible_diet_plan(
+                profile,
+                meal_type
             )
-            .first()
         )
-
 
         if diet_plan:
 
@@ -316,7 +831,6 @@ def get_or_create_today_diet(
                 diet_plan=diet_plan
 
             )
-
 
     return diet_day
 
@@ -332,7 +846,6 @@ def diet_api(request):
         request
     )
 
-
     if not user:
 
         return JsonResponse(
@@ -345,7 +858,6 @@ def diet_api(request):
             status=401
 
         )
-
 
     # -----------------------------------------------------
     # GET PROFILE
@@ -370,7 +882,6 @@ def diet_api(request):
 
         )
 
-
     # -----------------------------------------------------
     # GET TODAY'S DIET
     # -----------------------------------------------------
@@ -382,14 +893,12 @@ def diet_api(request):
         )
     )
 
-
     meals = []
 
     total_calories = 0
     total_protein = 0
     total_carbohydrates = 0
     total_fats = 0
-
 
     # -----------------------------------------------------
     # GET MEALS
@@ -404,13 +913,22 @@ def diet_api(request):
         .all()
     )
 
-
     for diet_meal in diet_meals:
 
         diet_plan = (
             diet_meal.diet_plan
         )
 
+        # -------------------------------------------------
+        # GET ONLY COMPATIBLE FOODS
+        # -------------------------------------------------
+
+        compatible_foods = (
+            get_compatible_foods(
+                diet_plan,
+                profile.diet_preference
+            )
+        )
 
         foods = []
 
@@ -419,23 +937,22 @@ def diet_api(request):
         meal_carbohydrates = 0
         meal_fats = 0
 
-
         # -------------------------------------------------
-        # GET FOODS
+        # FOOD DATA
         # -------------------------------------------------
 
-        for food in (
-            diet_plan.foods
-            .filter(is_active=True)
-        ):
+        for food in compatible_foods:
 
             food_data = {
 
-                "id": food.id,
+                "id":
+                    food.id,
 
-                "name": food.name,
+                "name":
+                    food.name,
 
-                "category": food.category,
+                "category":
+                    food.category,
 
                 "serving_size":
                     food.serving_size,
@@ -457,11 +974,9 @@ def diet_api(request):
 
             }
 
-
             foods.append(
                 food_data
             )
-
 
             meal_calories += (
                 food.calories
@@ -478,7 +993,6 @@ def diet_api(request):
             meal_fats += (
                 food.fats
             )
-
 
         # -------------------------------------------------
         # ADD MEAL TOTALS
@@ -499,7 +1013,6 @@ def diet_api(request):
         total_fats += (
             meal_fats
         )
-
 
         # -------------------------------------------------
         # ADD MEAL RESPONSE
@@ -562,7 +1075,6 @@ def diet_api(request):
 
         })
 
-
     # -----------------------------------------------------
     # RESPONSE
     # -----------------------------------------------------
@@ -580,6 +1092,9 @@ def diet_api(request):
                 user.full_name,
 
         },
+
+        "diet_preference":
+            profile.diet_preference,
 
         "diet_day": {
 
@@ -643,7 +1158,6 @@ def complete_meal_api(
         request
     )
 
-
     if not user:
 
         return JsonResponse(
@@ -656,7 +1170,6 @@ def complete_meal_api(
             status=401
 
         )
-
 
     # -----------------------------------------------------
     # GET MEAL
@@ -691,7 +1204,6 @@ def complete_meal_api(
 
         )
 
-
     # -----------------------------------------------------
     # TOGGLE COMPLETION
     # -----------------------------------------------------
@@ -710,14 +1222,12 @@ def complete_meal_api(
             timezone.now()
         )
 
-
     diet_meal.save(
         update_fields=[
             "completed",
             "completed_at",
         ]
     )
-
 
     # -----------------------------------------------------
     # CHECK ALL MEALS
@@ -740,21 +1250,19 @@ def complete_meal_api(
         .count()
     )
 
-
     diet_day_completed = (
 
         total_meals > 0
 
         and
+
         completed_meals == total_meals
 
     )
 
-
     diet_day = (
         diet_meal.diet_day
     )
-
 
     diet_day.completed = (
         diet_day_completed
@@ -765,7 +1273,6 @@ def complete_meal_api(
             "completed"
         ]
     )
-
 
     # -----------------------------------------------------
     # RESPONSE
