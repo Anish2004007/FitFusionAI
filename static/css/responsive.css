@@ -1,0 +1,217 @@
+/* =========================================================
+   RESPONSIVE DESIGN
+   ========================================================= */
+
+
+/* =========================================================
+   LARGE TABLETS / SMALL LAPTOPS
+   ========================================================= */
+
+@media (max-width: 1199px) {
+
+    .section-title {
+        font-size: 42px;
+    }
+
+    .section-subtitle {
+        font-size: 17px;
+    }
+
+    .feature-card {
+        padding: 35px 25px;
+    }
+
+}
+
+
+/* =========================================================
+   TABLETS
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    /* Sections */
+
+    section {
+        padding: 75px 0;
+    }
+
+    .features-section {
+        padding: 80px 0;
+    }
+
+
+    /* Section Titles */
+
+    .section-title {
+        font-size: 38px;
+    }
+
+    .section-subtitle {
+        font-size: 16px;
+        padding: 0 15px;
+    }
+
+
+    /* Feature Cards */
+
+    .feature-card {
+        padding: 35px 25px;
+    }
+
+    .feature-card i {
+        font-size: 48px;
+    }
+
+
+    /* About */
+
+    #about {
+        padding: 85px 0;
+    }
+
+    #about .feature-card {
+        text-align: center;
+    }
+
+
+    /* Contact */
+
+    #contact {
+        padding: 85px 0;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    /* General */
+
+    section {
+        padding: 65px 0;
+    }
+
+    .features-section {
+        padding: 70px 0;
+    }
+
+
+    /* Section Header */
+
+    .section-tag {
+        font-size: 12px;
+        letter-spacing: 1.5px;
+    }
+
+    .section-title {
+        font-size: 32px;
+        line-height: 1.25;
+    }
+
+    .section-subtitle {
+        font-size: 15px;
+        line-height: 1.6;
+        margin-top: 15px;
+    }
+
+
+    /* Feature Cards */
+
+    .feature-card {
+        padding: 30px 22px;
+        border-radius: 16px;
+    }
+
+    .feature-card i {
+        font-size: 45px;
+        margin-bottom: 20px;
+    }
+
+    .feature-card h4 {
+        font-size: 19px;
+        margin-bottom: 14px;
+    }
+
+    .feature-card p {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+
+    /* About */
+
+    #about {
+        padding: 70px 0;
+    }
+
+    #about .feature-card {
+        text-align: center;
+    }
+
+    #about .row .row .feature-card {
+        padding: 25px 20px;
+    }
+
+    #about .row .row .feature-card i {
+        font-size: 38px;
+    }
+
+
+    /* Contact */
+
+    #contact {
+        padding: 70px 0;
+    }
+
+    #contact .feature-card {
+        padding: 30px 22px;
+    }
+
+    #contact .feature-card i {
+        font-size: 42px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE DEVICES
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .section-title {
+        font-size: 28px;
+    }
+
+    .section-subtitle {
+        font-size: 14px;
+    }
+
+    .feature-card {
+        padding: 28px 18px;
+    }
+
+    .feature-card i {
+        font-size: 42px;
+    }
+
+    .feature-card h4 {
+        font-size: 18px;
+    }
+
+    .feature-card p {
+        font-size: 13px;
+    }
+
+    #contact .btn-success {
+        width: 100%;
+        max-width: 180px;
+    }
+
+}

@@ -1,64 +1,85 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+/* =========================================================
+   GLOBAL STYLES
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-html{
-    scroll-behavior:smooth;
+
+html {
+    scroll-behavior: smooth;
     scroll-padding-top: 100px;
 }
 
-body{
 
-    font-family:'Poppins',sans-serif;
-
-    background:#08111F;
-
-    color:#F8FAFC;
-
-    overflow-x:hidden;
-
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #08111F;
+    color: #F8FAFC;
+    overflow-x: hidden;
 }
 
-:root{
 
-    --primary:#22C55E;
+/* =========================================================
+   ROOT VARIABLES
+   ========================================================= */
 
-    --dark:#08111F;
-
-    --card:#162032;
-
-    --text:#F8FAFC;
-
-    --secondary:#94A3B8;
-
+:root {
+    --primary: #22C55E;
+    --dark: #08111F;
+    --card: #162032;
+    --text: #F8FAFC;
+    --secondary: #94A3B8;
 }
 
-section{
 
-    padding:90px 0;
+/* =========================================================
+   GLOBAL SECTION
+   ========================================================= */
 
+section {
+    padding: 90px 0;
 }
 
-.features-section{
-    padding:140px 0 100px;
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+a {
+    text-decoration: none;
 }
 
-.about-section{
-    padding:140px 0 100px;
-}   
 
-.stats-section{
-    padding:140px 0 100px;
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.btn {
+    transition: all 0.3s ease;
 }
 
-.footer-section{
-    padding:140px 0 100px;
+
+/* =========================================================
+   SMOOTH ANCHOR OFFSET
+   ========================================================= */
+
+#home,
+#features,
+#about,
+#contact {
+    scroll-margin-top: 100px;
 }
 
-a{
 
-    text-decoration:none;
+/* =========================================================
+   SELECTION
+   ========================================================= */
 
+::selection {
+    background: #22C55E;
+    color: #08111F;
 }
