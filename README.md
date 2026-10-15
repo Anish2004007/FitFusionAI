@@ -1,196 +1,199 @@
-# FitFusion AI 🏋️‍♂️🤖
+# 🏋️ FitFusion AI
 
-FitFusion AI is an AI-powered fitness and wellness platform designed to provide users with personalized fitness guidance based on their individual health and lifestyle information.
+> A full-stack personalized fitness and wellness platform built with React, Django, MySQL, and Google Gemini AI.
 
-The project combines fitness tracking, nutrition planning, health insights, and AI-powered recommendations into a single platform.
+FitFusion AI is a web-based fitness management platform that helps users manage their **workouts, diet, hydration, fitness progress, profile information, and AI-powered fitness guidance** from one centralized application.
 
----
-
-## 🚀 Project Status
-
-**Current Stage:** Module 3 — Dashboard Development
-
-### Completed
-
-- User registration and login
-- Session-based authentication
-- Profile setup
-- Personal information management
-- Body measurements
-- Fitness goals
-- Activity level selection
-- Diet preferences
-- Medical conditions and allergies
-- Profile picture upload and preview
-- Responsive dark-themed UI
-- Dashboard layout
-- Dynamic time-based greeting
-- Health summary cards
-- BMI calculation
-- BMI category calculation
-- Daily water goal calculation
-- Fitness goal display
-- Current and target weight display
-- BMR calculation
-- TDEE calculation
-- Personalized calorie target calculation
-- Dashboard sidebar and navigation
-
-### In Progress / Upcoming
-
-- Dashboard progress visualization
-- Workout module
-- Diet and nutrition module
-- Water tracking module
-- Progress tracking
-- AI Coach
-- AI-powered personalized recommendations
-- Advanced health insights
+The project combines a **React + Vite frontend**, **Django backend**, **relational database**, and **Google Gemini AI** to provide a personalized fitness experience.
 
 ---
 
-## 🎯 Main Objectives
+## 📌 Table of Contents
 
-FitFusion AI aims to help users:
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Main Modules](#-main-modules)
+- [User Profile](#-user-profile)
+- [Dashboard](#-dashboard)
+- [Workout Management](#-workout-management)
+- [Diet Management](#-diet-management)
+- [Water Tracker](#-water-tracker)
+- [Progress Tracking](#-progress-tracking)
+- [AI Coach](#-ai-coach)
+- [AI Fitness Score](#-ai-fitness-score)
+- [AI Daily Plan](#-ai-daily-plan)
+- [AI Fitness Chatbot](#-ai-fitness-chatbot)
+- [Gemini Fallback System](#-gemini-fallback-system)
+- [Technology Stack](#-technology-stack)
+- [System Architecture](#-system-architecture)
+- [Project Structure](#-project-structure)
+- [Application Flow](#-application-flow)
+- [API Overview](#-api-overview)
+- [Database Design](#-database-design)
+- [AI Personalization](#-ai-personalization)
+- [Authentication](#-authentication)
+- [Error Handling](#-error-handling)
+- [Installation](#-installation)
+- [Environment Variables](#-environment-variables)
+- [Database Setup](#-database-setup)
+- [Running the Project](#-running-the-project)
+- [Security](#-security)
+- [Current Status](#-current-status)
+- [Future Improvements](#-future-improvements)
+- [Project Objectives](#-project-objectives)
+- [License](#-license)
 
-- Understand their current fitness status
-- Track important health metrics
-- Set personalized fitness goals
-- Monitor body measurements
-- Receive personalized workout recommendations
-- Receive nutrition and calorie guidance
+---
+
+# 🎯 Overview
+
+FitFusion AI is designed to provide a centralized platform for managing different aspects of a user's fitness journey.
+
+Instead of using separate applications for workouts, nutrition, hydration, and progress tracking, FitFusion combines these features into a single system.
+
+The platform allows users to:
+
+- Manage their personal fitness profile
+- Set fitness goals
+- Select dietary preferences
+- Follow workout plans
+- Track completed workouts
+- Follow personalized diet plans
+- Complete meals
 - Track daily water intake
 - Monitor fitness progress
-- Interact with an AI fitness coach
+- View workout history
+- Calculate an AI Fitness Score
+- Generate an AI Daily Plan
+- Chat with an AI fitness coach
 
 ---
 
-## 🧩 Core Modules
+# ✨ Key Features
 
-### 1. Authentication
-
-Handles:
-
-- User registration
-- User login
-- Session management
-- Logout
-- Authentication-based dashboard access
-
----
-
-### 2. Profile Setup
-
-Users can create and maintain their fitness profile.
-
-Collected information includes:
-
-- Full name
-- Email
-- Phone number
-- Date of birth
-- Gender
-- Height
-- Weight
-- Target weight
-- Fitness goal
-- Activity level
-- Diet preference
-- Medical conditions
-- Allergies
-- Profile picture
-
-The profile information forms the foundation for personalized fitness calculations and future AI recommendations.
+| Feature | Description |
+|---|---|
+| 👤 Profile Management | Manage fitness information, goals, diet preference and profile picture |
+| 🏠 Dashboard | Centralized overview of fitness activities |
+| 💪 Workout Management | Start, complete and track workouts |
+| 🍽️ Diet Management | Personalized meal plans based on goals and dietary preference |
+| 🥗 Diet Filtering | Vegetarian, Eggetarian, Non-Vegetarian and Vegan support |
+| 💧 Water Tracker | Record, view and delete daily water intake |
+| 📊 Progress Tracking | Workout statistics, charts and recent history |
+| 🧠 AI Fitness Score | Score fitness performance from 0–100 |
+| 📅 AI Daily Plan | Personalized daily fitness recommendations |
+| 💬 AI Chatbot | Interactive AI fitness assistant |
+| 🛡️ AI Fallback | Local fallback when Gemini is unavailable |
+| ⏱️ Timeout Handling | Prevents AI requests from loading indefinitely |
 
 ---
 
-### 3. Dashboard
+# 👤 User Profile
 
-The dashboard provides a personalized overview of the user's fitness information.
+The Profile module stores the user's personal fitness information.
 
-Current dashboard features include:
+Users can manage:
 
-- Personalized greeting
-- Fitness overview section
-- BMI
-- BMI category
-- Daily water goal
+- Personal information
 - Fitness goal
 - Current weight
 - Target weight
-- BMR
-- TDEE
-- Recommended daily calorie target
-
-The dashboard uses data stored in the user's profile rather than hardcoded values.
-
----
-
-### 4. Workout Module
-
-Planned features:
-
-- Personalized workout plans
-- Exercise recommendations
-- Workout tracking
-- Workout history
-- Goal-based exercise selection
-
----
-
-### 5. Diet & Nutrition Module
-
-Planned features:
-
-- Personalized calorie targets
-- Meal recommendations
-- Diet preference-based plans
-- Nutrition tracking
-- Daily nutrition insights
-
----
-
-### 6. Water Tracker
-
-Planned features:
-
+- Diet preference
 - Daily water goal
-- Water intake tracking
-- Progress visualization
-- Hydration reminders
+- Profile picture
+
+## Supported Diet Preferences
+
+FitFusion supports four dietary preferences:
+
+### 🥗 Vegetarian
+
+Excludes:
+
+- Meat
+- Seafood
+- Eggs
+
+### 🥚 Eggetarian
+
+Allows:
+
+- Vegetarian food
+- Eggs
+
+Excludes:
+
+- Meat
+- Seafood
+
+### 🍗 Non-Vegetarian
+
+Allows:
+
+- Vegetarian food
+- Eggs
+- Meat
+- Seafood
+
+### 🌱 Vegan
+
+Excludes:
+
+- Meat
+- Seafood
+- Eggs
+- Dairy
+
+The selected diet preference is used by the diet module when filtering available food options.
 
 ---
 
-### 7. Progress Tracking
+# 🏠 Dashboard
 
-Planned features:
+The Dashboard acts as the main entry point of the application.
 
-- Weight progress
-- Goal progress
-- Workout history
-- Fitness statistics
-- Progress charts
+It provides access to:
 
----
+- Workout
+- Diet
+- Water Tracker
+- Progress
+- Profile
+- AI Coach
 
-### 8. AI Coach
-
-Planned AI functionality includes:
-
-- Personalized fitness guidance
-- Workout recommendations
-- Nutrition suggestions
-- Fitness-related questions and answers
-- Progress-based recommendations
-- Personalized health insights
+The dashboard connects information from multiple modules and provides a centralized fitness experience.
 
 ---
 
-## 🧮 Current Health Calculations
+# 💪 Workout Management
 
-### BMI
+The Workout module allows users to follow and track workout sessions.
 
-BMI is calculated using:
+## Features
+
+- View available workouts
+- Start a workout session
+- View exercises
+- Complete individual exercises
+- Complete a complete workout
+- Track completed workouts
+- Store workout completion information
+- Use workout activity in progress calculations
+- Use workout activity in AI Fitness Score calculations
+
+## Workout Flow
 
 ```text
-BMI = Weight (kg) / Height² (m)
+User selects workout
+        ↓
+Start workout session
+        ↓
+Perform exercises
+        ↓
+Complete individual exercises
+        ↓
+Complete workout
+        ↓
+Workout stored as completed
+        ↓
+Progress and AI Score updated
